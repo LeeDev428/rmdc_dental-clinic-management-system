@@ -1,4 +1,4 @@
-    <?php
+<?php
 
     use App\Http\Controllers\ProfileController;
     use App\Http\Controllers\AdminController;
@@ -13,6 +13,12 @@
     use App\Http\Controllers\Auth\GoogleController;
     use App\Http\Controllers\ChartController;
     use App\Http\Controllers\ProcedurePriceController;
+    use App\Http\Controllers\RatingController;
+    use App\Http\Controllers\Admin\ReviewController;
+    use App\Http\Controllers\DashboardController;
+    use App\Http\Controllers\WelcomeController;
+    use App\Http\Controllers\Admin\TeethLayoutController;
+    use App\Http\Controllers\Auth\CaptchaController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -28,29 +34,27 @@
 
 
     //default 8080
-    Route::get('/', function () {
-        return view('welcome');
-    });
+    Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
         Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
         Route::put('/appointments/{id}', [AppointmentController::class, 'update'])->name('appointments.update');
-        Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy'); // Updated for consistency 
+        Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy'); // Updated for consistency
         Route::post('/calculate-price', [AppointmentController::class, 'calculatePrice']);
         Route::get('appointments/check', [AppointmentController::class, 'check'])->name('appointments.check');
     });
 
     // Route for the user dashboard with UserMiddleware
     Route::middleware(UserMiddleware::class)->group(function () {
-        Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard'); // Use UserController instead of ProfileController
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/get-procedure-details', [UserController::class, 'getProcedureDetails']);
         Route::get('/admin/details', [UserController::class, 'getAdminDetails']);
         Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
-        Route::post('/messages', [MessageController::class, 'store'])->name('messages.store'); 
+        Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
           // In your routes/web.php
     Route::get('/admin/upcoming_appointments', [AdminController::class, 'showUpcomingAppointments']);
-    Route::post('/appointments/{id}/action/{action}', [AppointmentController::class, 'handleAction'])->name('appointment.handleAction');   
+    Route::post('/appointments/{id}/action/{action}', [AppointmentController::class, 'handleAction'])->name('appointment.handleAction');
     });
 
 
@@ -63,7 +67,7 @@
     // Routes for admin with AdminMiddleware
     Route::middleware(AdminMiddleware::class)->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
-        Route::get('/admin/patient-management', [AdminController::class, 'patientmanagement'])->name('admin.patient-management'); 
+        Route::get('/admin/patient-management', [AdminController::class, 'patientmanagement'])->name('admin.patient-management');
     });
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
@@ -72,13 +76,13 @@
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/fetch', [AdminAppointment::class, 'fetchNotifications'])->name('notifications.fetch');
 
-  
-    
+
+
     // Routes for admin with AdminMiddleware
     Route::middleware(['auth', AdminMiddleware::class])->group(function () {
         Route::get('/admin/pending-appointments', [AdminController::class, 'upcomingAppointments'])->name('admin.upcoming_appointments');
         Route::get('/admin/upcoming-appointments', [AdminController::class, 'acceptedAppointments'])->name('admin.appointments');
-        
+
     //decline and accept in appoitnments
         Route::post('/appointments/{id}/accept', [AppointmentController::class, 'accept'])->name('appointments.accept');
         Route::post('/appointments/{id}/decline', [AppointmentController::class, 'decline'])->name('appointments.decline');
@@ -88,7 +92,7 @@
         Route::put('/admin/inventory-admin/update/{id}', [InventoryController::class, 'update'])->name('admin.inventory_admin.update');
         Route::put('/admin/inventory/{id}', [InventoryController::class, 'update'])->name('admin.inventory.update');
         Route::delete('/admin/inventory-admin/{id}', [InventoryController::class, 'destroy'])->name('admin.inventory_admin.destroy');
-        
+
         Route::get('/notification/{id}', [NotificationController::class, 'show'])->name('notification.show');
         Route::post('/appointment/{id}/{action}', [AdminAppointment::class, 'handleAction'])->name('appointment.handleAction');
                 // This will ensure that the notification logic points to AdminAppointment controller
@@ -105,7 +109,7 @@
         Route::post('/mark-notifications-as-read', [NotificationController::class, 'markAsRead']);
         Route::get('/get-unread-count', [NotificationController::class, 'getUnreadCount']);
         Route::post('/mark-notifications-as-read', [NotificationController::class, 'markAsRead']);
-      
+
 
         //chat
         Route::get('/admin/messages', [AdminMessageController::class, 'index'])->name('admin.patient_messages');
@@ -130,17 +134,17 @@
     Route::post('/admin/inventory', [InventoryController::class, 'store'])->name('admin.inventory_admin.store');
     Route::get('/admin/inventory-admin', [InventoryController::class, 'index'])->name('admin.inventory_admin');
     Route::get('/appointments-chart', [ChartController::class, 'index']);
-    
+
     });
-    
+
     Route::middleware(['auth', AdminMiddleware::class])->group(function () {
         // Existing routes for inventory and procedure prices
         Route::get('/admin/procedure-prices', [ProcedurePriceController::class, 'index'])->name('admin.procedure_prices');
         Route::put('/admin/procedure-prices/{id}', [ProcedurePriceController::class, 'update'])->name('admin.procedure_prices.update');
-        
+
         // Add the store route for adding new procedure prices
         Route::post('/admin/procedure-prices', [ProcedurePriceController::class, 'store'])->name('admin.procedure_prices.store');
-      
+
         Route::delete('/admin/procedure_prices/{id}', [ProcedurePriceController::class, 'destroy'])->name('admin.procedure_prices.destroy');
 
         Route::get('admin/declined-appointments', [AdminAppointment::class, 'declinedAppointments'])->name('admin.declined_appointments');
@@ -152,13 +156,17 @@ Route::delete('admin/appointments/delete-all-declined', [AdminAppointment::class
     Route::post('admin/appointment/{id}/{action}', [AdminAppointment::class, 'messageFromAdmin'])->name('appointment.messageFromAdmin');
 
     });
-    
+
+    Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews');
+    });
+
     Route::get('/get-procedure-details', [ProcedurePriceController::class, 'getProcedureDetails'])->name('getProcedureDetails');
     // Define a new route to fetch the procedure price based on the procedure name
 Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedurePrice'])->name('getProcedurePrice');
 
 
-    
+
     // Grouping routes that require authentication
     // routes/web.php
     Route::middleware('auth')->group(function () {
@@ -175,10 +183,10 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::post('/appointment/{id}/{action}', [AdminAppointment::class, 'messageFromAdmin'])
     ->name('appointment.messageFromAdmin');
 
- 
 
 
-    
+
+
 
     Route::get('/search', function () {
         $query = request('query');
@@ -219,5 +227,23 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.google');
     Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
 
-    // Include auth routes
+    Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
+
+
+
+ Route::prefix('admin')->group(function () {
+    Route::get('/teeth-layout', [TeethLayoutController::class, 'index'])->name('admin.teeth_layout');
+    Route::get('/teeth-layout/{userId}', [TeethLayoutController::class, 'getTeethLayout']);
+    Route::post('/teeth-layout/add', [TeethLayoutController::class, 'addTooth']);
+    Route::delete('/teeth-layout/remove/{toothId}', [TeethLayoutController::class, 'removeTooth']);
+    Route::post('/teeth-layout/initialize/{userId}', [TeethLayoutController::class, 'initializeTeethLayout']);
+    Route::post('/teeth-layout/save/{userId}', [TeethLayoutController::class, 'saveTeethLayout']);
+});
+
+Route::get('/user/teeth-layout', [TeethLayoutController::class, 'getUserTeethLayout']);
+
+
+    Route::get('/captcha/image', [CaptchaController::class, 'generate'])->name('captcha.image');
+
+     // Include auth routes
     require __DIR__.'/auth.php';

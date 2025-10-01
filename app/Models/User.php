@@ -7,8 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Message;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -45,7 +46,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'is_email_verified' => 'integer', // Cast as integer
             'password' => 'hashed',
         ];
     }
@@ -65,13 +66,13 @@ class User extends Authenticatable
         {
             return $this->hasMany(Notification::class);
         }
-    
+
         // Get only unread notifications
         public function unreadNotifications()
         {
             return $this->notifications()->where('status', 'unread');
         }
-    
+
         // Mark all notifications as read
         public function markAllNotificationsAsRead()
         {

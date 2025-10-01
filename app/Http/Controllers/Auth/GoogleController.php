@@ -9,7 +9,7 @@ class GoogleController extends Controller
 {
     public function redirectToGoogle(Request $request) {
         return Socialite::driver('google')->redirect();
-        
+
     }
 
     public function handleGoogleCallback(Request $request){

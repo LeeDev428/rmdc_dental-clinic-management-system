@@ -14,6 +14,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="dark:text-white">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                <!--
                     <x-nav-link :active="request()->routeIs('asklee')" class="dark:text-white">
                         {{ __('Ask Lee AI?') }}
                     </x-nav-link>
@@ -22,7 +23,7 @@
                     </x-nav-link>
                     <x-nav-link :href="route('appointments')" :active="request()->routeIs('appointments')" class="dark:text-white">
                         {{ __('Appointment') }}
-                    </x-nav-link>
+                    </x-nav-link> -->
                 </div>
             </div>
 
@@ -33,11 +34,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-600 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18a2 2 0 012 2v10a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2-2 0 012-2zM3 8l9 6 9-6" />
                     </svg>
-                
+
                     <!-- Notification Badge -->
                     <span id="message-count" class="absolute top-0 right-0 rounded-full bg-red-500 text-white text-xs font-semibold px-2 py-1 notification-count animate-pulse hidden">0</span>
                 </button>
-                
+
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script>
                     function fetchUnreadMessagesCount() {
@@ -48,7 +49,7 @@
                             success: function (response) {
                                 let count = response.count;
                                 let badge = $("#message-count");
-                
+
                                 if (count > 0) {
                                     badge.text(count).removeClass("hidden");
                                 } else {
@@ -60,7 +61,7 @@
                             }
                         });
                     }
-                
+
                     function markMessagesAsRead() {
                         $.ajax({
                             url: "/mark-messages-as-read",
@@ -68,18 +69,18 @@
                             data: { _token: "{{ csrf_token() }}" },
                             success: function () {
                                 $("#message-count").addClass("hidden");
-                                window.location.href = "{{ route('messages.index') }}"; 
+                                window.location.href = "{{ route('messages.index') }}";
                             },
                             error: function (xhr) {
                                 console.error("Error marking messages as read:", xhr);
                             }
                         });
                     }
-                
+
                     $(document).ready(fetchUnreadMessagesCount);
                     setInterval(fetchUnreadMessagesCount, 5000);
                 </script>
-                
+
 
 
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -109,7 +110,7 @@
                  0
              </span>
          @endif
-         
+
          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
          <script>
              function updateUnreadNotifications() {
@@ -119,7 +120,7 @@
                      success: function(response) {
                          let count = response.unreadCount;
                          let badge = $("#notification-badge");
-         
+
                          if (count > 0) {
                              badge.text(count > 10 ? "10+" : count).show(); // Apply "10+" logic
                          } else {
@@ -131,18 +132,18 @@
                      }
                  });
              }
-         
+
              // Update every 10 seconds
              setInterval(updateUnreadNotifications, 10000);
-         
+
              // Initial call when page loads
              $(document).ready(function() {
                  updateUnreadNotifications();
              });
          </script>
-         
+
                     <!-- Notification Dropdown -->
-                    <div 
+                    <div
                     x-show="notificationsOpen"
                     x-transition:enter="transition ease-out duration-200 transform"
                     x-transition:enter-start="opacity-0 translate-y-2"
@@ -188,21 +189,21 @@
                     <ul id="notification-list" class="font-poppins text-gray-700 dark:text-gray-300 text-sm p-3">
                         <p class="text-center italic text-gray-600">Loading Notifications...</p>
                     </ul>
-                    
+
                     <!-- Google Fonts -->
                     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
-                    
+
                     <!-- Tailwind CSS or Custom Styles -->
                     <style>
                         body {
                             font-family: 'Poppins', sans-serif;
                         }
                     </style>
-                                      
+
                 </div>
                 </div>
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                
+
 <script>
 $(document).ready(function () {
     function fetchNotifications() {
@@ -289,8 +290,8 @@ function formatDate(dateString) {
 });
 </script>
 
-                
-                
+
+
 <!-- Profile Dropdown -->
 <div x-data="{ open: false }" @click.away="open = false" class="relative">
     <!-- Profile Button -->
@@ -313,7 +314,7 @@ function formatDate(dateString) {
 
     <!-- Dropdown Menu -->
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
-        <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link>
+  <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Ask Lee AI?') }}</x-dropdown-link>

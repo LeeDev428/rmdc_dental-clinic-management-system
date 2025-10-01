@@ -224,40 +224,40 @@ nav ul li a:hover {
     background-color: #0056b3;
 }
 
-        
-    
+
+
         /* Sections */
         section {
             padding: 72px 18px;
             text-align: center;
         }
-    
+
         section h2 {
             font-size: 2.7rem;
             font-weight: 600;
             margin-bottom: 18px;
         }
-    
+
         section p {
             font-size: 1.125rem;
             margin-bottom: 18px;
         }
-    
-        
+
+
         /* Responsive Design */
         @media (max-width: 768px) {
             nav {
                 padding: 13.5px 18px;
             }
-    
+
             nav ul {
                 display: none;
             }
-    
+
             .hamburger {
                 display: flex;
             }
-    
+
             .menu {
                 display: none;
                 flex-direction: column;
@@ -270,50 +270,55 @@ nav ul li a:hover {
                 padding: 9px;
                 border-radius: 4.5px;
             }
-    
+
             .menu.active {
                 display: flex;
             }
-    
+
             .hero {
                 margin-top: 144px;
             }
-    
+
             .hero h1 {
                 font-size: 2.25rem;
             }
-    
+
             .hero p {
                 font-size: 1.08rem;
             }
-    
+
             .btn-hero {
                 padding: 10.8px 22.5px;
                 font-size: 14.4px;
             }
-    
+
             .contact-info {
                 font-size: 0.9rem;
             }
-    
+
             .btn-nav {
                 display: none;
             }
         }
-    
+
         /* For large screen */
         @media (min-width: 769px) {
             nav ul {
                 margin-left: auto;
                 gap: 36px;
             }
-    
+
             .btn-nav {
                 display: inline-block;
             }
         }
+        /* Hide scrollbar on WebKit browsers */
+        ::-webkit-scrollbar {
+        display: none;
+       }
+
     </style>
-    
+
 </head>
 <body>
     <header>
@@ -323,8 +328,8 @@ nav ul li a:hover {
             &nbsp;&nbsp;
             <div style="font-size: 2rem; font-weight: 700; margin-bottom: 0px;">RMDC</div>
             &nbsp;&nbsp;
-            
-            
+
+
             <!-- Hamburger Menu Icon -->
             <div class="hamburger" onclick="toggleMenu()">
                 <div></div>
@@ -356,7 +361,7 @@ nav ul li a:hover {
                 <span style="font-size: 15px; font-weight: 500;"> &nbsp; |  &nbsp; Email: </span>
                 <span style="font-size: 17px; font-weight: 600;">robles_moncayo@yahoo.com</span>
               </p>
-              
+
         </div>
     </header>
 
@@ -364,27 +369,61 @@ nav ul li a:hover {
     <section id="about">
         <h2>About Us</h2>
         <p>We are a trusted dental clinic providing high-quality care to our patients. Our team of professionals is committed to offering top-notch dental services to keep your smile bright and healthy.</p>
+
     </section>
 
     <!-- Services Section -->
     <section id="services">
         <h2>Our Services</h2>
-        <p>We offer a variety of dental services, including routine check-ups, teeth whitening, orthodontics, and more. Our goal is to help you maintain a healthy and beautiful smile.</p>
+<div style="position: relative; overflow-x: auto; white-space: nowrap; padding-bottom: 10px;">
+    @foreach($procedures as $procedure)
+        <div style="
+            display: inline-flex;
+            flex-direction: column;
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: space-between;
+            vertical-align: top;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 380px;
+            height: 410px;
+            margin-right: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: normal;
+            word-wrap: break-word;
+            text-align: left;
+        ">
+            @if($procedure->image_path)
+                <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="{{ $procedure->procedure_name }}"
+                    style="width: 100%; height: 180px; object-fit: cover; border-radius: 10px;">
+            @endif
+
+            <div>
+                <h3 style=" font-size: 1.1rem; font-weight: bold;  overflow: hidden; text-overflow: ellipsis;">
+                    {{ $procedure->procedure_name }}
+                </h3>
+                <p style="font-size: 14px; color: #333; line-height: 1.4; max-height: 100px; overflow: hidden; text-overflow: ellipsis;">
+                    {{ \Illuminate\Support\Str::limit($procedure->description, 160) }}
+                </p>
+                <p style="font-size: 14px; color: #555; margin-bottom: 8px;"><strong>Estimated Duration:</strong> {{ $procedure->duration }}</p>
+                <p style="margin: 8px 0 4px;font-size: 14px; color: #555;"><strong>Price:</strong> ₱{{ number_format($procedure->price, 2) }}</p>
+
+
+            </div>
+        </div>
+    @endforeach
+</div>
     </section>
-
-  
-
-   
-    
-       <!-- Scroll to Top Button -->
-       <button id="scrollToTopBtn" class="scroll-to-top" onclick="scrollToTop()">↑</button>
-
        <footer style="text-align: center; padding: 20px; background-color: #333; color: white; font-size: 15px; position: absolute; bottom: 100; width: 100%; height: 145px;">
         <p style="position: relative; top: 30px;">&copy; 2025 RMDC. All Rights Reserved.</p>
         <p><a href="#" style="color: #fff; text-decoration: none; position: relative; top: 30px;">Privacy Policy &nbsp;&nbsp;|&nbsp;&nbsp;</a>  <a href="#" style="color: #fff; text-decoration: none; position: relative; top: 30px;">Terms of Service</a></p>
-    </footer>
-    
-    
+       </footer>
+
+
     <script>
         // Toggle menu visibility on mobile
         function toggleMenu() {

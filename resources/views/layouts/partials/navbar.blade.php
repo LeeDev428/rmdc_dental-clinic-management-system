@@ -20,7 +20,7 @@
             color: white;
             font-size: 20px; /* Ensure it's visible */
             cursor: pointer;
-            top: 12px; 
+            top: 12px;
         }
         .notification-bell .badge {
             position: absolute;
@@ -52,14 +52,14 @@
         </form>
         <!-- Navbar-->
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <!-- Notification Bell -->
-            <li class="nav-item"> 
+            <!-- Notification Bell
+            <li class="nav-item">
                 <a class="nav-link notification-bell" href="{{ route('admin.upcoming_appointments') }}">
                     <i class="fas fa-bell"></i>
                     <span id="pending-count-badge" class="badge notification-count" style="display: none;">0</span>
                 </a>
-            </li>
-            
+            </li>-->
+
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
                 function updatePendingCount() {
@@ -80,18 +80,18 @@
                         }
                     });
                 }
-            
+
                 // ✅ Fetch count every 5 seconds
                 setInterval(updatePendingCount, 5000);
-            
+
                 // ✅ Fetch count when page loads
                 $(document).ready(function() {
                     updatePendingCount();
                 });
             </script>
-            
-                       
-            
+
+
+
             <!-- Profile Dropdown -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

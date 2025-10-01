@@ -4,8 +4,72 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e2afa568a21fd07d809152093387c85",
+    "content-hash": "beb4f41b6bd1de112e19bcf2c203e5e3",
     "packages": [
+        {
+            "name": "anhskohbo/no-captcha",
+            "version": "3.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/anhskohbo/no-captcha.git",
+                "reference": "87666572f0dbe1e3380a2e9ae7574bf3a2d0804e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/anhskohbo/no-captcha/zipball/87666572f0dbe1e3380a2e9ae7574bf3a2d0804e",
+                "reference": "87666572f0dbe1e3380a2e9ae7574bf3a2d0804e",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.2|^7.0",
+                "illuminate/support": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": ">=5.5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8|^9.5.10|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "NoCaptcha": "Anhskohbo\\NoCaptcha\\Facades\\NoCaptcha"
+                    },
+                    "providers": [
+                        "Anhskohbo\\NoCaptcha\\NoCaptchaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Anhskohbo\\NoCaptcha\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "anhskohbo",
+                    "email": "anhskohbo@gmail.com"
+                }
+            ],
+            "description": "No CAPTCHA reCAPTCHA For Laravel.",
+            "keywords": [
+                "captcha",
+                "laravel",
+                "laravel4",
+                "laravel5",
+                "laravel6",
+                "no-captcha",
+                "recaptcha"
+            ],
+            "support": {
+                "issues": "https://github.com/anhskohbo/no-captcha/issues",
+                "source": "https://github.com/anhskohbo/no-captcha/tree/3.7.0"
+            },
+            "time": "2025-02-25T18:53:34+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.12.1",
@@ -2179,6 +2243,79 @@
                 "source": "https://github.com/thephpleague/oauth1-client/tree/v1.11.0"
             },
             "time": "2024-12-10T19:59:05+00:00"
+        },
+        {
+            "name": "mews/captcha",
+            "version": "3.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mewebstudio/captcha.git",
+                "reference": "cead591ddc544b2b80a4136897893dd3bd70e7a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mewebstudio/captcha/zipball/cead591ddc544b2b80a4136897893dd3bd70e7a7",
+                "reference": "cead591ddc544b2b80a4136897893dd3bd70e7a7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "illuminate/config": "~5|^6|^7|^8|^9|^10|^11|^12",
+                "illuminate/filesystem": "~5|^6|^7|^8|^9|^10|^11|^12",
+                "illuminate/hashing": "~5|^6|^7|^8|^9|^10|^11|^12",
+                "illuminate/session": "~5|^6|^7|^8|^9|^10|^11|^12",
+                "illuminate/support": "~5|^6|^7|^8|^9|^10|^11|^12",
+                "intervention/image": "^3.7",
+                "php": "^7.2|^8.1|^8.2|^8.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^8.5|^9.5.10|^10.5|^11"
+            },
+            "type": "package",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Captcha": "Mews\\Captcha\\Facades\\Captcha"
+                    },
+                    "providers": [
+                        "Mews\\Captcha\\CaptchaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Mews\\Captcha\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Muharrem ERİN",
+                    "email": "me@mewebstudio.com",
+                    "homepage": "https://github.com/mewebstudio",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Laravel 5/6/7/8/9/10/11/12 Captcha Package",
+            "homepage": "https://github.com/mewebstudio/captcha",
+            "keywords": [
+                "captcha",
+                "laravel12 Captcha",
+                "laravel12 Security",
+                "laravel5 Security"
+            ],
+            "support": {
+                "issues": "https://github.com/mewebstudio/captcha/issues",
+                "source": "https://github.com/mewebstudio/captcha/tree/3.4.6"
+            },
+            "time": "2025-04-16T15:40:08+00:00"
         },
         {
             "name": "monolog/monolog",

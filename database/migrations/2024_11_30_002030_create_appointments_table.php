@@ -22,10 +22,12 @@ return new class extends Migration
             $table->dateTime('end');
             $table->string('status')->default('pending');
             $table->string('image_path')->nullable(); // Add image path column
+            $table->string('teeth_layout')->nullable();
+
             $table->timestamps();
         });
     }
-    
+
 
     /**
      * Reverse the migrations.

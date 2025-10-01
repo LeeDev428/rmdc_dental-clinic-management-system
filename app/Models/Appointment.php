@@ -9,23 +9,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
-    use HasFactory;
+    // use HasFactory;
 
-    protected $table = 'appointments'; // Use the actual table name
+    // protected $table = 'appointments'; // Use the actual table name
 
-    protected $fillable = [
-        'user_id',
-        'title',
-        'procedure',
-        'duration',
-        'time',
-        'start',
-        'end',
-        'status',
-        'image_path',
-    ];
+    // protected $fillable = [
+    //     'user_id',
+    //     'title',
+    //     'procedure',
+    //     'duration',
+    //     'time',
+    //     'start',
+    //     'end',
+    //     'status',
+    //     'image_path',
+    // ];
 
-
-
-    
+    protected $guarded = [];
 }

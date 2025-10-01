@@ -7,70 +7,52 @@
                 Dashboard
             </a>
 
-            <a class="nav-link" href="{{ url('admin/patient-management') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
-                RMDC Management
+            <div class="sb-sidenav-menu-heading">RMDC Management</div>
+            <a class="nav-link" href="{{ route('admin.patient_messages') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-comment"></i></div>
+                Patient Messages
+                <span id="sidebarUnreadMessagesBadge" class="badge bg-secondary ms-2">0</span>
             </a>
-            
+            <a class="nav-link" href="{{ route('admin.patient_information') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                User Information
+            </a>
+            <a class="nav-link" href="{{ route('admin.appointments') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-calendar"></i></div>
+                Upcoming Appointments
+            </a>
+            <a class="nav-link" href="{{ route('admin.upcoming_appointments') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-clock"></i></div>
+                Pending Appointments
+                <span id="sidebarPendingApptBadge" class="badge bg-secondary ms-2">0</span>
+            </a>
+            <a class="nav-link" href="#">
+                <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>
+                Edit Availability
+            </a>
+            <a class="nav-link" href="{{ route('admin.inventory_admin') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
+                Inventory
+            </a>
+            <a class="nav-link" href="{{ route('admin.procedure_prices') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
+                Dental Prices
+            </a>
+            <a class="nav-link" href="{{ route('admin.teeth_layout') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-teeth"></i></div>
+                Teeth Layout Management
+            </a>
+
             <div class="sb-sidenav-menu-heading">Interface</div>
-            <!-- Edit Profile Link Added Here -->
             <a class="nav-link" href="{{ url('/profile') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-user-edit"></i></div>
                 Edit Profile
             </a>
 
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts">
-                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                Layouts
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="collapseLayouts" data-bs-parent="#sidenavAccordion">
-                <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="layout-static.html">Static Navigation</a>
-                    <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a>
-                </nav>
-            </div>
-
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages">
-                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                Pages
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="collapsePages" data-bs-parent="#sidenavAccordion">
-                <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth">
-                        Authentication
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse" id="pagesCollapseAuth" data-bs-parent="#pagesCollapseAuth">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="login.html">Login</a>
-                            <a class="nav-link" href="register.html">Register</a>
-                            <a class="nav-link" href="password.html">Forgot Password</a>
-                        </nav>
-                    </div>
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError">
-                        Error
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse" id="pagesCollapseError" data-bs-parent="#pagesCollapseError">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="401.html">401 Page</a>
-                            <a class="nav-link" href="404.html">404 Page</a>
-                            <a class="nav-link" href="500.html">500 Page</a>
-                        </nav>
-                    </div>
-                </nav>
-            </div>
-
             <div class="sb-sidenav-menu-heading">Addons</div>
-            <a class="nav-link" href="charts.html">
-                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                Charts
-            </a>
-            <a class="nav-link" href="tables.html">
-                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                Tables
+            <a class="nav-link" href="{{ url('admin/reviews') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
+                Reviews
             </a>
         </div>
     </div>
@@ -80,3 +62,50 @@
         {{ __(auth()->user()->name) }}
     </div>
 </nav>
+
+<script>
+// Update unread messages badge in sidebar
+function updateSidebarUnreadMessagesCount() {
+    $.ajax({
+        url: "{{ url('/admin/unread-messages-count') }}",
+        method: "GET",
+        success: function(response) {
+            let badge = $("#sidebarUnreadMessagesBadge");
+            if (response.count > 0) {
+                badge.text(response.count).removeClass("bg-secondary").addClass("bg-danger");
+            } else {
+                badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
+            }
+        }
+    });
+}
+
+// Update pending appointments badge in sidebar
+function updateSidebarPendingCount() {
+    $.ajax({
+        url: "{{ route('notifications.pending-count') }}",
+        method: "GET",
+        success: function(response) {
+            let count = response.pendingCount;
+            let badge = $("#sidebarPendingApptBadge");
+            if (count > 0) {
+                badge.text(count).removeClass("bg-secondary").addClass("bg-danger");
+            } else {
+                badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
+            }
+        }
+    });
+}
+
+$(document).ready(function() {
+    // Initialize badges
+    updateSidebarUnreadMessagesCount();
+    updateSidebarPendingCount();
+
+    // Refresh counts every 30 seconds
+    setInterval(function() {
+        updateSidebarUnreadMessagesCount();
+        updateSidebarPendingCount();
+    }, 30000);
+});
+</script>

@@ -21,7 +21,7 @@
             <div class="ml-auto p-3 bg-blue-600 text-white rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Patient's Profile Image -->
-                    <img src="{{ $message->user->avatar ? Storage::url($message->user->avatar) : asset('img/defaultprofile.png') }}" 
+                    <img src="{{ $message->user->avatar ? Storage::url($message->user->avatar) : asset('img/defaultprofile.png') }}"
                          alt="Patient Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -35,9 +35,9 @@
             <div class="mr-auto p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Admin's Profile Image -->
-                    <img src="{{ $message->user->avatar && Storage::exists('avatars/' . $message->user->avatar) 
-                     ? Storage::url('avatars/' . $message->user->avatar) 
-                     : asset('img/defaultprofile.png') }}" 
+                    <img src="{{ $message->user->avatar && Storage::exists('avatars/' . $message->user->avatar)
+                     ? Storage::url('avatars/' . $message->user->avatar)
+                     : asset('img/defaultprofile.png') }}"
                          alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">

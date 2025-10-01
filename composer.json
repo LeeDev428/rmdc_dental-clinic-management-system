@@ -6,10 +6,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "anhskohbo/no-captcha": "^3.7",
         "intervention/image": "^3.9",
         "laravel/framework": "^11.9",
         "laravel/socialite": "^5.17",
         "laravel/tinker": "^2.9",
+        "mews/captcha": "^3.4",
         "pusher/pusher-php-server": "^7.2",
         "spatie/image-optimizer": "^1.8"
     },

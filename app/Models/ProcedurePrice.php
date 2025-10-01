@@ -11,5 +11,6 @@ class ProcedurePrice extends Model
 
     protected $table = 'procedure_prices';
 
-    protected $fillable = ['procedure_name', 'price', 'duration'];
+    protected $fillable = ['procedure_name', 'price', 'duration', 'image_path', 'description'];
 }
+ 

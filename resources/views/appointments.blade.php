@@ -85,7 +85,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
             padding: 7px;
             font-size: 12px;
             font-weight: 450;
-            background-color: rgb(25, 221, 221); 
+            background-color: rgb(25, 221, 221);
             border: none;
             color: rgb(37, 37, 37);
             border-radius: 5px;
@@ -93,7 +93,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
         }
 
         .apptbutton:hover {
-            background-color: rgb(15, 173, 173); 
+            background-color: rgb(15, 173, 173);
         }
 
         /* Modernized Modal */
@@ -124,7 +124,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
         .btn-close {
             font-size: 14px;
         }
-        
+
   /* Custom Modal Styles */
 .custom-modal {
     display: flex;
@@ -209,7 +209,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
 }
                 </style>
 
-                
+
 <!-- Need help? Button with icon -->
 <div class="flex items-center mt-4 cursor-pointer hover:text-gray-600" onclick="openHelpModal()">
     <!-- SVG for Question Mark inside a Circle -->
@@ -217,7 +217,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
         <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2" fill="none"></circle>
         <text x="12" y="16" font-size="14" text-anchor="middle" font-family="Arial" fill="black" font-weight="100">?</text>
     </svg>
-    
+
     <!-- "Need Help?" text with adjusted font size -->
     <span class="font-medium text-base text-black hover:text-gray-600">Need help</span>
 </div>
@@ -280,7 +280,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function(e
                         rowDiv.classList.add("time-row");
                         timesList.appendChild(rowDiv);
                     }
-                    
+
                     let timeItem = document.createElement("div");
                     timeItem.classList.add("time-slot");
                     timeItem.innerText = time;
@@ -292,7 +292,7 @@ document.getElementById("appointmentForm").addEventListener("submit", function(e
 
             // Show modal smoothly
             let modal = document.getElementById("availableTimesModal");
-            modal.style.display = "flex"; 
+            modal.style.display = "flex";
             setTimeout(() => { modal.classList.add("show"); }, 10);
         })
         .catch(error => console.error("Error fetching available times:", error));
@@ -315,7 +315,7 @@ window.onclick = function(event) {
 };
 
 </script>
-                
+
                     <!-- Modal for How to Book an Appointment -->
                     <div id="helpModal" class="hidden fixed z-10 inset-0 overflow-y-auto bg-black bg-opacity-50">
                         <div class="flex items-center justify-center min-h-screen">
@@ -324,7 +324,7 @@ window.onclick = function(event) {
                                 <button onclick="closeHelpModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none">
                                     &times;
                                 </button>
-                
+
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white">• How to Book an Appointment</h3>
                                 <div class="mt-4 space-y-4 text-sm text-gray-700 dark:text-gray-300">
                                     <div>
@@ -356,7 +356,7 @@ window.onclick = function(event) {
                                             <li>Edit your booking by clicking on your event.</li>
                                             <li>You can unlimited edit/update your appointment. But once it was approved, you can't edit/update your appointment (Deleting the appointment will face some penalties).</li>
                                             <li>Cancel your appointment by clicking 'Delete Appointment' (only available for your own bookings).</li>
-                                           
+
                                         </ul>
                                     </div>
                                     <div>
@@ -367,7 +367,7 @@ window.onclick = function(event) {
                                         </ul>
                                     </div>
                                 </div>
-                
+
                                 <!-- OK button to close the modal -->
                                 <div class="mt-6 flex justify-end">
                                     <button onclick="closeHelpModal()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" style="font-size: 14px;">OK</button>
@@ -376,22 +376,22 @@ window.onclick = function(event) {
                         </div>
                     </div>
                 </div>
-                
+
                 <script>
                     // Function to open the modal
                     function openHelpModal() {
                         const modal = document.getElementById('helpModal');
                         modal.classList.remove('hidden');
                     }
-                
+
                     // Function to close the modal
                     function closeHelpModal() {
                         const modal = document.getElementById('helpModal');
                         modal.classList.add('hidden');
                     }
                 </script>
-                
-                
+
+
                 <br>
                 <div id="calendar" style="max-width: 900px; margin: auto;"></div>
 
@@ -404,13 +404,13 @@ window.onclick = function(event) {
                                 <input type="hidden" id="booking-id" name="id">
                                 <input type="hidden" id="booking-start" name="start">
                                 <input type="hidden" id="booking-end" name="end">
-                                
+
                                 <!-- Event Title -->
                                 <div class="mb-4">
                                     <label for="booking-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
                                     <input type="text" id="booking-title" name="title" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 </div>
-                
+
 <!-- Procedure Dropdown -->
 <div class="mb-4">
     <label for="operation-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dental Procedure</label>
@@ -423,14 +423,14 @@ window.onclick = function(event) {
         @endforeach
     </select>
 </div>
-                                
-                              
-            
+
+
+
 <!-- Estimated Time Display -->
 <div class="mb-4">
     <label for="estimated-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Duration</label>
-    <input type="text" id="estimated-time" name="estimated-time" readonly 
-           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+    <input type="text" id="estimated-time" name="estimated-time" readonly
+           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
            placeholder="Select a procedure"
            value="{{ isset($procedurePrice) ? $procedurePrice->duration . ' minutes' : '' }}">
 </div>
@@ -438,8 +438,8 @@ window.onclick = function(event) {
 <!-- Procedure Price Display -->
 <div class="mb-4">
     <label for="procedure-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Procedure Price</label>
-    <input type="text" id="procedure-price" name="procedure-price" readonly 
-           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+    <input type="text" id="procedure-price" name="procedure-price" readonly
+           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
            placeholder="Price"
            value="{{ isset($procedurePrice) ? '₱' . number_format($procedurePrice->price, 2) : '' }}">
 </div>
@@ -460,7 +460,7 @@ window.onclick = function(event) {
                         if (response) {
                             // Update price field
                             $('#procedure-price').val(response.price ? '₱' + parseFloat(response.price).toFixed(2) : 'Price not available');
-                            
+
                             // Update estimated duration field
                             $('#estimated-time').val(response.duration ? response.duration + ' minutes' : 'Duration not available');
                         } else {
@@ -538,25 +538,25 @@ window.onclick = function(event) {
 
     </select>
 </div>
-                                
+
                                 <div class="mb-4">
                                     <label for="valid-id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Upload Valid ID</label>
                                     <input type="file" id="valid-id" name="image_path" accept="image/*" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="previewImage(event)" required>
-                                    
+
                                     <!-- Small Preview of Image -->
                                     <div id="image-preview-container" class="mt-2">
                                         <img id="image-preview" src="#" alt="Image Preview" style="display:none; width: 50px; height: auto; border: 1px solid #ccc; cursor: zoom-in;" onclick="zoomImage()">
                                     </div>
-                                    
+
                                     <small class="text-gray-500">Accepts image files (JPEG, PNG, JPG, SVG).</small>
                                 </div>
-                                
-                                
+
+
                                 <!-- Modal for Image Zoom -->
                                 <div id="image-zoom-modal" class="fixed inset-0 bg-gray-700 bg-opacity-50 flex justify-center items-center" style="display:none;">
                                     <img id="zoomed-image" src="#" alt="Zoomed Image" style="max-width: 90%; max-height: 90%; cursor: zoom-out;">
                                 </div>
-                                
+
                                 <script>
                                     function previewImage(event) {
                                         var file = event.target.files[0];
@@ -568,15 +568,15 @@ window.onclick = function(event) {
                                         };
                                         reader.readAsDataURL(file);
                                     }
-                                
+
                                     function zoomImage() {
                                         var modal = document.getElementById('image-zoom-modal');
                                         var zoomedImage = document.getElementById('zoomed-image');
                                         var previewImage = document.getElementById('image-preview');
-                                        
+
                                         zoomedImage.src = previewImage.src;
                                         modal.style.display = 'flex';
-                                
+
                                         modal.onclick = function() {
                                             modal.style.display = 'none';
                                         };
@@ -585,8 +585,8 @@ window.onclick = function(event) {
                                <!-- Terms and Agreement Section Below the Time Input -->
 <div class="mb-4">
     <label for="terms-checkbox" class="text-sm text-gray-600 dark:text-gray-300">
-       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  <span class="font-bold">🔺 Terms and Conditions 🔺</span> 
-    
+       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  <span class="font-bold">🔺 Terms and Conditions 🔺</span>
+
         <ul class="list-disc pl-5 text-gray-600 dark:text-gray-300">
             <li>Rescheduling and editing the appointment is not allowed once the appointment was created.</li>
             <li>If you delete your appointment, it will be counted as the first violation. You are allowed a maximum of 3 violations. On the 3rd violation, you will be restricted from the system.</li>
@@ -602,14 +602,14 @@ window.onclick = function(event) {
     </div>
 </div>
 
-                                
+
                                 <script>
                                     document.addEventListener('DOMContentLoaded', function () {
                                         const termsCheckbox = document.getElementById('terms-checkbox');
-                                
+
                                         // Retrieve the stored value from localStorage (if any)
                                         const termsAccepted = localStorage.getItem('termsAccepted');
-                                
+
                                         // If the value exists and is 'true', set the checkbox as checked
                                         if (termsAccepted === 'true') {
                                             termsCheckbox.checked = true;
@@ -617,31 +617,31 @@ window.onclick = function(event) {
                                             // If no saved state, leave it unchecked
                                             termsCheckbox.checked = false;
                                         }
-                                
+
                                         // When the checkbox state changes, update localStorage
                                         termsCheckbox.addEventListener('change', function () {
                                             localStorage.setItem('termsAccepted', termsCheckbox.checked);
                                         });
                                     });
                                 </script>
-                                    
-                
+
+
                                     <button type="submit" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                         Save Changes
                                     </button>
-                                
-                
+
+
                                 <button id="delete-appointment" type="button" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
                                     Delete Appointment
                                 </button>
                             </form>
-                
-                            
+
+
                             <button id="close-modal" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Close</button>
                         </div>
                     </div>
                 </div>
-                
+
 
                 <!-- Success or Failure Popup -->
                 <div id="popup-message" class="hidden fixed z-10 inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -650,21 +650,160 @@ window.onclick = function(event) {
                         <p id="popup-text" class="text-lg font-medium text-gray-900 dark:text-gray-300"></p>
                     </div>
                 </div>
+
+                <!-- Rating Modal -->
+                <div id="rating-modal" class="hidden fixed z-20 inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-5 w-96 shadow-lg relative">
+                        <!-- Close Button -->
+                        <button id="close-rating-modal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            &times;
+                        </button>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Rate Your Experience</h3>
+                        <div class="flex justify-center mb-4">
+                            <!-- Star Rating -->
+                            <div id="star-rating" class="flex space-x-2">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <svg data-value="{{ $i }}" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400 cursor-pointer hover:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                                    </svg>
+                                @endfor
+                            </div>
+                        </div>
+                        <textarea id="rating-message" class="w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" rows="3" placeholder="Leave a message (optional)"></textarea>
+                        <button id="submit-rating" class="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">Submit</button>
+                    </div>
+                </div>
+
+                <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ratingModal = document.getElementById('rating-modal');
+        const closeRatingModal = document.getElementById('close-rating-modal');
+        const stars = document.querySelectorAll('#star-rating svg');
+        let selectedRating = 0;
+
+        // Hover effect for stars
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function () {
+                const value = this.getAttribute('data-value');
+                stars.forEach(s => s.classList.toggle('text-yellow-400', s.getAttribute('data-value') <= value));
+            });
+
+            star.addEventListener('mouseout', function () {
+                stars.forEach(s => s.classList.toggle('text-yellow-400', s.getAttribute('data-value') <= selectedRating));
+            });
+
+            star.addEventListener('click', function () {
+                selectedRating = this.getAttribute('data-value');
+                stars.forEach(s => s.classList.toggle('text-yellow-400', s.getAttribute('data-value') <= selectedRating));
+            });
+        });
+
+        // Submit rating
+        document.getElementById('submit-rating').addEventListener('click', function () {
+            const message = document.getElementById('rating-message').value;
+
+            if (selectedRating === 0) {
+                alert('Please select a rating before submitting.');
+                return;
+            }
+
+            fetch("{{ route('ratings.store') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    rating: selectedRating,
+                    message: message,
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Response status:', response.status);
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Failed to submit rating.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Rating submitted:', data);
+                showPopup('success', 'Thank you for your feedback!');
+                ratingModal.classList.add('hidden');
+            })
+            .catch(error => {
+                console.error('Error submitting rating:', error);
+                showPopup('error', 'An error occurred while submitting your rating. Please try again.');
+            });
+        });
+
+        // Show rating modal 7 seconds after "Save Changes"
+        document.getElementById('booking-form').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Simulate form submission success
+            setTimeout(() => {
+                ratingModal.classList.remove('hidden');
+            }, 6000); // Show modal after 7 seconds
+
+            // Proceed with the actual form submission logic
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Form submitted successfully:', data);
+                // Optionally handle success response
+            })
+            .catch(error => console.error('Error submitting form:', error));
+        });
+
+        // Close rating modal
+        closeRatingModal.addEventListener('click', function () {
+            ratingModal.classList.add('hidden');
+        });
+
+        // Function to show modern success/failed popup
+        function showPopup(type, message) {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            popup.innerHTML = `
+                <div class="flex items-center">
+                    <span class="mr-2">${type === 'success' ? '✔️' : '❌'}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(popup);
+
+            setTimeout(() => {
+                popup.classList.add('opacity-0');
+                setTimeout(() => popup.remove(), 500); // Remove after fade-out
+            }, 3000); // Show for 3 seconds
+        }
+    });
+</script>
             </div>
         </div>
     </div>
     @section('css')
         <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css" rel="stylesheet">
         <style>
-         
+
             .fc-event {
                 transition: background-color 0.3s, transform 0.3s;
                 position: relative;
-                background-color: rgb(25, 221, 221); 
+                background-color: rgb(25, 221, 221);
                 font-size: 13px;
             }
             .fc-event:hover {
-                background-color: rgb(26, 184, 184); 
+                background-color: rgb(26, 184, 184);
                 transform: scale(1.05);
             }
             .fc-event-title {
@@ -719,14 +858,14 @@ window.onclick = function(event) {
          document.addEventListener('DOMContentLoaded', function() {
     // Define estimated times for each procedure
     const procedureTimes = {
-     
+
     };
 
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         events: @json($appointments).filter(appointment => appointment.status !== 'declined'),
-        
+
 
         eventTimeFormat: { // 24-hour format
             hour: '2-digit',
@@ -754,7 +893,7 @@ window.onclick = function(event) {
         allowedStart = new Date(now);
         allowedStart.setDate(now.getDate() + 1); // Tomorrow
         allowedStart.setHours(0, 0, 0, 0);
-        
+
         allowedEnd = new Date(now);
         allowedEnd.setDate(now.getDate() - now.getDay() + 7); // Sunday
         allowedEnd.setHours(23, 59, 59, 999);
@@ -785,7 +924,7 @@ window.onclick = function(event) {
         eventClick: function(info) {
             const event = info.event;
             const isLoggedInUserEvent = event.extendedProps.user_id === {{ auth()->id() }};
-            
+
             if (isLoggedInUserEvent) {
                 $('#booking-id').val(event.id);
                 $('#booking-title').val(event.title.split(' (')[0]);
@@ -793,7 +932,7 @@ window.onclick = function(event) {
                 $('#booking-start').val(event.start.toISOString().split('T')[0]);
 
                 let appointmentTime = event.start.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-                
+
                 // Validate the selected time is within 8 AM - 5 PM
                 const [hour, minute] = appointmentTime.split(':').map(Number);
                 if (hour < 8 || hour >= 17) {
@@ -830,12 +969,12 @@ window.onclick = function(event) {
     let userName = "{{ auth()->user()->name }}".substring(0, 0);
 
     // If status is "accepted", show a small checkmark instead of a dot
-    let icon = status === "accepted" 
+    let icon = status === "accepted"
         ? `<span style="font-size: 8px;">✔</span>` // Small checkmark
         : `<span style="color: white; font-size: 18px;">•</span>`; // Default Pending
 
         return {
-    html: isLoggedInUserEvent 
+    html: isLoggedInUserEvent
         ? `${icon}<span class="event-time">${timeFormatted}</span> ${userName}`
         : `${icon}<span class="event-time">${timeFormatted}</span>`
 };
@@ -891,19 +1030,19 @@ eventClick: function(info) {
         errorModal.id = "error-message";
         errorModal.innerHTML = `
             <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                        background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 20px; 
+                        background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 20px;
                         border-radius: 8px; text-align: center; font-size: 16px;
                         width: 350px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
                         z-index: 9999;">
                 <p style="margin: 0; font-weight: bold;">⚠️ ${message}</p>
                 <br>
-                <button onclick="document.getElementById('error-message').remove()" 
-                        style="background: white; color: red; padding: 5px 10px; border: none; 
+                <button onclick="document.getElementById('error-message').remove()"
+                        style="background: white; color: red; padding: 5px 10px; border: none;
                         cursor: pointer; font-size: 14px; border-radius: 4px;">
                     Close
                 </button>
             </div>`;
-        
+
         document.body.appendChild(errorModal);
 
         // Auto-remove the error message after 5 seconds
@@ -912,7 +1051,7 @@ eventClick: function(info) {
             if (modal) modal.remove();
         }, 5000);
     }
-   
+
                 $('#booking-form').on('submit', function(event) {
                 event.preventDefault();
 
@@ -978,7 +1117,7 @@ eventClick: function(info) {
                     }
                 });
             });
-        
+
                 $('#delete-appointment').on('click', function() {
                     const appointmentId = $('#booking-id').val();
                     if (appointmentId) {
@@ -1001,11 +1140,11 @@ eventClick: function(info) {
                         });
                     }
                 });
-        
+
                 $('#close-modal').on('click', function() {
                     $('#booking-modal').addClass('hidden');
                 });
-        
+
                 function showPopup(type, message) {
                     const icon = type === 'success' ? '✔️' : '❌';
                     $('#popup-icon').text(icon);
@@ -1017,6 +1156,6 @@ eventClick: function(info) {
                 }
             });
         </script>
-        
+
     @endsection
 </x-app-layout>

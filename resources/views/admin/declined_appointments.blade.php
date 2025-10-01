@@ -3,103 +3,118 @@
 @section('title', 'Declined Appointments')
 
 @section('content')
-<div class="container">
-    <br>
-    <h2>Declined Appointments</h2>
-    <br>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0" style="background-color: #ffffff; border-radius: 12px;">
+        <div class="card-body">
+            <h2 class="card-title mb-4 text-danger">Declined Appointments</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success" id="successMessage">
-            {{ session('success') }}
+            <!-- Search Bar -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by patient name, title, or procedure">
+                </div>
+                <div class="col-md-6">
+                    <input type="date" id="datePicker" class="form-control">
+                </div>
+            </div>
+
+            <!-- Appointments Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle" style="background-color: #fff; border-radius: 8px;">
+                    <thead style="background-color: #FF4C4C; color: white;">
+                        <tr>
+                            <th class="px-3 py-2">Patient Name</th>
+                            <th class="px-3 py-2">Title</th>
+                            <th class="px-3 py-2">Procedure</th>
+                            <th class="px-3 py-2">Reason</th>
+                            <th class="px-3 py-2">Declined At</th>
+                            <th class="px-3 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointment-data">
+                        @foreach($declinedAppointments as $index => $appointment)
+                        <tr>
+                            <td class="px-3 py-2">{{ $appointment->patient_name }}</td>
+                            <td class="px-3 py-2">{{ $appointment->title }}</td>
+                            <td class="px-3 py-2" style="word-wrap: break-word; max-width: 200px;">{{ $appointment->procedure }}</td>
+                            <td class="px-3 py-2" style="word-wrap: break-word; max-width: 200px;">
+                                <span class="short-reason" onclick="showReasonModal('{{ $appointment->decline_reason }}')" style="cursor: pointer;">
+                                    {{ Str::limit($appointment->decline_reason, 50, '...') }}
+                                </span>
+                            </td>
+                            <td class="px-3 py-2">{{ $appointment->updated_at }}</td>
+                            <td class="px-3 py-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="actionDropdown{{ $appointment->user_id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $appointment->user_id }}">
+                                        <li>
+                                            <a class="dropdown-item" href="{{ route('admin.patient_information', ['id' => $appointment->user_id]) }}">View Patient</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
-    @endif
-
-    @if($declinedAppointments->isEmpty())
-        <div class="alert alert-warning">No declined appointments found.</div>
-    @else
-        <!-- DELETE ALL BUTTON -->
-        <form id="deleteForm" action="{{ route('appointments.deleteAllDeclined') }}" method="POST">
-            @csrf
-            @method('DELETE')
-            <button type="button" class="btn btn-danger mb-3" onclick="showDeleteMessage()">Delete All Declined</button>
-        </form>
-
-        
-
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Procedure</th>
-                    <th>Create at</th>
-                    <th>Declined at</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($declinedAppointments as $appointment)
-                <tr>
-                    <td>{{ $appointment->user_id }}</td>
-                    <td>{{ $appointment->title }}</td>
-                    <td>{{ $appointment->procedure }}</td>
-                    <td>{{ $appointment->created_at->format('Y-m-d H:i') }}</td>
-                    <td>{{ $appointment->updated_at->format('Y-m-d H:i') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    @endif
+    </div>
 </div>
 
-<!-- CUSTOM DELETE CONFIRMATION (Centered) -->
-<div id="deleteMessage" class="delete-popup">
-    <p>Delete all declined appointments?</p>
-    <button onclick="confirmDelete()" class="btn btn-danger btn-sm">Yes</button>
-    <button onclick="closeMessage()" class="btn btn-secondary btn-sm">No</button>
+<!-- Reason Modal -->
+<div class="modal fade" id="reasonModal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reasonModalLabel">Full Reason</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="reasonModalBody">
+                <!-- Full reason will be dynamically inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- STYLES -->
-<style>
-    .delete-popup {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 15px 20px;
-        border: 1px solid red;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-        text-align: center;
-        border-radius: 8px;
-        z-index: 1000;
-    }
-    .btn-sm {
-        padding: 6px 12px;
-        margin: 5px;
-        font-size: 14px;
-    }
-</style>
-
-<!-- SCRIPT -->
+<!-- Filtering Script -->
 <script>
-    setTimeout(() => {
-        let successMessage = document.getElementById('successMessage');
-        if (successMessage) {
-            successMessage.style.display = 'none';
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchInput');
+        const datePicker = document.getElementById('datePicker');
+        const tableRows = document.querySelectorAll('#appointment-data tr');
+
+        function filterTable() {
+            const searchValue = searchInput.value.toLowerCase();
+            const selectedDate = datePicker.value;
+
+            tableRows.forEach(row => {
+                const patientName = row.cells[1].textContent.toLowerCase();
+                const title = row.cells[2].textContent.toLowerCase();
+                const procedure = row.cells[3].textContent.toLowerCase();
+                const declinedAt = row.cells[5].textContent;
+
+                const matchesSearch = patientName.includes(searchValue) || title.includes(searchValue) || procedure.includes(searchValue);
+                const matchesDate = !selectedDate || declinedAt.startsWith(selectedDate);
+
+                row.style.display = matchesSearch && matchesDate ? '' : 'none';
+            });
         }
-    }, 3000);
 
-    function showDeleteMessage() {
-        document.getElementById("deleteMessage").style.display = "block";
-    }
+        searchInput.addEventListener('input', filterTable);
+        datePicker.addEventListener('change', filterTable);
+    });
 
-    function closeMessage() {
-        document.getElementById("deleteMessage").style.display = "none";
-    }
-
-    function confirmDelete() {
-        document.getElementById("deleteForm").submit();
+    function showReasonModal(reason) {
+        const modalBody = document.getElementById('reasonModalBody');
+        modalBody.textContent = reason;
+        const reasonModal = new bootstrap.Modal(document.getElementById('reasonModal'));
+        reasonModal.show();
     }
 </script>
 @endsection

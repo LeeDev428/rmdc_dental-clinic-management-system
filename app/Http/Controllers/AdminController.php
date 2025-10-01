@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB; // Import Log facade
 
 class   AdminController extends Controller
 {
-    
+
         public function index()
         {
             // Initialize an empty array for procedure counts
@@ -25,16 +25,16 @@ class   AdminController extends Controller
                 'Cleaning',
                 'Checkup'
             ];
-        
+
             // Loop through each procedure and count appointments
             foreach ($procedures as $procedure) {
                 $proceduresCount[$procedure] = Appointment::where('procedure', $procedure)->count();
             }
-        
+
             // Count other data
             $appointmentsCount = Appointment::count();
             $pendingAppointmentsCount = Appointment::where('status', 'pending')->count();
-        
+
             // Get the current month, previous month, and next month
             $currentMonth = Carbon::now()->month;
             $currentYear = Carbon::now()->year;
@@ -42,12 +42,12 @@ class   AdminController extends Controller
             $previousYear = Carbon::now()->subMonth()->year;
             $nextMonth = Carbon::now()->addMonth()->month;
             $nextYear = Carbon::now()->addMonth()->year;
-        
+
             // Get the number of days in each month
             $daysInCurrentMonth = Carbon::now()->daysInMonth;
             $daysInPreviousMonth = Carbon::now()->subMonth()->daysInMonth;
             $daysInNextMonth = Carbon::now()->addMonth()->daysInMonth;
-        
+
             // Initialize arrays for appointment data
             $appointmentsThisMonth = [];
             $appointmentsPreviousMonth = [];
@@ -58,77 +58,104 @@ class   AdminController extends Controller
             $declinedPreviousMonth = [];
             $acceptedNextMonth = [];
             $declinedNextMonth = [];
-        
-            // Retrieve appointment counts using `start` column instead of `created_at`
+
+            // Retrieve appointment counts using `created_at` column
             for ($day = 1; $day <= $daysInCurrentMonth; $day++) {
-                $appointmentsThisMonth[$day] = Appointment::whereDay('start', $day)
-                                                          ->whereMonth('start', $currentMonth)
-                                                          ->whereYear('start', $currentYear)
-                                                          ->count();
-        
-                $acceptedThisMonth[$day] = Appointment::whereDay('start', $day)
-                                                      ->whereMonth('start', $currentMonth)
-                                                      ->whereYear('start', $currentYear)
+                $appointmentsThisMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                          ->whereMonth('created_at', $currentMonth)
+                                                          ->whereYear('created_at', $currentYear)
+                                                          ->count(); // Total appointments created
+
+                $acceptedThisMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                      ->whereMonth('created_at', $currentMonth)
+                                                      ->whereYear('created_at', $currentYear)
                                                       ->where('status', 'accepted')
                                                       ->count();
-        
-                $declinedThisMonth[$day] = Appointment::whereDay('start', $day)
-                                                      ->whereMonth('start', $currentMonth)
-                                                      ->whereYear('start', $currentYear)
+
+                $declinedThisMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                      ->whereMonth('created_at', $currentMonth)
+                                                      ->whereYear('created_at', $currentYear)
                                                       ->where('status', 'declined')
                                                       ->count();
             }
-        
+
             for ($day = 1; $day <= $daysInPreviousMonth; $day++) {
                 $appointmentsPreviousMonth[$day] = Appointment::whereDay('start', $day)
                                                               ->whereMonth('start', $previousMonth)
                                                               ->whereYear('start', $previousYear)
-                                                              ->count();
-        
+                                                              ->count(); // Total appointments
+
                 $acceptedPreviousMonth[$day] = Appointment::whereDay('start', $day)
                                                           ->whereMonth('start', $previousMonth)
                                                           ->whereYear('start', $previousYear)
                                                           ->where('status', 'accepted')
                                                           ->count();
-        
+
                 $declinedPreviousMonth[$day] = Appointment::whereDay('start', $day)
                                                           ->whereMonth('start', $previousMonth)
                                                           ->whereYear('start', $previousYear)
                                                           ->where('status', 'declined')
                                                           ->count();
             }
-        
+
             for ($day = 1; $day <= $daysInNextMonth; $day++) {
                 $appointmentsNextMonth[$day] = Appointment::whereDay('start', $day)
                                                           ->whereMonth('start', $nextMonth)
                                                           ->whereYear('start', $nextYear)
-                                                          ->count();
-        
+                                                          ->count(); // Total appointments
+
                 $acceptedNextMonth[$day] = Appointment::whereDay('start', $day)
                                                       ->whereMonth('start', $nextMonth)
                                                       ->whereYear('start', $nextYear)
                                                       ->where('status', 'accepted')
                                                       ->count();
-        
+
                 $declinedNextMonth[$day] = Appointment::whereDay('start', $day)
                                                       ->whereMonth('start', $nextMonth)
                                                       ->whereYear('start', $nextYear)
                                                       ->where('status', 'declined')
                                                       ->count();
             }
-        
+
             // Count pending appointments
             $pendingCount = Appointment::where('status', 'pending')->count();
-        
+
             // Get inventory data
             $inventories = Inventory::all();
-        
+
             // Get the total quantity of each category
             $categoryQuantities = DB::table('inventories')
                 ->select('category', DB::raw('SUM(quantity) as total_quantity'))
                 ->groupBy('category')
                 ->get();
-        
+
+            // Initialize arrays for appointment data based on `created_at`
+            $appointmentsCreatedThisMonth = [];
+            $appointmentsCreatedPreviousMonth = [];
+            $appointmentsCreatedNextMonth = [];
+
+            // Retrieve appointment counts using `created_at` column
+            for ($day = 1; $day <= $daysInCurrentMonth; $day++) {
+                $appointmentsCreatedThisMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                         ->whereMonth('created_at', $currentMonth)
+                                                         ->whereYear('created_at', $currentYear)
+                                                         ->count(); // Total appointments created
+            }
+
+            for ($day = 1; $day <= $daysInPreviousMonth; $day++) {
+                $appointmentsCreatedPreviousMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                             ->whereMonth('created_at', $previousMonth)
+                                                             ->whereYear('created_at', $previousYear)
+                                                             ->count(); // Total appointments created
+            }
+
+            for ($day = 1; $day <= $daysInNextMonth; $day++) {
+                $appointmentsCreatedNextMonth[$day] = Appointment::whereDay('created_at', $day)
+                                                         ->whereMonth('created_at', $nextMonth)
+                                                         ->whereYear('created_at', $nextYear)
+                                                         ->count(); // Total appointments created
+            }
+
             // Return the view with all data
             return view('admin.dashboard', compact(
                 'proceduresCount',
@@ -141,71 +168,103 @@ class   AdminController extends Controller
                 'declinedPreviousMonth',
                 'acceptedNextMonth',
                 'declinedNextMonth',
+                'appointmentsCreatedThisMonth', // Pass created_at data
+                'appointmentsCreatedPreviousMonth', // Pass created_at data
+                'appointmentsCreatedNextMonth', // Pass created_at data
                 'inventories',
                 'categoryQuantities',
                 'pendingCount'
             ));
         }
 
-    public function getPendingCount(Request $request) 
+    public function getPendingCount(Request $request)
     {
         $pendingCount = Appointment::where('status', 'pending')->count();
         return response()->json(['pendingCount' => $pendingCount]);
     }
-    
-    public function patientmanagement()  
+
+    public function patientmanagement()
     {
         // Count the number of pending appointments
         $pendingCount = Appointment::where('status', 'pending')->count();
-    
+
         // Count the number of upcoming appointments (accepted appointments with a start time greater than the current time)
-        $upcomingCount = Appointment::where('status', 'accepted')->count(); 
-        
+        $upcomingCount = Appointment::where('status', 'accepted')->count();
+
         $userCount = User::count();
 
         // Store the upcoming count in the session (optional)
         session(['upcoming_count' => $upcomingCount]);
         session(['userCount' => $userCount]);
-        
-        // Pass both counts to the view
-        return view('admin.patient-management', compact('pendingCount', 'upcomingCount','userCount')); 
-    }
-    
-    
-    
-    
 
-    public function upcomingAppointments()
+        // Pass both counts to the view
+        return view('admin.patient-management', compact('pendingCount', 'upcomingCount','userCount'));
+    }
+
+
+
+
+
+    public function upcomingAppointments(Request $request)
     {
         // Fetch all appointments ordered by created_at ascending (or descending if you prefer)
         $appointments = Appointment::orderBy('created_at', 'asc')->get();
-    
+
         // Get the count of appointments with 'pending' status
         $pendingCount = Appointment::where('status', 'pending')->count();
-    
+
         // Count of all upcoming appointments
         $upcomingCount = $appointments->count();
-    
+
         // Check if there are new appointments and create a notification message
         $recentlyBooked = $appointments->first(); // Get the most recent appointment if it exists
         if ($recentlyBooked) {
             session()->flash('notification', "A new appointment has been booked by user ID: {$recentlyBooked->user_id}");
         }
-    
+
         // Set the session variable for upcoming appointments count (optional)
         session(['upcoming_count' => $upcomingCount]);
-    
+
         // Log all appointments for debugging
         logger()->info('All appointments:', $appointments->toArray());
-    
-        // Pass both pendingCount and upcomingCount to the view
+
+        $query = Appointment::join('users', 'appointments.user_id', '=', 'users.id') // Join with users table to fetch username
+            ->select(
+                'appointments.*',
+                'users.name as username' // Fetch username from users table
+            );
+
+        // Apply search filter if provided
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('appointments.procedure', 'like', "%$search%")
+                  ->orWhere('appointments.status', 'like', "%$search%")
+                  ->orWhere('users.name', 'like', "%$search%"); // Allow search by username
+            });
+        }
+
+        // Apply date filter if provided
+        if ($request->has('date') && $request->date != '') {
+            $query->whereDate('appointments.start', $request->date); // Filter by the 'start' column
+        }
+
+        // Paginate the results (10 items per page)
+        $paginatedAppointments = $query->paginate(10);
+
+        // Count pending appointments
+        $pendingCount = Appointment::where('status', 'pending')->count();
+
+        // Count total upcoming appointments
+        $upcomingCount = Appointment::count();
+
         return view('admin.upcoming_appointments', [
-            'appointments' => $appointments,
+            'appointments' => $paginatedAppointments, // Pass paginated appointments
             'pendingCount' => $pendingCount,  // Include pending appointments count
             'upcomingCount' => $upcomingCount // Include upcoming appointments count
         ]);
     }
-    
+
 
     public function bookAppointment($request)
 {
@@ -267,38 +326,39 @@ public function patientInformation(Request $request)
      {
          // Fetch all appointments ordered by created_at descending
          $appointments = Appointment::orderBy('created_at', 'desc')->get();
-     
+
          // Count of upcoming appointments
          $upcomingCount = $appointments->count();
-     
+
          // Check if there are new appointments and create a notification message
          $recentlyBooked = $appointments->first(); // Get the most recent appointment if it exists
          if ($recentlyBooked) {
              session()->flash('notification', "A new appointment has been booked by user ID: {$recentlyBooked->user_id}");
          }
-     
+
          // Reset notification count only if the admin has viewed the notifications
          session(['upcoming_count' => $upcomingCount]);
-     
+
          // Log all appointments for debugging
          logger()->info('All appointments:', $appointments->toArray());
-     
+
          return view('admin.appointments', ['appointments' => $appointments]);
      }
-  
-     public function acceptedAppointments() 
+
+     public function acceptedAppointments()
 {
     // Fetch all accepted appointments ordered by start date
     $acceptedAppointments = Appointment::where('status', 'accepted')
                                        ->orderBy('start', 'asc') // Sort by start time
+                                       ->select('id', 'title', 'procedure', 'start', 'end') // Include the 'end' column
                                        ->get();
-    
+
     // Count the number of pending appointments
     $pendingCount = Appointment::where('status', 'pending')->count();
 
     // Count of accepted appointments
     $upcomingCount = $acceptedAppointments->count();
-    
+
     // Check if there are any upcoming appointments and create a notification message
     $recentlyBooked = $acceptedAppointments->first(); // Get the most recent accepted appointment if it exists
     if ($recentlyBooked) {
@@ -313,5 +373,5 @@ public function patientInformation(Request $request)
     ]);
 }
 
-     
+
 }

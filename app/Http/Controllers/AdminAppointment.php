@@ -16,39 +16,54 @@ use App\Events\AppointmentStatusChanged;
 class AdminAppointment extends Controller
 {
 
-    
+
     public function handleAction(Request $request, $id, $action)
 {
     // Find the appointment by its ID
     $appointment = Appointment::findOrFail($id);
 
-    if ($action === 'decline') {
-        // Create a record in the declined_appointments table
-        DeclinedAppointment::create([
-            'appointment_id' => $appointment->id,
-            'user_id' => $appointment->user_id,
-            'decline_reason' => $request->input('decline_reason', 'No reason provided'), // Optional decline reason
-        ]);
+    if ($action == 'decline') {
+    $request->validate([
+        'message' => 'required|string|max:255' // Admin's reason
+    ]);
 
-        // Update the appointment status to 'declined'
-        $appointment->status = 'declined';
-        $appointment->save();
+    $dateTime = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
+    $reason = $request->message;
 
-        // Set a message for notification
-        $message = "Your appointment has been declined.";
+$autoMessage = " for <strong regret to inform you that your appointment scheduledtrong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
 
-        // Create a notification for the user (optional)
-        Notification::create([
-            'user_id' => $appointment->user_id,
-            'message' => $message,
-        ]);
+// Save the auto-generated message
+Message::create([
+    'user_id' => $appointment->user_id,
+    'message' => $autoMessage,
+    'is_admin' => true,
+    'status' => 'unread'
+]);
 
-        // Broadcast the status change (optional)
-        broadcast(new AppointmentStatusChanged($appointment));
+// Save decline record
+DeclinedAppointment::create([
+    'appointment_id' => $appointment->id,
+    'user_id' => $appointment->user_id,
+    'decline_reason' => $reason,
+]);
 
-        // Return with success message
-        return redirect()->back()->with('success', "Appointment has been declined and moved to declined appointments.");
-    }
+// Update appointment status
+$appointment->status = 'declined';
+$appointment->start = '2003-04-28 23:59';
+$appointment->end = '2003-04-28 23:59';
+$appointment->save();
+
+// Optional notification
+Notification::create([
+    'user_id' => $appointment->user_id,
+    'message' => "Your appointment has been declined. You may reschedule your appointment."
+]);
+
+broadcast(new AppointmentStatusChanged($appointment));
+
+return redirect()->back()->with('success', 'Appointment declined successfully and message sent.');
+}
+
 
     // Handle other actions (like accept)
     if ($action === 'accept') {
@@ -74,7 +89,7 @@ class AdminAppointment extends Controller
     return redirect()->back()->with('success', "Appointment has been {$action}ed.");
 }
 
-    
+
 
 
 
@@ -83,7 +98,7 @@ class AdminAppointment extends Controller
         Notification::where('user_id', Auth::id())
                     ->where('status', 'unread')
                     ->update(['status' => 'read']);
-    
+
         return response()->json(['success' => true]);
     }
 
@@ -94,17 +109,17 @@ class AdminAppointment extends Controller
             ->latest()
             ->take(10)
             ->get();
-    
+
         $unreadCount = Notification::where('user_id', Auth::id())
             ->where('status', 'unread')
             ->count();
-    
+
         return response()->json([
             'notifications' => $notifications,
             'unreadCount' => $unreadCount // Send unread count
         ]);
     }
-    
+
     public function markAllAsRead()
     {
         Notification::where('user_id', Auth::id())
@@ -113,7 +128,7 @@ class AdminAppointment extends Controller
 
         return response()->json(['message' => 'All notifications marked as read']);
     }
-    
+
 
 public function unreadNotificationCount()
 {
@@ -135,9 +150,23 @@ public function getUnreadCount()
 
 public function declinedAppointments()
 {
-    $declinedAppointments = Appointment::where('status', 'declined')
-    ->select('user_id', 'title', 'procedure', 'created_at', 'updated_at')
-    ->get();
+    $declinedAppointments = Appointment::join('messages', 'appointments.user_id', '=', 'messages.user_id') // Join with messages table
+        ->join('users', 'appointments.user_id', '=', 'users.id') // Join with users table to get patient name
+        ->where('appointments.status', 'declined') // Explicitly reference appointments.status
+        ->where('messages.is_admin', true) // Ensure the message is from the admin
+        ->select(
+            'appointments.user_id',
+            'users.name as patient_name', // Fetch patient name from users table
+            'appointments.title',
+            'appointments.procedure',
+            'messages.message as decline_reason', // Fetch the decline reason from messages
+            'appointments.start',
+            'appointments.end',
+            'appointments.created_at',
+            'appointments.updated_at'
+        )
+        ->get();
+
     return view('admin.declined_appointments', compact('declinedAppointments'));
 }
 
@@ -157,13 +186,20 @@ public function messageFromAdmin(Request $request, $id, $action)
             'message' => 'required|string|max:255' // Validate the reason for declining
         ]);
 
-        // Save the decline message
-        Message::create([
-            'user_id' => $appointment->user_id,
-            'message' => $request->message,
-            'is_admin' => true,
-            'status' => 'unread'
-        ]);
+        // Format the date and time
+$dateTime = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
+
+// Auto-generate the full message
+$autoMessage = "We regret to inform you that your appointment scheduled for {$dateTime} has been declined due to {$request->message}. You may reschedule your appointment at your convenience. Thank you for your understanding.";
+
+// Save the full message to messages table
+Message::create([
+    'user_id' => $appointment->user_id,
+    'message' => $autoMessage,
+    'is_admin' => true,
+    'status' => 'unread'
+]);
+
 
         // Create a record in the declined_appointments table
         DeclinedAppointment::create([
@@ -187,9 +223,8 @@ public function messageFromAdmin(Request $request, $id, $action)
         // Broadcast the status change (optional)
         broadcast(new AppointmentStatusChanged($appointment));
 
-        return response()->json([
-            'message' => 'Appointment declined successfully and message sent.'
-        ]);
+        // Change from JSON response to redirect
+        return redirect()->back()->with('success', 'Appointment declined successfully and message sent.');
     }
 
     if ($action === 'accept') {
@@ -209,7 +244,7 @@ public function messageFromAdmin(Request $request, $id, $action)
         return redirect()->back()->with('success', 'Appointment accepted successfully.');
     }
 
-    return response()->json(['message' => 'Invalid action.'], 400);
+    return redirect()->back()->with('error', 'Invalid action.');
 }
 
 

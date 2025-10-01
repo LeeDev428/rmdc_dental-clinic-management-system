@@ -19,7 +19,7 @@
                     </div>
 
                     <!-- Language Settings Card -->
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                     {{--<div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Language Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Select your preferred language for the system.</p>
                         <a href="#" class="text-blue-600 hover:text-blue-400">Change Language</a>
@@ -33,7 +33,7 @@
                     </div>
 
                     <!-- Privacy Settings Card -->
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                     <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Privacy Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Set your privacy preferences and visibility settings.</p>
                         <a href="#" class="text-blue-600 hover:text-blue-400">Manage Privacy</a>
@@ -46,12 +46,12 @@
                         <a href="{{ route('profile.edit') }}#update-password-section" class="text-blue-600 hover:text-blue-400">Change Password</a>
                     </div> --}}
 
-                    <!-- Account Settings Card -->
-                    {{-- <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                    <!-- Account Settings Card
+                        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Account Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Manage your account preferences.</p>
                         <a href="#" class="text-blue-600 hover:text-blue-400">Account Settings</a>
-                    </div> --}}
+                    </div> -->
 
                     <!-- Theme Settings Card -->
                     <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
@@ -62,18 +62,18 @@
                     </div>
 
                     <!-- History Settings Card -->
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                     <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">History Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Notification, Appointment, Billing History.</p>
                         <a href="#" class="text-blue-600 hover:text-blue-400">History Settings</a>
                     </div>
 
-                    <!-- Advanced Settings Card -->
-                    {{-- <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                    <!-- Advanced Settings Card
+                    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Advanced Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Access advanced configurations and developer settings.</p>
                         <a href="#" class="text-blue-600 hover:text-blue-400">Advanced Settings</a>
-                    </div> --}}
+                    </div>-->   
                 </div>
             </div>
         </div>

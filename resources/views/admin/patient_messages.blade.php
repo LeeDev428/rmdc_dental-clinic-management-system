@@ -19,14 +19,14 @@
 
             <div class="list-group">
                 @foreach ($users as $user)
-                    <a href="{{ route('admin.messages', ['user_id' => $user->id]) }}" 
+                    <a href="{{ route('admin.messages', ['user_id' => $user->id]) }}"
                        class="list-group-item list-group-item-action {{ $selectedUser && $selectedUser->id == $user->id ? 'active' : '' }}"
-                       style="border-radius: 8px; display: flex; align-items: center; justify-content: space-between; 
+                       style="border-radius: 8px; display: flex; align-items: center; justify-content: space-between;
                               background-color: {{ $selectedUser && $selectedUser->id == $user->id ? '#ADD8E6' : '#FFFFFF' }};">
                         <!-- Profile Picture -->
                         <div style="display: flex; align-items: center;">
-                            <img src="{{ $user->avatar ? Storage::url($user->avatar) : asset('img/defaultprofile.png') }}" 
-                                 alt="User Avatar" 
+                            <img src="{{ $user->avatar ? Storage::url($user->avatar) : asset('img/defaultprofile.png') }}"
+                                 alt="User Avatar"
                                  style="width: 26px; height: 26px; border-radius: 50%; margin-right: 12px;">
                             <div>
                                 <strong style="color: black;">
@@ -34,17 +34,17 @@
                                 </strong>
                                 <p style="color: black; font-size: 11px; margin-bottom: 0;">
                                     User ID: {{Str::limit($user->id, 6, '...') }}
-                                </p>                                
+                                </p>
                             </div>
                         </div>
                         <!-- Message Preview and Timestamp -->
                         <div class="text-muted" style="font-size: 0.8rem; text-align: right;">
-                            @if($user->messages->isNotEmpty())  
+                            @if($user->messages->isNotEmpty())
                                 <!-- Truncate message if longer than 8 characters -->
                                 <span style="color: black; display: block;">
                                     ( {{ Str::limit($user->messages->first()->message, 7, '...') }} )
                                 </span>
-                                <span style="font-size: 11px; display: block; color: black;"> 
+                                <span style="font-size: 11px; display: block; color: black;">
                                     • {{ $user->messages->first()->created_at->diffForHumans() }}
                                 </span>
                             @else
@@ -54,7 +54,7 @@
                     </a>
                 @endforeach
             </div>
-        </div>            
+        </div>
 
         <!-- Right Panel: Chat Box -->
         <div class="col-md-9">
@@ -63,17 +63,17 @@
 
                 <!-- Display Recent Messages for Admin -->
                 <div class="chat-box border rounded p-3" style="height: 350px; overflow-y: scroll;">
-                    <h4>Recent Messages</h4>    
+                    <h4>Recent Messages</h4>
                     @php
                         $previousUserId = null;
                     @endphp
                     @foreach ($messages as $index => $message)
                         <div class="d-flex {{ $message->is_admin ? 'justify-content-end' : 'justify-content-start' }} mb-3">
-                            <div class="card" style="max-width: 60%; border-radius: 25px; padding: 5px; margin-bottom: 5px; 
+                            <div class="card" style="max-width: 60%; border-radius: 25px; padding: 5px; margin-bottom: 5px;
                                         {{ $message->is_admin ? 'background-color: #d1e7fd;' : 'background-color: #f8f9fa;' }}">
 
                                 <div class="card-body" style="padding: 0 5px 5px 5px; display: flex; flex-direction: column; justify-content: flex-start; min-height: 40px; text-align: center;">
-                                    <p style="color: black; font-size: 15px; white-space: pre-line; overflow-wrap: break-word; margin-bottom: 0; text-align: center;"> 
+                                    <p style="color: black; font-size: 15px; white-space: pre-line; overflow-wrap: break-word; margin-bottom: 0; text-align: center;">
                                         {{ $message->message }}
                                     </p>
                                     <div class="d-flex align-items-center justify-content-between" style="margin-top: 5px;">

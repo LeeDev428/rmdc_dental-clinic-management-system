@@ -20,9 +20,7 @@
                 <a href="{{ route('redirect.google') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
                     <i class="fa-brands fa-google"></i>
                 </a>
-                <a href="#" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 text-white text-lg">
-                    <i class="fa-brands fa-linkedin-in"></i>
-                </a>
+                
             </div>
 
             <!-- OR Divider -->
@@ -54,7 +52,7 @@
 
                 <!-- Links -->
                 <div class="flex justify-between text-md mb-4">
-          
+
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" class="text-gray-600 hover:underline">{{ __('Forgot your password?') }}</a>
                     @endif
