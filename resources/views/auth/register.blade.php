@@ -14,10 +14,10 @@
 
             <!-- Social Media Login Options -->
             <div class="flex justify-center gap-3 mt-4">
-                <a href="{{ route('auth.redirection', 'facebook') }}"class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white text-lg">
+                <a href="{{ route('facebook.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white text-lg">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                <a href="{{ route('redirect.google') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
+                <a href="{{ route('google.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
                     <i class="fa-brands fa-google"></i>
                 </a>
             </div>
@@ -69,11 +69,14 @@
 
                 <!-- Captcha -->
                 <div class="mb-4">
-                    <x-input-label for="captcha" :value="__('Solve the math problem below:')" class="text-md" />
+                    <x-input-label for="captcha" :value="__('Verify you are human:')" class="text-md" />
                     <div class="flex items-center gap-3 mt-2">
-                        <img src="{{ route('captcha.image') }}" alt="Captcha" class="border rounded-md">
-                        <x-text-input id="captcha" class="block w-full p-2.5 text-md border border-gray-300 rounded-md" type="text" name="captcha" required />
+                        <img src="{{ captcha_src('flat') }}" alt="Captcha" class="border rounded-md cursor-pointer" onclick="this.src='{{ captcha_src('flat') }}?'+Math.random()" title="Click to refresh">
+                        <button type="button" onclick="document.querySelector('img[alt=Captcha]').src='{{ captcha_src('flat') }}?'+Math.random()" class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
                     </div>
+                    <x-text-input id="captcha" class="block w-full p-2.5 text-md border border-gray-300 rounded-md mt-2" type="text" name="captcha" placeholder="Enter the characters above" required />
                     <x-input-error :messages="$errors->get('captcha')" class="mt-1 text-red-500" />
                 </div>
 
