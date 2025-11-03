@@ -11,7 +11,12 @@ class UserMiddleware
     {
         // Check if the user is authenticated and is a regular user
         if (Auth::check() && Auth::user()->usertype === 'user') {
-            return $next($request); // Proceed if the user is a regular user
+            // Check if email is verified
+            if (!Auth::user()->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
+            
+            return $next($request); // Proceed if the user is a regular user and verified
         }
 
         // Redirect if the user is not a regular user
