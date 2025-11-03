@@ -3,14 +3,278 @@
 @section('title', 'Teeth Layout Management')
 
 @section('content')
-<div class="container py-4">
-    <h2 class="mb-4">Teeth Layout Management</h2>
+<style>
+    body {
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 14px;
+    }
+
+    .content-wrapper {
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        background-color: #fff;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        color: #1a1a1a;
+    }
+
+    .search-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #4a4a4a;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 14px;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #0084ff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0,132,255,0.1);
+    }
+
+    .list-group {
+        margin-top: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        display: none;
+    }
+
+    .list-group-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .teeth-layout-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 24px;
+    }
+
+    .teeth-layout-card h4 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+        color: #1a1a1a;
+    }
+
+    .svg-dental-chart {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        margin: 0 auto 24px;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .tooth-group path {
+        transition: fill 0.2s;
+    }
+
+    .tooth-group:hover path {
+        fill: #f0f0f0;
+    }
+
+    .tooth-group text {
+        pointer-events: none;
+    }
+
+    .tooth-group text[font-size="18"] {
+        pointer-events: all;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-primary {
+        background-color: #0084ff;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0070e0;
+    }
+
+    .btn-success {
+        background-color: #16a34a;
+        color: #fff;
+    }
+
+    .btn-success:hover {
+        background-color: #15803d;
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+    }
+
+    .btn-danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .d-none {
+        display: none;
+    }
+
+    /* Modal Styles */
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+
+    .modal[style*="display: block"] {
+        display: flex !important;
+    }
+
+    .modal-dialog {
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        padding: 20px 24px;
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .modal-body {
+        padding: 24px;
+        color: #4a4a4a;
+    }
+
+    .modal-footer {
+        padding: 16px 24px;
+        background: #fafafa;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+    }
+
+    .close:hover {
+        color: #4a4a4a;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h2 class="page-title">Teeth Layout Management</h2>
+    </div>
 
     <!-- User Search -->
-    <div class="mb-4">
+    <div class="search-card">
         <label for="user-search" class="form-label">Search User:</label>
         <input type="text" id="user-search" class="form-control" placeholder="Search user by name or ID" oninput="filterUsers()">
-        <ul id="user-list" class="list-group mt-2" style="max-height: 150px; overflow-y: auto;">
+        <ul id="user-list" class="list-group">
             @foreach($users as $user)
                 <li class="list-group-item" onclick="selectUser({{ $user->id }}, '{{ $user->name }}')">
                     {{ $user->name }} (ID: {{ $user->id }})
@@ -20,19 +284,23 @@
     </div>
 
     <div id="teeth-layout-container" class="d-none">
-        <h4 class="mb-3">Teeth Layout</h4>
-        <form id="teeth-layout-form" onsubmit="saveTeethLayout(event)">
-            <div class="svg-dental-chart">
-                <svg id="teeth-chart" viewBox="0 0 400 700" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Quadrant lines only -->
-                    <line x1="200" y1="60" x2="200" y2="640" stroke="#a084ca" stroke-width="3" stroke-dasharray="8,6"/>
-                    <line x1="40" y1="350" x2="360" y2="350" stroke="#a084ca" stroke-width="3" stroke-dasharray="8,6"/>
-                </svg>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-        </form>
-        <button class="btn btn-success mt-3" onclick="showInitializeConfirmation()">Initialize Default Layout</button>
-        <button class="btn btn-secondary mt-3" onclick="addNewTooth()">Add Tooth</button>
+        <div class="teeth-layout-card">
+            <h4>Teeth Layout</h4>
+            <form id="teeth-layout-form" onsubmit="saveTeethLayout(event)">
+                <div class="svg-dental-chart">
+                    <svg id="teeth-chart" viewBox="0 0 400 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 700px;">
+                        <!-- Quadrant lines only -->
+                        <line x1="200" y1="60" x2="200" y2="640" stroke="#9ca3af" stroke-width="2" stroke-dasharray="8,6"/>
+                        <line x1="40" y1="350" x2="360" y2="350" stroke="#9ca3af" stroke-width="2" stroke-dasharray="8,6"/>
+                    </svg>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-success" onclick="showInitializeConfirmation()">Initialize Default Layout</button>
+                    <button type="button" class="btn btn-secondary" onclick="addNewTooth()">Add Tooth</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -366,65 +634,4 @@ function getToothPath(type) {
     }
 }
 </script>
-
-<style>
-.svg-dental-chart {
-    width: 400px;
-    height: 700px;
-    margin: 0 auto;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    position: relative;
-}
-.tooth-group path {
-    transition: fill 0.3s;
-}
-.tooth-group:hover path {
-    fill: #e0e0e0;
-}
-.tooth-group text {
-    pointer-events: none;
-}
-.tooth-group text[font-size="18"] {
-    pointer-events: all;
-}
-
-/* Modal Styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1050;
-}
-
-.modal-dialog {
-    background: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 90%;
-    max-width: 500px;
-}
-
-.modal-header, .modal-footer {
-    padding: 10px;
-    background: #f1f1f1;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-body {
-    padding: 20px;
-}
-</style>
 @endsection
