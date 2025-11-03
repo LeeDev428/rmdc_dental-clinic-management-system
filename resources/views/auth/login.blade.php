@@ -38,9 +38,10 @@
                 </div>
 
                 <!-- Password -->
-                <div class="mb-4">
+                <div class="mb-4 relative">
                     <x-input-label for="password" :value="__('Password')" class="text-md" />
-                    <x-text-input id="password" class="block mt-1 w-full p-2.5 text-md border border-gray-300 rounded-md" type="password" name="password" required autocomplete="current-password" />
+                    <x-text-input id="password" class="block mt-1 w-full p-2.5 text-md border border-gray-300 rounded-md pr-10" type="password" name="password" required autocomplete="current-password" />
+                    <i class="fa fa-eye absolute top-10 right-3 cursor-pointer text-gray-500 hover:text-gray-700" onclick="togglePasswordVisibility('password')"></i>
                     <x-input-error :messages="$errors->get('password')" class="mt-1 text-red-500" />
                 </div>
 
@@ -77,4 +78,21 @@
         </div>
 
     </div>
+
+    <script>
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = field.nextElementSibling;
+            
+            if (field.getAttribute('type') === 'password') {
+                field.setAttribute('type', 'text');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.setAttribute('type', 'password');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </x-guest-layout>
