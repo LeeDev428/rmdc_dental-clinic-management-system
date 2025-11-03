@@ -830,24 +830,6 @@
 </div>
 
 <script>
-    // Function to toggle add form visibility
-    function toggleAddForm() {
-        const formCard = document.querySelector('.form-card');
-        const floatingBtn = document.querySelector('.floating-add-btn');
-        
-        if (formCard.classList.contains('active')) {
-            formCard.classList.remove('active');
-            floatingBtn.innerHTML = '<i class="fas fa-plus"></i>';
-            floatingBtn.title = 'Add New Item';
-        } else {
-            formCard.classList.add('active');
-            floatingBtn.innerHTML = '<i class="fas fa-times"></i>';
-            floatingBtn.title = 'Close Form';
-            // Scroll to form
-            formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    }
-    
     // Function to toggle expiration date field based on expiration type
     function toggleExpirationField() {
         const expirationType = document.getElementById('expiration_type').value;
