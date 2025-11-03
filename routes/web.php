@@ -22,6 +22,7 @@
     use App\Http\Controllers\Auth\CaptchaController;
     use App\Http\Controllers\DentalRecordController;
     use App\Http\Controllers\PatientDentalRecordController;
+    use App\Http\Controllers\AppointmentHistoryController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
