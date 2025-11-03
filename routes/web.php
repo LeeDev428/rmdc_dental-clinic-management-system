@@ -21,6 +21,7 @@
     use App\Http\Controllers\Admin\TeethLayoutController;
     use App\Http\Controllers\Auth\CaptchaController;
     use App\Http\Controllers\DentalRecordController;
+    use App\Http\Controllers\PatientDentalRecordController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -57,6 +58,10 @@
           // In your routes/web.php
     Route::get('/admin/upcoming_appointments', [AdminController::class, 'showUpcomingAppointments']);
     Route::post('/appointments/{id}/action/{action}', [AppointmentController::class, 'handleAction'])->name('appointment.handleAction');
+    
+    // Patient Dental Records
+    Route::get('/my-dental-records', [PatientDentalRecordController::class, 'index'])->name('patient.dental_records');
+    Route::get('/my-dental-records/{id}', [PatientDentalRecordController::class, 'show'])->name('patient.dental_record.show');
     });
 
 
