@@ -58,6 +58,39 @@
     .input-group {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+    
+    .filter-buttons .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .filter-buttons .btn.active {
+        background-color: #0056b3;
+        color: white;
+    }
+    
+    .priority-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .priority-high {
+        background-color: #ff4444;
+        color: white;
+    }
+    
+    .priority-medium {
+        background-color: #ffa500;
+        color: white;
+    }
+    
+    .priority-low {
+        background-color: #4CAF50;
+        color: white;
+    }
 
     @media (max-width: 768px) {
         .table th,
@@ -70,22 +103,55 @@
 <div class="container mt-4">
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title mb-4">Upcoming Appointments</h2>
+            <h2 class="card-title mb-4">Upcoming Appointments (Priority by Nearest Time)</h2>
+            
+            <!-- Success Message -->
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-            <!-- Search Bar and Date Picker -->
+            <!-- Search Bar -->
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control rounded-start" placeholder="Search by title or procedure">
-                        <button class="btn btn-primary" type="button" id="clearSearch">Clear</button>
-                    </div>
+                    <form method="GET" action="{{ route('admin.appointments') }}" id="appointmentSearchForm">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control rounded-start" 
+                                   placeholder="Search by title or procedure" 
+                                   value="{{ request('search') }}">
+                            <input type="hidden" name="date" id="hiddenAppointmentDate" value="{{ request('date') }}">
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                            @if(request('search') || request('date'))
+                                <a href="{{ route('admin.appointments') }}" class="btn btn-secondary">Clear</a>
+                            @endif
+                        </div>
+                    </form>
                 </div>
                 <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="date" id="datePicker" class="form-control">
-                        <button class="btn btn-outline-secondary" type="button" id="clearDate">Clear Date</button>
-                    </div>
+                    <input type="date" id="appointmentDateFilter" class="form-control" value="{{ request('date') }}" placeholder="Filter by date">
                 </div>
+            </div>
+            
+            <!-- Filter Buttons -->
+            <div class="filter-buttons mb-3">
+                <a href="{{ route('admin.appointments', ['filter' => 'today']) }}" 
+                   class="btn btn-outline-primary {{ request('filter') == 'today' ? 'active' : '' }}">
+                    Today
+                </a>
+                <a href="{{ route('admin.appointments', ['filter' => 'week']) }}" 
+                   class="btn btn-outline-primary {{ request('filter') == 'week' ? 'active' : '' }}">
+                    This Week
+                </a>
+                <a href="{{ route('admin.appointments', ['filter' => 'month']) }}" 
+                   class="btn btn-outline-primary {{ request('filter') == 'month' ? 'active' : '' }}">
+                    This Month
+                </a>
+                <a href="{{ route('admin.appointments') }}" 
+                   class="btn btn-outline-secondary {{ !request('filter') ? 'active' : '' }}">
+                    All Upcoming
+                </a>
             </div>
 
             <!-- Appointments Table -->
@@ -94,66 +160,64 @@
                     <thead>
                         <tr>
                             <th>No.</th>
+                            <th>Priority</th>
                             <th>Title</th>
                             <th>Procedure</th>
                             <th>Start Time</th>
-                            <th>End Time</th> <!-- Added End Time column -->
+                            <th>End Time</th>
                         </tr>
                     </thead>
-                    <tbody id="appointment-data">
-                        @foreach($acceptedAppointments as $index => $appointment)
+                    <tbody>
+                        @forelse($acceptedAppointments as $index => $appointment)
+                        @php
+                            $now = now();
+                            $appointmentTime = \Carbon\Carbon::parse($appointment->start);
+                            $hoursUntil = $now->diffInHours($appointmentTime, false);
+                            
+                            if ($hoursUntil <= 2) {
+                                $priorityClass = 'priority-high';
+                                $priorityLabel = 'URGENT';
+                            } elseif ($hoursUntil <= 24) {
+                                $priorityClass = 'priority-medium';
+                                $priorityLabel = 'SOON';
+                            } else {
+                                $priorityClass = 'priority-low';
+                                $priorityLabel = 'SCHEDULED';
+                            }
+                        @endphp
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ ($acceptedAppointments->currentPage() - 1) * $acceptedAppointments->perPage() + $index + 1 }}</td>
+                            <td>
+                                <span class="priority-badge {{ $priorityClass }}">{{ $priorityLabel }}</span>
+                            </td>
                             <td>{{ $appointment->title }}</td>
                             <td>{{ $appointment->procedure }}</td>
-                            <td>{{ $appointment->start }}</td>
-                            <td>{{ $appointment->end }}</td> <!-- Display End Time -->
+                            <td>{{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y h:i A') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($appointment->end)->format('M d, Y h:i A') }}</td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center">No upcoming appointments found.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $acceptedAppointments->appends(request()->query())->links() }}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Filtering Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const searchInput = document.getElementById('searchInput');
-        const datePicker = document.getElementById('datePicker');
-        const clearSearchButton = document.getElementById('clearSearch');
-        const clearDateButton = document.getElementById('clearDate');
-        const tableRows = document.querySelectorAll('#appointment-data tr');
-
-        function filterTable() {
-            const searchValue = searchInput.value.toLowerCase();
-            const selectedDate = datePicker.value;
-
-            tableRows.forEach(row => {
-                const title = row.cells[1].textContent.toLowerCase();
-                const procedure = row.cells[2].textContent.toLowerCase();
-                const startTime = row.cells[3].textContent;
-
-                const matchesSearch = title.includes(searchValue) || procedure.includes(searchValue);
-                const matchesDate = !selectedDate || startTime.startsWith(selectedDate);
-
-                row.style.display = matchesSearch && matchesDate ? '' : 'none';
-            });
-        }
-
-        searchInput.addEventListener('input', filterTable);
-        datePicker.addEventListener('change', filterTable);
-
-        clearSearchButton.addEventListener('click', function () {
-            searchInput.value = '';
-            filterTable();
-        });
-
-        clearDateButton.addEventListener('click', function () {
-            datePicker.value = '';
-            filterTable();
-        });
+    // Date filter functionality
+    document.getElementById('appointmentDateFilter').addEventListener('change', function() {
+        const selectedDate = this.value;
+        document.getElementById('hiddenAppointmentDate').value = selectedDate;
+        document.getElementById('appointmentSearchForm').submit();
     });
 </script>
 @endsection
