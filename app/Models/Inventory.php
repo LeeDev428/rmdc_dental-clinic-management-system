@@ -9,8 +9,8 @@ class Inventory extends Model
 {
     use HasFactory;
 
-    // Adding 'category' to the fillable array
-    protected $fillable = ['name', 'price', 'expiration_date', 'quantity', 'supplier', 'expiration_type', 'category'];
+    // Adding 'category', 'unit', 'items_per_unit', and 'low_stock_threshold' to the fillable array
+    protected $fillable = ['name', 'price', 'expiration_date', 'quantity', 'low_stock_threshold', 'unit', 'items_per_unit', 'supplier', 'expiration_type', 'category'];
 
     protected $casts = [
         'expiration_date' => 'datetime',
