@@ -45,10 +45,10 @@
         <!-- Navbar Search-->
         <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
             {{-- Uncomment this block if you want to enable the search feature --}}
-            <div class="input-group">
+            {{-- <div class="input-group">
                 <input type="text" class="form-control" name="search" placeholder="Search by ID, Name, Email, Usertype..." value="{{ request('search') }}">
                 <button class="btn btn-primary" type="submit">Search</button>
-            </div>
+            </div> --}}
         </form>
         <!-- Navbar-->
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
@@ -96,21 +96,23 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <!-- User Profile Image -->
-                    @if(Auth::user()->avatar)
-                        <img src="{{ Storage::url(Auth::user()->avatar) }}" alt="Profile Image" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
-                    @endif
+                    <img src="{{ Auth::user()->avatar_url }}" 
+                         alt="{{ Auth::user()->name }}" 
+                         onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
+                         style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 2px solid #fff;">
                     <!-- Display Username -->
                     <span>{{ Auth::user()->name }}</span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="#!">Settings</a></li>
-                    <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                    <li><a class="dropdown-item" href="{{ route('admin.profile.edit') }}"><i class="fas fa-user-edit me-2"></i>Edit Profile</a></li>
+                    <li><a class="dropdown-item" href="#!"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                    <li><a class="dropdown-item" href="#!"><i class="fas fa-history me-2"></i>Activity Log</a></li>
                     <li><hr class="dropdown-divider" /></li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button class="dropdown-item" type="submit">
-                                {{ __('Log Out') }}
+                                <i class="fas fa-sign-out-alt me-2"></i>{{ __('Log Out') }}
                             </button>
                         </form>
                     </li>
