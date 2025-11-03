@@ -1,6 +1,7 @@
 <?php
 
     use App\Http\Controllers\ProfileController;
+    use App\Http\Controllers\Admin\AdminProfileController;
     use App\Http\Controllers\AdminController;
     use App\Http\Controllers\UserController; // Add this import for UserController
     use App\Http\Controllers\AppointmentController;
@@ -68,6 +69,11 @@
     Route::middleware(AdminMiddleware::class)->group(function () {
         Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/patient-management', [AdminController::class, 'patientmanagement'])->name('admin.patient-management');
+        
+        // Admin Profile Routes
+        Route::get('/admin/profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
+        Route::put('/admin/profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+        Route::put('/admin/profile/password', [AdminProfileController::class, 'updatePassword'])->name('admin.profile.password');
     });
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
@@ -215,17 +221,26 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::post('/set-theme', [ThemeController::class, 'setTheme'])->name('set-theme');
 
 
-    //facebook
+    // OAuth Routes - Simple and Clean
     use App\Http\Controllers\SocialiteController;
-    Route::controller(SocialiteController::class)->group(function () {
-        Route::get('auth/redirection/{provider}', 'authProviderRedirection')->name('auth.redirection');
-        Route::get('auth/{provider}/callback','socialAuthentication')->name('auth.callback');
+    use App\Http\Controllers\PrivacyPolicyController;
+    use App\Http\Controllers\UserDataDeletionController;
+    
+    // Google OAuth
+    Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+    Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+    // Facebook OAuth  
+    Route::get('/auth/facebook', function() {
+        return app(SocialiteController::class)->authProviderRedirection('facebook');
+    })->name('facebook.login');
+    Route::get('/auth/facebook/callback', function() {
+        return app(SocialiteController::class)->socialAuthentication('facebook');
     });
 
-    //google
-
-    Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('redirect.google');
-    Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+    // Facebook Required Pages
+    Route::get('/privacy-policy', [PrivacyPolicyController::class, 'show'])->name('privacy.policy');
+    Route::get('/user-data-deletion', [UserDataDeletionController::class, 'show'])->name('user.data.deletion');
 
     Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
