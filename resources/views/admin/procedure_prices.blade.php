@@ -2,241 +2,417 @@
 
 @section('title', 'Procedure Prices')
 
+@section('content')
 <style>
-    :root {
-        --primary-color: #3498db;
-        --secondary-color: #2ecc71;
-        --danger-color: #e74c3c;
-        --light-bg: #f8f9fa;
-        --dark-text: #2c3e50;
-        --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        --border-radius: 8px;
-        --transition-speed: 0.3s;
-    }
-
-    body {
-        background-color: #f0f5f9 !important;
-        color: var(--dark-text);
-        font-family: 'Nunito', sans-serif;
+    .content-wrapper {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
     .page-header {
-        background: linear-gradient(135deg, var(--primary-color), #2980b9);
-        color: white;
-        padding: 30px 0;
-        margin-bottom: 30px;
-        margin-top: 30px;
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
+        background-color: #fff;
+        padding: 20px 24px;
+        margin-bottom: 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
     .page-title {
-        font-weight: 700;
-        margin: 0;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .card {
-        border: none;
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
-        margin-bottom: 30px;
-        overflow: hidden;
-        transition: transform var(--transition-speed), box-shadow var(--transition-speed);
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-
-    .card-header {
-        padding: 15px 20px;
+        font-size: 24px;
         font-weight: 600;
+        margin: 0;
+        color: #1a1a1a;
+    }
+
+    .alert-success {
+        background-color: #f0f9f4;
+        border: 1px solid #d1f2e0;
+        color: #16a34a;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .alert-success svg {
+        flex-shrink: 0;
     }
 
     .table-container {
-        background-color: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
-        padding: 20px;
-        margin-bottom: 30px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 24px;
+        margin-bottom: 24px;
     }
 
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background-color: #f1f8ff;
-        color: var(--primary-color);
-        border-bottom: 2px solid var(--primary-color);
-        padding: 12px 15px;
+    .table-container h4 {
+        font-size: 18px;
         font-weight: 600;
+        margin: 0 0 20px 0;
+        color: #1a1a1a;
     }
 
-    .table td {
-        padding: 15px;
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .data-table thead th {
+        background-color: #f8f9fa;
+        color: #4a4a4a;
+        font-weight: 600;
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .data-table tbody td {
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
         vertical-align: middle;
     }
 
-    .table tbody tr {
-        transition: background-color var(--transition-speed);
+    .data-table tbody tr:hover {
+        background-color: #fafafa;
     }
 
-    .table tbody tr:hover {
-        background-color: #f8f9fa;
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
     }
 
     .form-control {
+        border: 1px solid #e0e0e0;
         border-radius: 6px;
-        border: 1px solid #ddd;
         padding: 8px 12px;
-        transition: all var(--transition-speed);
+        font-size: 14px;
+        transition: all 0.2s;
+        width: 100%;
     }
 
     .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        border-color: #0084ff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0,132,255,0.1);
     }
 
     textarea.form-control {
         min-height: 100px;
+         min-width: 180px;
+        resize: vertical;
     }
 
-    .action-buttons {
+    .input-group {
         display: flex;
-        gap: 8px;
-        justify-content: center;
+        width: 100%;
     }
 
-    .btn {
-        border-radius: 6px;
-        font-weight: 600;
-        padding: 8px 16px;
-        transition: all var(--transition-speed);
+    .input-group-prepend,
+    .input-group-append {
+        display: flex;
     }
 
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-        background-color: #2980b9;
-        border-color: #2980b9;
-    }
-
-    .btn-success {
-        background-color: var(--secondary-color);
-        border-color: var(--secondary-color);
-    }
-
-    .btn-success:hover {
-        background-color: #27ae60;
-        border-color: #27ae60;
-    }
-
-    .btn-danger {
-        background-color: var(--danger-color);
-        border-color: var(--danger-color);
-    }
-
-    .btn-danger:hover {
-        background-color: #c0392b;
-        border-color: #c0392b;
-    }
-
-    .btn-sm {
-        padding: 5px 10px;
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        padding: 8px 12px;
         font-size: 14px;
+        color: #4a4a4a;
+    }
+
+    .input-group-prepend .input-group-text {
+        border-right: none;
+        border-radius: 6px 0 0 6px;
+    }
+
+    .input-group-append .input-group-text {
+        border-left: none;
+        border-radius: 0 6px 6px 0;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 6px 6px 0;
+    }
+
+    .input-group-prepend + .form-control {
+        border-left: none;
+    }
+
+    .input-group .form-control:not(:last-child) {
+        border-radius: 6px 0 0 6px;
+        border-right: none;
     }
 
     .image-preview-container {
         display: flex;
         flex-direction: column;
         gap: 8px;
+        max-width: 80px;
     }
 
     .image-preview {
         width: 100%;
-        height: 120px;
+        height: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
         overflow: hidden;
         border: 1px solid #e0e0e0;
-        border-radius: var(--border-radius);
-        background-color: #f8f9fa;
-        transition: all var(--transition-speed);
-    }
-
-    .image-preview:hover {
-        border-color: var(--primary-color);
+        border-radius: 6px;
+        background-color: #fafafa;
     }
 
     .image-preview img {
         max-width: 100%;
-        max-height: 120px;
+        max-height: 50px;
         object-fit: contain;
     }
 
     .no-image {
-        color: #aaa;
+        color: #9ca3af;
+        font-size: 12px;
         font-style: italic;
     }
 
-    .file-upload-control {
-        position: relative;
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-start;
     }
 
-    .file-upload-control input[type="file"] {
-        cursor: pointer;
+    .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
         font-size: 14px;
-    }
-
-    .alert {
-        border-radius: var(--border-radius);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .alert-success {
-        background-color: #d4edda;
-        border-color: #c3e6cb;
-        color: #155724;
-    }
-
-    /* Modal styling */
-    .modal-content {
-        border-radius: var(--border-radius);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        font-weight: 500;
         border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .modal-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #eee;
+    .btn-primary {
+        background-color: #0084ff;
+        color: #fff;
     }
 
-    .modal-footer {
-        background-color: #f8f9fa;
-        border-top: 1px solid #eee;
+    .btn-primary:hover {
+        background-color: #0070e0;
+    }
+
+    .btn-success {
+        background-color: #16a34a;
+        color: #fff;
+    }
+
+    .btn-success:hover {
+        background-color: #15803d;
+    }
+
+    .btn-danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        color: #fff;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
     }
 
     .section-divider {
-        height: 3px;
-        background: linear-gradient(to right, transparent, var(--primary-color), transparent);
-        margin: 40px 0;
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: 32px 0;
         border: none;
     }
 
-    .form-group label {
-        font-weight: 600;
-        color: #555;
-        margin-bottom: 5px;
+    .add-form-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 24px;
     }
 
-    /* Responsive adjustments */
+    .form-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .form-card-header h4 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: #1a1a1a;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: #4a4a4a;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .custom-file {
+        position: relative;
+        display: block;
+    }
+
+    .custom-file-input {
+        width: 100%;
+        height: 40px;
+        opacity: 0;
+        position: absolute;
+        cursor: pointer;
+    }
+
+    .custom-file-label {
+        display: block;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        background-color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .custom-file-label::after {
+        content: 'Browse';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        padding: 8px 16px;
+        background-color: #f8f9fa;
+        border-left: 1px solid #e0e0e0;
+        border-radius: 0 6px 6px 0;
+        color: #4a4a4a;
+        font-weight: 500;
+    }
+
+    .form-text {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 6px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .modal-content {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    .modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e0e0e0;
+        background-color: #fff;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+
+    .modal-body {
+        padding: 24px;
+        font-size: 14px;
+        color: #4a4a4a;
+    }
+
+    .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #e0e0e0;
+        background-color: #fafafa;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close:hover {
+        color: #4a4a4a;
+    }
+
+    /* Floating Add Button */
+    .floating-add-btn {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #16a34a;
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+
+    .floating-add-btn:hover {
+        background-color: #15803d;
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(22, 163, 74, 0.5);
+    }
+
+    .floating-add-btn:active {
+        transform: scale(0.95);
+    }
+
     @media (max-width: 768px) {
         .action-buttons {
             flex-direction: column;
@@ -248,16 +424,15 @@
     }
 </style>
 
-@section('content')
-<div class="container">
-    <div class="page-header text-center">
+<div class="content-wrapper">
+    <div class="page-header">
         <h2 class="page-title">Procedure Prices</h2>
     </div>
 
     <!-- Display success message with fade-out effect -->
     @if(session('success'))
-        <div class="alert alert-success d-flex align-items-center" id="successMessage">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check-circle-fill flex-shrink-0 me-2" viewBox="0 0 16 16">
+        <div class="alert alert-success" id="successMessage">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
             </svg>
             <div>{{ session('success') }}</div>
@@ -266,9 +441,9 @@
 
     <!-- Table to display procedure prices -->
     <div class="table-container">
-        <h4 class="mb-4">Current Procedures</h4>
+        <h4>Current Procedures</h4>
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>Procedure Name</th>
@@ -282,7 +457,7 @@
                 <tbody>
                     @foreach($procedures as $procedure)
                     <tr>
-                        <td class="font-weight-bold">{{ $procedure->procedure_name }}</td>
+                        <td style="font-weight: 500;">{{ $procedure->procedure_name }}</td>
                         <td>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -308,25 +483,23 @@
                                         <div class="no-image">No Image</div>
                                     @endif
                                 </div>
-                                <div class="file-upload-control">
-                                    <input type="file" id="image_path_{{ $procedure->id }}" class="form-control-file form-control-sm">
-                                </div>
+                                <input type="file" id="image_path_{{ $procedure->id }}" class="form-control-file" style="font-size: 10px; padding: 2px;">
                             </div>
                         </td>
                         <td>
-                            <textarea id="description_{{ $procedure->id }}" class="form-control">{{ old('description', $procedure->description) }}</textarea>
+                            <textarea id="description_{{ $procedure->id }}" class="form-control" style="font-size: 10px;">{{ old('description', $procedure->description) }}</textarea>
                         </td>
                         <td>
                             <!-- Action Buttons Container -->
                             <div class="action-buttons">
                                 <!-- Update Button -->
                                 <button class="btn btn-primary btn-sm" onclick="confirmUpdate({{ $procedure->id }})">
-                                    <i class="fas fa-save mr-1"></i> Update
+                                    <i class="fas fa-save"></i> Update
                                 </button>
 
                                 <!-- Delete Button -->
                                 <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ $procedure->id }})">
-                                    <i class="fas fa-trash mr-1"></i> Delete
+                                    <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
 
@@ -352,74 +525,87 @@
             </table>
         </div>
     </div>
+</div>
 
-    <hr class="section-divider">
+<!-- Floating Add Button -->
+<button type="button" class="floating-add-btn" onclick="$('#addProcedureModal').modal('show')">
+    <i class="fas fa-plus"></i>
+</button>
 
-    <!-- Form to Create New Procedure Price -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h4 class="mb-0"><i class="fas fa-plus-circle mr-2"></i> Add New Procedure</h4>
-        </div>
-        <div class="card-body">
-            <form action="{{ route('admin.procedure_prices.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
+<!-- Add New Procedure Modal -->
+<div class="modal fade" id="addProcedureModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle" style="color: #16a34a; margin-right: 8px;"></i>
+                    Add New Procedure
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addProcedureForm" action="{{ route('admin.procedure_prices.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="procedure_name">Procedure Name</label>
-                            <input type="text" name="procedure_name" id="procedure_name" class="form-control" placeholder="Enter procedure name" required>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="modal_procedure_name">Procedure Name</label>
+                                <input type="text" name="procedure_name" id="modal_procedure_name" class="form-control" placeholder="Enter procedure name" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="price">Price (₱)</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"></span>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="modal_price">Price (₱)</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">₱</span>
+                                    </div>
+                                    <input type="text" name="price" id="modal_price" class="form-control" placeholder="0.00" required>
                                 </div>
-                                <input type="text" name="price" id="price" class="form-control" placeholder="0.00" required>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="duration">Duration (minutes)</label>
-                            <div class="input-group">
-                                <input type="text" name="duration" id="duration" class="form-control" placeholder="30" required>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">min</span>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="modal_duration">Duration (minutes)</label>
+                                <div class="input-group">
+                                    <input type="text" name="duration" id="modal_duration" class="form-control" placeholder="30" required>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">min</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="image_path">Procedure Image</label>
-                            <div class="custom-file">
-                                <input type="file" name="image_path" id="image_path" class="custom-file-input">
-                                <label class="custom-file-label" for="image_path">Choose image...</label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="modal_image_path">Procedure Image</label>
+                                <div class="custom-file">
+                                    <input type="file" name="image_path" id="modal_image_path" class="custom-file-input">
+                                    <label class="custom-file-label" for="modal_image_path">Choose image...</label>
+                                </div>
+                                <small class="form-text">Recommended size: 600x400px</small>
                             </div>
-                            <small class="form-text text-muted">Recommended size: 600x400px</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="modal_description">Description</label>
+                                <textarea name="description" id="modal_description" class="form-control" rows="4" placeholder="Enter procedure description..."></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Enter procedure description..."></textarea>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-plus-circle mr-1"></i> Add New Procedure
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="document.getElementById('addProcedureForm').submit()">
+                    <i class="fas fa-plus-circle"></i> Add Procedure
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -447,8 +633,14 @@
 <script>
     // Function to handle file input display
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle the custom file input
+        // Handle the custom file input for main form
         $('.custom-file-input').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName || 'Choose image...');
+        });
+
+        // Handle the custom file input for modal form
+        $('#modal_image_path').on('change', function() {
             var fileName = $(this).val().split('\\').pop();
             $(this).next('.custom-file-label').html(fileName || 'Choose image...');
         });
@@ -499,12 +691,5 @@
         }
     }, 3000);
 </script>
-
-<!-- FontAwesome, Bootstrap & jQuery -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 @endsection
