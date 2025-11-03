@@ -22,6 +22,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'usertype', // Added usertype
+        'email_verified_at', // Added for OAuth
         'auth_provider', // Added auth_provider
         'auth_provider_id', // Added auth_provider_id
         'bio', // Added bio
@@ -58,7 +60,16 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrlAttribute(): string
     {
-        return $this->avatar ? Storage::url($this->avatar) : 'https://www.gravatar.com/avatar/' . md5(strtolower(trim($this->email))) . '?d=mp';
+        if ($this->avatar) {
+            // Check if it's the default image or a public path
+            if (strpos($this->avatar, 'img/') === 0) {
+                return asset($this->avatar); // Use asset() for public folder files
+            }
+            return Storage::url($this->avatar); // Use Storage for uploaded files
+        }
+        
+        // Fallback to default avatar
+        return asset('img/default-dp.jpg');
     }
 
         // Relationship with Notification model
