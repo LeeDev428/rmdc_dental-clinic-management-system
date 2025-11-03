@@ -4,98 +4,234 @@
 
 @section('content')
 <style>
-    .card {
+    .modern-container {
+        background-color: #f5f7fa;
+        min-height: calc(100vh - 100px);
+        padding: 30px 20px;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-title {
+        color: #fff;
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .search-card {
+        background: #fff;
         border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
 
-    .table {
-        background-color: #ffffff;
+    .search-input {
+        border: 2px solid #e4e7eb;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        table-layout: auto;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: all 0.3s ease;
     }
 
-    .table th {
-        background-color: #007BFF;
-        color: white;
-        text-align: center;
-        padding: 12px;
-        white-space: nowrap;
+    .search-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
-    .table td {
-        background-color: #f9f9f9;
-        color: #333;
-        padding: 12px;
-        vertical-align: middle;
-        word-wrap: break-word;
-        max-width: 200px;
+    .filter-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
     }
 
-    .table-responsive {
+    .filter-pill {
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: 2px solid #e4e7eb;
+        background: #fff;
+        color: #64748b;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .filter-pill:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+
+    .filter-pill.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: #fff;
+    }
+
+    .data-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .table-wrapper {
         overflow-x: auto;
     }
 
-    .container {
-        background-color: #f0f8ff;
-        padding: 30px;
-        border-radius: 10px;
+    .modern-table {
+        width: 100%;
+        margin: 0;
     }
 
-    h2 {
-        color: #007BFF;
-        font-weight: bold;
+    .modern-table thead th {
+        background: linear-gradient(to right, #f8fafc, #f1f5f9);
+        color: #475569;
+        font-weight: 600;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 20px;
+        border: none;
+        white-space: nowrap;
     }
 
-    .btn {
+    .modern-table tbody td {
+        padding: 16px 20px;
+        color: #334155;
         font-size: 14px;
-        padding: 10px 20px;
-        border-radius: 5px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
     }
 
-    .input-group {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    .modern-table tbody tr {
+        transition: all 0.2s ease;
     }
-    
-    .filter-buttons .btn {
-        margin-right: 10px;
-        margin-bottom: 10px;
+
+    .modern-table tbody tr:hover {
+        background-color: #f8fafc;
     }
-    
-    .filter-buttons .btn.active {
-        background-color: #0056b3;
-        color: white;
-    }
-    
+
     .priority-badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 20px;
         font-size: 12px;
-        font-weight: bold;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-    
-    .priority-high {
-        background-color: #ff4444;
-        color: white;
+
+    .priority-urgent {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
     }
-    
-    .priority-medium {
-        background-color: #ffa500;
-        color: white;
+
+    .priority-soon {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
     }
-    
-    .priority-low {
-        background-color: #4CAF50;
-        color: white;
+
+    .priority-scheduled {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .alert-modern {
+        border-radius: 10px;
+        border: none;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-modern {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-search {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-clear {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .btn-clear:hover {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .pagination {
+        margin: 20px 0 0 0;
+    }
+
+    .pagination .page-link {
+        border: none;
+        color: #667eea;
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin: 0 4px;
+        font-weight: 500;
+    }
+
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+    }
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        opacity: 0.5;
     }
 
     @media (max-width: 768px) {
-        .table th,
-        .table td {
-            font-size: 14px;
+        .page-title {
+            font-size: 22px;
+        }
+
+        .filter-pills {
+            flex-direction: column;
+        }
+
+        .modern-table thead th,
+        .modern-table tbody td {
+            padding: 12px;
+            font-size: 12px;
         }
     }
 </style>
