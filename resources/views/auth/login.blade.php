@@ -14,10 +14,10 @@
 
             <!-- Social Media Buttons -->
             <div class="flex justify-center gap-3 mt-4">
-                <a href="{{ route('auth.redirection', 'facebook') }}"class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white text-lg">
+                <a href="{{ route('facebook.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white text-lg">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
-                <a href="{{ route('redirect.google') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
+                <a href="{{ route('google.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
                     <i class="fa-brands fa-google"></i>
                 </a>
                 
