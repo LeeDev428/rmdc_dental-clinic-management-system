@@ -129,7 +129,7 @@
             min-height: calc(100vh - 72px);
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);
             position: relative;
             overflow: hidden;
         }
@@ -424,7 +424,7 @@
 
         /* Contact Section */
         .contact {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);
             color: white;
             text-align: center;
         }
@@ -654,7 +654,7 @@
                     @if($procedure->image_path)
                         <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="{{ $procedure->procedure_name }}" class="service-image">
                     @else
-                        <div class="service-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <div class="service-image" style="background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);"></div>
                     @endif
                     
                     <div class="service-content">
