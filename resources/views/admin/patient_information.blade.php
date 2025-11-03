@@ -189,6 +189,7 @@
                         <th>Usertype</th>
                         <th>Created</th>
                         <th>Updated</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -209,6 +210,13 @@
                             </td>
                             <td>{{ $u->created_at->format('Y-m-d') }}</td>
                             <td>{{ $u->updated_at->format('Y-m-d') }}</td>
+                            <td>
+                                <a href="{{ route('admin.dental_records.index', $u->id) }}" 
+                                   class="btn-primary" 
+                                   style="text-decoration: none; display: inline-block;">
+                                    <i class="fas fa-file-medical"></i> Dental Records
+                                </a>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
