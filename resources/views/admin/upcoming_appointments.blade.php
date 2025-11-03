@@ -4,144 +4,356 @@
 
 @section('content')
 <style>
-    .table {
-        background-color: #ffffff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    .page-header {
+        background-color: #fff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+    
+    .content-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+    }
+    
+    .search-section {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #0084ff;
+    }
+    
+    .date-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #e0e0e0;
+        background-color: #fff;
+        color: #1a1a1a;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    
+    .filter-btn:hover {
+        background-color: #f5f5f5;
+        color: #1a1a1a;
+    }
+    
+    .filter-btn.active {
+        background-color: #0084ff;
+        color: #fff;
+        border-color: #0084ff;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-nav {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-nav.info {
+        background-color: #0ea5e9;
+        color: #fff;
+    }
+    
+    .btn-nav.info:hover {
+        background-color: #0284c7;
+        color: #fff;
+    }
+    
+    .btn-nav.primary {
+        background-color: #0084ff;
+        color: #fff;
+    }
+    
+    .btn-nav.primary:hover {
+        background-color: #0073e6;
+        color: #fff;
+    }
+    
+    .btn-nav.danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+    
+    .btn-nav.danger:hover {
+        background-color: #dc2626;
+        color: #fff;
+    }
+    
+    .data-table {
         width: 100%;
-        table-layout: auto;
-    }
-
-    .table th {
-        background-color: #007BFF;
-        color: white;
-        text-align: center;
-        padding: 12px;
-        white-space: nowrap;
-    }
-
-    .table td {
-        background-color: #f9f9f9;
-        color: #333;
-        padding: 12px;
-        vertical-align: middle;
-        word-wrap: break-word;
-        max-width: 200px;
-    }
-
-    .table img {
-        max-width: 100%;
-        height: auto;
-        cursor: pointer;
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    .container {
-        background-color: #f0f8ff;
-        padding: 30px;
-        border-radius: 10px;
-    }
-
-    h1 {
-        color: #007BFF;
-        font-weight: bold;
-    }
-
-    .btn {
-        font-size: 14px;
-        padding: 10px 20px;
-        border-radius: 5px;
-    }
-
-    .dropdown-menu {
-        min-width: 150px;
-    }
-
-    .dropdown-item {
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 14px;
-        white-space: nowrap;
-    }
-
-    .dropdown-item:hover {
-        background-color: #e0f7fa;
+        border-collapse: collapse;
     }
     
-    .filter-buttons .btn {
-        margin-right: 10px;
-        margin-bottom: 10px;
+    .data-table thead th {
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: left;
+        padding: 12px;
+        border-bottom: 2px solid #e0e0e0;
     }
     
-    .filter-buttons .btn.active {
-        background-color: #0056b3;
-        color: white;
+    .data-table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #4a4a4a;
     }
-
-    @media (max-width: 768px) {
-        .table th,
-        .table td {
-            font-size: 14px;
-        }
+    
+    .data-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .id-image {
+        width: 60px;
+        height: 50px;
+        border-radius: 6px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .action-btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-accept {
+        background-color: #10b981;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-accept:hover {
+        background-color: #059669;
+    }
+    
+    .btn-decline {
+        background-color: #ef4444;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-decline:hover {
+        background-color: #dc2626;
+    }
+    
+    .alert-success {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        padding: 12px 16px;
+        border-radius: 6px;
+        border-left: 4px solid #16a34a;
+        margin-bottom: 16px;
+    }
+    
+    .modal-content {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 16px 24px;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .modal-body {
+        padding: 24px;
+    }
+    
+    .modal-body label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .modal-body textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .modal-body textarea:focus {
+        outline: none;
+        border-color: #0084ff;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #e0e0e0;
+        padding: 16px 24px;
+    }
+    
+    .modal-footer .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .modal-footer .btn-secondary {
+        background-color: #f0f0f0;
+        color: #1a1a1a;
+    }
+    
+    .modal-footer .btn-secondary:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .modal-footer .btn-danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+    
+    .modal-footer .btn-danger:hover {
+        background-color: #dc2626;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 24px;
     }
 </style>
 
-<div class="container mb-5">
-    <h1 class="mb-4">Pending Appointments</h1>
+<div class="page-header">
+    <h1 class="page-title">Pending Appointments</h1>
+</div>
 
+<div class="content-card">
+
+<div class="content-card">
     <!-- Success Message -->
     @if(session('success'))
-        <div class="alert alert-success">
+        <div class="alert-success">
             {{ session('success') }}
         </div>
     @endif
 
     <!-- Search and Date Filter -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <form method="GET" action="{{ route('admin.upcoming_appointments') }}" id="searchForm">
-                <input type="text" name="search" class="form-control" placeholder="Search by procedure, status, or username" value="{{ request('search') }}">
-                <input type="hidden" name="date" id="hiddenDateInput" value="{{ request('date') }}">
-            </form>
-        </div>
-        <div class="col-md-6">
-            <input type="date" id="dateFilter" class="form-control" value="{{ request('date') }}" placeholder="Filter by date">
-        </div>
+    <div class="search-section">
+        <form method="GET" action="{{ route('admin.upcoming_appointments') }}" id="searchForm" style="flex: 1; min-width: 250px;">
+            <input type="text" name="search" class="search-input" placeholder="Search by procedure, status, or username" value="{{ request('search') }}">
+            <input type="hidden" name="date" id="hiddenDateInput" value="{{ request('date') }}">
+        </form>
+        <input type="date" id="dateFilter" class="date-input" value="{{ request('date') }}" placeholder="Filter by date">
     </div>
 
     <!-- Filter Buttons -->
-    <div class="filter-buttons mb-3">
+    <div class="filter-buttons">
         <a href="{{ route('admin.upcoming_appointments', ['filter' => 'today']) }}" 
-           class="btn btn-outline-primary {{ request('filter') == 'today' ? 'active' : '' }}">
+           class="filter-btn {{ request('filter') == 'today' ? 'active' : '' }}">
             Today
         </a>
         <a href="{{ route('admin.upcoming_appointments', ['filter' => 'week']) }}" 
-           class="btn btn-outline-primary {{ request('filter') == 'week' ? 'active' : '' }}">
+           class="filter-btn {{ request('filter') == 'week' ? 'active' : '' }}">
             This Week
         </a>
         <a href="{{ route('admin.upcoming_appointments', ['filter' => 'month']) }}" 
-           class="btn btn-outline-primary {{ request('filter') == 'month' ? 'active' : '' }}">
+           class="filter-btn {{ request('filter') == 'month' ? 'active' : '' }}">
             This Month
         </a>
         <a href="{{ route('admin.upcoming_appointments') }}" 
-           class="btn btn-outline-secondary {{ !request('filter') ? 'active' : '' }}">
+           class="filter-btn {{ !request('filter') ? 'active' : '' }}">
             All
         </a>
     </div>
 
-    <!-- Buttons -->
-    <div class="d-flex mb-3">
-        <a href="{{ route('admin.patient_information') }}" class="btn btn-info me-2">Patient Information</a>
-        <a href="{{ route('admin.appointments') }}" class="btn btn-primary me-2">Upcoming Appointments</a>
-        <a href="{{ route('admin.declined_appointments') }}" class="btn btn-danger">Declined Appointments</a>
+    <!-- Navigation Buttons -->
+    <div class="action-buttons">
+        <a href="{{ route('admin.patient_information') }}" class="btn-nav info">Patient Information</a>
+        <a href="{{ route('admin.appointments') }}" class="btn-nav primary">Upcoming Appointments</a>
+        <a href="{{ route('admin.declined_appointments') }}" class="btn-nav danger">Declined Appointments</a>
     </div>
 
     <!-- Appointments Table -->
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped align-middle">
+    <div style="overflow-x: auto;">
+        <table class="data-table">
             <thead>
                 <tr>
                     <th>User ID</th>
@@ -169,9 +381,9 @@
                     <td>{{ $appointment->username }}</td>
                     <td>
                         @if($appointment->image_path)
-                            <img src="{{ Storage::url($appointment->image_path) }}" alt="Valid ID" style="width: 60px; height: 50px; border-radius: 5px;" onclick="zoomImage(this)">
+                            <img src="{{ Storage::url($appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
                         @else
-                            <img src="https://via.placeholder.com/100" alt="Default ID Image" style="width: 60px; height: 50px; border-radius: 5px;">
+                            <img src="https://via.placeholder.com/100" alt="Default ID Image" class="id-image">
                         @endif
                     </td>
                     <td>{{ $appointment->status }}</td>
@@ -180,12 +392,11 @@
                     <td>{{ $appointment->created_at }}</td>
                     <td>{{ $appointment->updated_at }}</td>
                     <td>
-                        <!-- Accept and Decline Buttons (Vertically Aligned) -->
-                        <div class="d-flex  gap-2">
-                            <button class="btn btn-success btn-sm accept-action" data-appointment-id="{{ $appointment->id }}">
+                        <div class="action-btn-group">
+                            <button class="btn-accept accept-action" data-appointment-id="{{ $appointment->id }}">
                                 Accept
                             </button>
-                            <button class="btn btn-danger btn-sm decline-action" data-appointment-id="{{ $appointment->id }}">
+                            <button class="btn-decline decline-action" data-appointment-id="{{ $appointment->id }}">
                                 Decline
                             </button>
                         </div>
@@ -196,7 +407,7 @@
         </table>
         
         <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
+        <div class="pagination">
             {{ $appointments->appends(request()->query())->links() }}
         </div>
     </div>
