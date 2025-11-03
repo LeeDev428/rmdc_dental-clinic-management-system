@@ -14,6 +14,8 @@ class CreateInventoriesTable extends Migration
             $table->decimal('price', 8, 2);
             $table->date('expiration_date')->nullable();
             $table->integer('quantity')->nullable();  // Make quantity nullable
+            $table->string('unit')->default('pieces');  // Unit type (pieces, boxes, packs, bottles, etc.)
+            $table->integer('items_per_unit')->default(1);  // How many items in one unit (e.g., 10 masks per box)
             $table->string('supplier');
             $table->enum('expiration_type', ['Expirable', 'Inexpirable'])->default('Expirable');
             $table->string('category');  // To store the category (e.g., "Dental Instruments", "Consumables")
