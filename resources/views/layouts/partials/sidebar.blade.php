@@ -15,7 +15,7 @@
             </a>
             <a class="nav-link" href="{{ route('admin.patient_information') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                User Information
+                Patient Information
             </a>
             <a class="nav-link" href="{{ route('admin.appointments') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-calendar"></i></div>
