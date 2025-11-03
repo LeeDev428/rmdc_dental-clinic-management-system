@@ -179,41 +179,94 @@
     <section>
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 bg-white dark:bg-blue-800 shadow-sm rounded-lg relative">
-            <div class="text-center font-semibold text-3xl text-gray-800 dark:text-white mt-6">
+            <div class="text-center font-semibold text-3xl text-gray-800 dark:text-white mt-6 mb-8">
                 <span class="text-blue-600">Our</span> Services
             </div>
 
-            <!-- Horizontal Scrollable Services -->
-            <div id="services-scroll" class="flex overflow-x-auto space-x-6 p-6 scroll-smooth">
-                @foreach($procedures as $procedure)
-                <div class="w-[360px] flex-shrink-0 rounded-xl shadow-lg bg-white dark:bg-gray-800 hover:scale-105 transform transition duration-300 ease-in-out">
-                    <img src="{{ asset('storage/' . $procedure->image_path) }}"
-                         alt="{{ $procedure->procedure_name }}"
-                         class="w-full h-44 object-cover rounded-t-xl">
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-white">{{ $procedure->procedure_name }}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-3">
-                            {{ $procedure->description ?? 'No description available.' }}
-                        </p>
-                        <div class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                            <p><strong>Estimated Time:</strong> {{ $procedure->duration }} Minutes</p>
-                            <p><strong>Price:</strong> ₱{{ number_format($procedure->price, 2) }}</p>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            <!-- Grid Layout for Services (3 cards per row) -->
+            <div id="services-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                @include('partials.services-cards', ['procedures' => $procedures])
+            </div>
+
+            <!-- Pagination -->
+            <div id="services-pagination" class="flex justify-center py-6">
+                {{ $procedures->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </div>
 </section>
 
-<!-- Scroll Script -->
+<!-- AJAX Pagination Script -->
 <script>
-    function scrollServices(offset) {
-        const container = document.getElementById('services-scroll');
-        container.scrollLeft += offset;
-    }
+    $(document).ready(function() {
+        // Handle pagination clicks
+        $(document).on('click', '#services-pagination .pagination a', function(e) {
+            e.preventDefault();
+            
+            let page = $(this).attr('href').split('page=')[1];
+            fetchServices(page);
+        });
+        
+        function fetchServices(page) {
+            $.ajax({
+                url: "/dashboard?page=" + page,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $('#services-container').html(data.html);
+                    $('#services-pagination').html(data.pagination);
+                },
+                error: function(xhr) {
+                    console.error('Error loading services:', xhr);
+                }
+            });
+        }
+    });
 </script>
+
+<style>
+    .service-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Pagination styling */
+    #services-pagination .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    #services-pagination .page-item {
+        list-style: none;
+    }
+    
+    #services-pagination .page-link {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        color: #374151;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    #services-pagination .page-link:hover {
+        background-color: #3b82f6;
+        color: white;
+    }
+    
+    #services-pagination .page-item.active .page-link {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+    
+    #services-pagination .page-item.disabled .page-link {
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+</style>
 
 
     <script>
