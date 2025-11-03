@@ -11,7 +11,7 @@ class InventoryController extends Controller
     // Display all inventory items
     public function index()
     {
-        $inventory = Inventory::all();
+        $inventory = Inventory::paginate(20); // Paginate with 20 items per page
         $item = null; // Default value to avoid undefined variable issue
         $pendingCount = Appointment::where('status', 'pending')->count();
         return view('admin.inventory_admin', compact('inventory', 'item', 'pendingCount'));
@@ -26,9 +26,12 @@ class InventoryController extends Controller
             'price' => 'required|numeric',
             'expiration_date' => 'nullable|date',
             'quantity' => 'required|integer|min:0',
+            'low_stock_threshold' => 'required|integer|min:1',
+            'unit' => 'required|string|max:50',
+            'items_per_unit' => 'required|integer|min:1',
             'supplier' => 'nullable|string|max:255',
             'expiration_type' => 'required|string|in:expirable,inexpirable',
-            'category' => 'required|string|max:255', // Added category validation
+            'category' => 'required|string|max:255',
         ]);
     
         // Check expiration type and adjust expiration_date accordingly
@@ -58,18 +61,24 @@ class InventoryController extends Controller
         'name' => 'required|string|max:255',
         'price' => 'required|numeric',
         'quantity' => 'required|integer',
+        'low_stock_threshold' => 'required|integer|min:1',
+        'unit' => 'required|string|max:50',
+        'items_per_unit' => 'required|integer|min:1',
         'expiration_date' => 'nullable|date',
         'supplier' => 'nullable|string|max:255',
-        'category' => 'required|string|max:255', // Added category validation
+        'category' => 'required|string|max:255',
     ]);
 
     // Update the item
     $item->name = $validated['name'];
     $item->price = $validated['price'];
     $item->quantity = $validated['quantity'];
+    $item->low_stock_threshold = $validated['low_stock_threshold'];
+    $item->unit = $validated['unit'];
+    $item->items_per_unit = $validated['items_per_unit'];
     $item->expiration_date = $validated['expiration_date'];
     $item->supplier = $validated['supplier'];
-    $item->category = $validated['category']; // Update category
+    $item->category = $validated['category'];
 
     $item->save();
 
