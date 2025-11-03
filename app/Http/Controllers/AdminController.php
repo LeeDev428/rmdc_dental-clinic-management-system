@@ -244,13 +244,35 @@ class   AdminController extends Controller
             });
         }
 
-        // Apply date filter if provided
-        if ($request->has('date') && $request->date != '') {
-            $query->whereDate('appointments.start', $request->date); // Filter by the 'start' column
+        // Apply time-based filter (today, this week, this month)
+        if ($request->has('filter')) {
+            switch ($request->filter) {
+                case 'today':
+                    $query->whereDate('appointments.start', today());
+                    break;
+                case 'week':
+                    $query->whereBetween('appointments.start', [
+                        now()->startOfWeek(),
+                        now()->endOfWeek()
+                    ]);
+                    break;
+                case 'month':
+                    $query->whereMonth('appointments.start', now()->month)
+                          ->whereYear('appointments.start', now()->year);
+                    break;
+            }
         }
 
-        // Paginate the results (10 items per page)
-        $paginatedAppointments = $query->paginate(10);
+        // Apply specific date filter if provided
+        if ($request->has('date') && $request->date != '') {
+            $query->whereDate('appointments.start', $request->date);
+        }
+
+        // Sort by most recent created_at first
+        $query->orderBy('appointments.created_at', 'desc');
+
+        // Paginate the results (20 items per page)
+        $paginatedAppointments = $query->paginate(20);
 
         // Count pending appointments
         $pendingCount = Appointment::where('status', 'pending')->count();
@@ -345,31 +367,68 @@ public function patientInformation(Request $request)
          return view('admin.appointments', ['appointments' => $appointments]);
      }
 
-     public function acceptedAppointments()
+     public function acceptedAppointments(Request $request)
 {
-    // Fetch all accepted appointments ordered by start date
-    $acceptedAppointments = Appointment::where('status', 'accepted')
-                                       ->orderBy('start', 'asc') // Sort by start time
-                                       ->select('id', 'title', 'procedure', 'start', 'end') // Include the 'end' column
-                                       ->get();
+    $now = now();
+    
+    // Start query for accepted appointments
+    $query = Appointment::where('status', 'accepted')
+                        ->where('start', '>=', $now); // Only future appointments
+    
+    // Apply search filter if provided
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%$search%")
+              ->orWhere('procedure', 'like', "%$search%");
+        });
+    }
+    
+    // Apply time-based filter (today, this week, this month)
+    if ($request->has('filter')) {
+        switch ($request->filter) {
+            case 'today':
+                $query->whereDate('start', today());
+                break;
+            case 'week':
+                $query->whereBetween('start', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+                break;
+            case 'month':
+                $query->whereMonth('start', now()->month)
+                      ->whereYear('start', now()->year);
+                break;
+        }
+    }
+    
+    // Apply specific date filter if provided
+    if ($request->has('date') && $request->date != '') {
+        $query->whereDate('start', $request->date);
+    }
+    
+    // Sort by nearest time first (closest to current time = highest priority)
+    $query->orderByRaw('ABS(TIMESTAMPDIFF(SECOND, start, NOW()))')
+          ->orderBy('start', 'asc');
+    
+    // Paginate the results (20 items per page)
+    $acceptedAppointments = $query->select('id', 'title', 'procedure', 'start', 'end', 'user_id')
+                                   ->paginate(20);
 
     // Count the number of pending appointments
     $pendingCount = Appointment::where('status', 'pending')->count();
 
     // Count of accepted appointments
-    $upcomingCount = $acceptedAppointments->count();
-
-    // Check if there are any upcoming appointments and create a notification message
-    $recentlyBooked = $acceptedAppointments->first(); // Get the most recent accepted appointment if it exists
-    if ($recentlyBooked) {
-        session()->flash('notification', "A new appointment has been accepted for user ID: {$recentlyBooked->user_id}");
-    }
+    $upcomingCount = Appointment::where('status', 'accepted')
+                                 ->where('start', '>=', $now)
+                                 ->count();
 
     // Pass accepted appointments and counts to the view
     return view('admin.appointments', [
-        'acceptedAppointments' => $acceptedAppointments, // Passed accepted appointments
-        'upcomingCount' => $upcomingCount, // Passed upcoming count
-        'pendingCount' => $pendingCount, // Passed pending count
+        'acceptedAppointments' => $acceptedAppointments,
+        'upcomingCount' => $upcomingCount,
+        'pendingCount' => $pendingCount,
     ]);
 }
 
