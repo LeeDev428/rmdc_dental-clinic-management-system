@@ -23,6 +23,7 @@
     use App\Http\Controllers\DentalRecordController;
     use App\Http\Controllers\PatientDentalRecordController;
     use App\Http\Controllers\AppointmentHistoryController;
+    use App\Http\Controllers\HistorySettingsController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -68,9 +69,7 @@
     Route::get('/appointment-history', [AppointmentHistoryController::class, 'index'])->name('appointment.history');
     
     // History Settings
-    Route::get('/history-settings', function () {
-        return view('history-settings');
-    })->name('history.settings');
+    Route::get('/history-settings', [HistorySettingsController::class, 'index'])->name('history.settings');
     });
 
 
