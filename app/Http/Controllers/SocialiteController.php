@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
@@ -19,39 +19,74 @@ class SocialiteController extends Controller
     public function socialAuthentication($provider) 
     {
         try {
-            // Get user data from the social provider
             $socialUser = Socialite::driver($provider)->user();
-    
-            // Find user in the database by provider ID
-            $user = User::where('auth_provider_id', $socialUser->id)->first();
-    
+            
+            // Debug: Log what we get from social provider
+            Log::info($provider . ' user data:', [
+                'name' => $socialUser->getName(),
+                'email' => $socialUser->getEmail(),
+                'id' => $socialUser->getId()
+            ]);
+            
+            // Check if email is provided
+            $email = $socialUser->getEmail();
+            
+            if (!$email) {
+                // If no email, create one using provider ID
+                $email = $socialUser->getId() . '@' . $provider . '.local';
+                Log::warning($provider . ' did not provide email. Using fallback: ' . $email);
+            }
+            
+            // Find existing user or create new one
+            $user = User::where('email', $email)
+                       ->orWhere('auth_provider_id', $socialUser->getId())
+                       ->first();
+            
             if ($user) {
-                // Update avatar if not already set
+                Log::info('Found existing user: ' . $user->email);
+                
+                // Update provider info if not set
+                if (!$user->auth_provider) {
+                    $user->update([
+                        'auth_provider' => $provider,
+                        'auth_provider_id' => $socialUser->getId(),
+                        'email_verified_at' => now(),
+                    ]);
+                }
+                
+                // Update avatar if user doesn't have one
                 if (!$user->avatar) {
-                    $user->avatar = $socialUser->avatar;
-                    $user->save();
+                    $user->update([
+                        'avatar' => 'img/default-dp.jpg',
+                    ]);
                 }
                 
                 Auth::login($user);
             } else {
-                // If user doesn't exist, create a new user
-                $userData = User::create([
-                    'name' => $socialUser->name,
-                    'email' => $socialUser->email,
-                    'password' => Hash::make('Password@1234'), // Consider using a random password generator
-                    'avatar' => $socialUser->avatar, // Store Facebook profile picture
+                Log::info('Creating new user for: ' . $email);
+                
+                $user = User::create([
+                    'name' => $socialUser->getName() ?? $provider . ' User',
+                    'email' => $email,
+                    'usertype' => 'user', // Explicitly set usertype for middleware
+                    'password' => Hash::make(Str::random(16)),
+                    'email_verified_at' => now(),
+                    'bio' => null, // Set bio to blank
+                    'avatar' => 'img/default-dp.jpg', // Use default profile picture
                     'auth_provider' => $provider,
-                    'auth_provider_id' => $socialUser->id,
+                    'auth_provider_id' => $socialUser->getId(),
                 ]);
-    
-                Auth::login($userData);
+                Log::info('Created user: ' . $user->id);
+                Auth::login($user);
             }
-    
-            return redirect()->route('dashboard');
+            
+            Log::info('User logged in, redirecting to dashboard');
+            return redirect('/dashboard');
+            
         } catch (\Exception $e) {
-            Log::error('Social authentication error: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', 'Something went wrong during authentication');
+            Log::error($provider . ' OAuth error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return redirect('/login')->with('error', $provider . ' login failed: ' . $e->getMessage());
         }
     }
-    
 }
