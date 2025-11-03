@@ -142,15 +142,15 @@ public function unreadNotificationCount()
 public function getUnreadCount()
 {
     $unreadCount = Notification::where('user_id', Auth::id())
-        ->whereNull('read_at') // Only count unread notifications
+        ->where('status', 'unread') // Check status column instead of read_at
         ->count();
 
     return response()->json(['unreadCount' => $unreadCount]);
 }
 
-public function declinedAppointments()
+public function declinedAppointments(Request $request)
 {
-    $declinedAppointments = Appointment::join('messages', 'appointments.user_id', '=', 'messages.user_id') // Join with messages table
+    $query = Appointment::join('messages', 'appointments.user_id', '=', 'messages.user_id') // Join with messages table
         ->join('users', 'appointments.user_id', '=', 'users.id') // Join with users table to get patient name
         ->where('appointments.status', 'declined') // Explicitly reference appointments.status
         ->where('messages.is_admin', true) // Ensure the message is from the admin
@@ -164,8 +164,47 @@ public function declinedAppointments()
             'appointments.end',
             'appointments.created_at',
             'appointments.updated_at'
-        )
-        ->get();
+        );
+
+    // Apply search filter if provided
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('users.name', 'like', "%$search%")
+              ->orWhere('appointments.title', 'like', "%$search%")
+              ->orWhere('appointments.procedure', 'like', "%$search%");
+        });
+    }
+
+    // Apply time-based filter (today, this week, this month)
+    if ($request->has('filter')) {
+        switch ($request->filter) {
+            case 'today':
+                $query->whereDate('appointments.updated_at', today());
+                break;
+            case 'week':
+                $query->whereBetween('appointments.updated_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+                break;
+            case 'month':
+                $query->whereMonth('appointments.updated_at', now()->month)
+                      ->whereYear('appointments.updated_at', now()->year);
+                break;
+        }
+    }
+
+    // Apply specific date filter if provided
+    if ($request->has('date') && $request->date != '') {
+        $query->whereDate('appointments.updated_at', $request->date);
+    }
+
+    // Sort by most recent declined first
+    $query->orderBy('appointments.updated_at', 'desc');
+
+    // Paginate the results (20 items per page)
+    $declinedAppointments = $query->paginate(20);
 
     return view('admin.declined_appointments', compact('declinedAppointments'));
 }
