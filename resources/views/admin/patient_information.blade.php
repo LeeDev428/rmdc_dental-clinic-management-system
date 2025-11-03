@@ -125,7 +125,10 @@
                             @foreach($user as $u)
                                 <tr>
                                     <td>
-                                        <img src="{{ $u->avatar ? Storage::url($u->avatar) : 'https://via.placeholder.com/50' }}" alt="Profile Image" style="width: 50px; height: 50px;">
+                                        <img src="{{ $u->avatar_url }}" 
+                                             alt="{{ $u->name }}" 
+                                             onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
+                                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                                     </td>
                                     <td>{{ $u->name }}</td>
                                     <td>{{ $u->email }}</td>
