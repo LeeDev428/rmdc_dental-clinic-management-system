@@ -408,7 +408,11 @@ window.onclick = function(event) {
                                 <!-- Event Title -->
                                 <div class="mb-4">
                                     <label for="booking-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                                    <input type="text" id="booking-title" name="title" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <input type="text" id="booking-title" name="title" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                  
+           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+           placeholder="Select a procedure"
+           value="{{ __( auth()->user()->name) }}">
                                 </div>
 
 <!-- Procedure Dropdown -->
