@@ -296,14 +296,7 @@ function formatDate(dateString) {
 <div x-data="{ open: false }" @click.away="open = false" class="relative">
     <!-- Profile Button -->
     <button class="inline-flex items-center px-7 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-white bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150" @click="open = !open">
-        @if (Auth::user()->avatar)
-            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-8 h-8 rounded-full">
-        @else
-            <svg class="h-8 w-8 rounded-full text-gray-500 dark:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="7" r="4"></circle>
-                <path d="M12 14c4 0 7 1 7 3v4H5v-4c0-2 3-3 7-3z"></path>
-            </svg>
-        @endif
+        <img src="{{ Auth::user()->avatar_url }}" alt="Avatar" class="w-8 h-8 rounded-full">
         <div class="ms-2 hidden sm:block dark:text-white">{{ Auth::user()->name }}</div>
         <div class="ms-1">
             <svg class="fill-current h-4 w-4 dark:text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
