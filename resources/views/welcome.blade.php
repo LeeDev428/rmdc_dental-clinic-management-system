@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ asset('img/dcms_iconmini(1).png') }}" type="image/png">
     <title>RMDC - Robles Moncayo Dental Clinic</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
         * {
@@ -20,20 +17,10 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-color: #0084ff;
-            --primary-dark: #0070e0;
-            --text-dark: #1a1a1a;
-            --text-gray: #6b7280;
-            --bg-light: #f8f9fa;
-            --white: #ffffff;
-        }
-
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text-dark);
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            color: #1a1a1a;
+            background: #fafafa;
         }
 
         /* Navigation */
@@ -41,695 +28,552 @@
             position: fixed;
             top: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: white;
             z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-        }
-
-        nav.scrolled {
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 16px 24px;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
             font-size: 24px;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #2d2b2b;
             text-decoration: none;
-        }
-
-        .logo img {
-            width: 40px;
-            height: 40px;
         }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 30px;
             list-style: none;
             align-items: center;
         }
 
         .nav-links a {
-            color: var(--text-dark);
+            color: #666;
             text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
+            font-weight: 400;
+            font-size: 14px;
             transition: color 0.3s;
         }
 
         .nav-links a:hover {
-            color: var(--primary-color);
+            color: #333;
         }
 
-        .btn-primary {
-            background: var(--primary-color);
+        .btn-login {
+            background: #00c8d7;
             color: white;
             padding: 10px 24px;
-            border-radius: 8px;
+            border-radius: 6px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 14px;
             transition: all 0.3s;
-            border: none;
-            cursor: pointer;
         }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 132, 255, 0.3);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-dark);
+        .btn-login:hover {
+            background: #03828b;
         }
 
         /* Hero Section */
         .hero {
-            margin-top: 72px;
-            min-height: calc(100vh - 72px);
+            margin-top: 70px;
+            min-height: 85vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('{{ asset('img/dcms_bg.jpg') }}') center/cover;
-            opacity: 0.15;
+            background: white;
         }
 
         .hero-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 80px 24px;
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            color: white;
+            padding: 60px 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
         }
 
-        .hero h1 {
-            font-size: 56px;
+        .hero-content h1 {
+            font-size: 48px;
             font-weight: 700;
-            margin-bottom: 24px;
             line-height: 1.2;
-            animation: fadeInUp 0.8s ease;
+            margin-bottom: 20px;
+            color: #1a1a1a;
         }
 
-        .hero p {
-            font-size: 20px;
-            margin-bottom: 40px;
-            opacity: 0.95;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            animation: fadeInUp 1s ease;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            animation: fadeInUp 1.2s ease;
-        }
-
-        .btn-hero {
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-weight: 600;
+        .hero-content p {
             font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .hero-btn {
+            background: #00c8d7;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 6px;
             text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: inline-block;
             transition: all 0.3s;
         }
 
-        .btn-hero-primary {
+        .hero-btn:hover {
+            background: #03747c;
+        }
+
+        .hero-image {
+            background: linear-gradient(135deg, #555 0%, #777 100%);
+            border-radius: 12px;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* Info Cards */
+        .info-section {
+            background: #fafafa;
+            padding: 40px 0;
+        }
+
+        .info-cards {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .info-card {
             background: white;
-            color: var(--primary-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
         }
 
-        .btn-hero-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+        .info-card h3 {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
         }
 
-        .btn-hero-secondary {
-            background: transparent;
-            color: white;
-            border: 2px solid white;
+        .info-card p {
+            color: #666;
+            font-size: 14px;
         }
 
-        .btn-hero-secondary:hover {
+        /* Services Section */
+        .services {
+            padding: 80px 40px;
             background: white;
-            color: var(--primary-color);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Sections */
-        section {
-            padding: 80px 24px;
-        }
-
-        .section-container {
+        .services-container {
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .section-header {
+        .section-title {
             text-align: center;
-            margin-bottom: 60px;
-        }
-
-        .section-header h2 {
-            font-size: 40px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-dark);
+            margin-bottom: 50px;
+            color: #1a1a1a;
         }
 
-        .section-header p {
-            font-size: 18px;
-            color: var(--text-gray);
-            max-width: 600px;
-            margin: 0 auto;
+        .services-carousel {
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Stats Section */
-        .stats {
-            background: var(--bg-light);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 32px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 32px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border-radius: 50%;
+        .services-wrapper {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 28px;
+            transition: transform 0.3s ease-in-out;
         }
 
-        .stat-card h3 {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 8px;
-        }
-
-        .stat-card p {
-            color: var(--text-gray);
-            font-size: 16px;
-        }
-
-        /* Services Section */
-        .services-grid {
+        .services-slide {
+            min-width: 100%;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 24px;
         }
 
         .service-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             transition: all 0.3s;
         }
 
         .service-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
         }
 
         .service-image {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
+            background: linear-gradient(135deg, #555, #777);
         }
 
         .service-content {
-            padding: 24px;
+            padding: 20px;
         }
 
         .service-content h3 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-dark);
+            margin-bottom: 8px;
         }
 
         .service-content p {
-            color: var(--text-gray);
-            font-size: 14px;
-            line-height: 1.6;
+            color: #666;
+            font-size: 13px;
             margin-bottom: 16px;
+            line-height: 1.5;
         }
 
         .service-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .service-duration {
-            font-size: 14px;
-            color: var(--text-gray);
+            padding-top: 12px;
+            border-top: 1px solid #eee;
         }
 
         .service-price {
             font-size: 18px;
             font-weight: 700;
-            color: var(--primary-color);
+            color: #333;
         }
 
-        /* Clinics Section */
-        .clinics {
-            background: var(--bg-light);
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            align-items: center;
         }
 
-        .clinics-grid {
+        .carousel-btn {
+            background: #333;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .carousel-btn:hover {
+            background: #555;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            gap: 8px;
+        }
+
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .carousel-dot.active {
+            background: #333;
+            width: 30px;
+            border-radius: 5px;
+        }
+
+        /* Clinic Locations */
+        .locations {
+            padding: 80px 40px;
+            background: #fafafa;
+        }
+
+        .locations-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .locations-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
         }
 
-        .clinic-card {
+        .location-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
 
-        .clinic-map {
+        .location-map {
             width: 100%;
             height: 300px;
         }
 
-        .clinic-info {
-            padding: 32px;
+        .location-info {
+            padding: 20px;
         }
 
-        .clinic-info h3 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-dark);
+        .location-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
         }
 
-        .clinic-detail {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .clinic-detail i {
-            color: var(--primary-color);
-            font-size: 18px;
-            width: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .clinic-detail-content {
-            flex: 1;
-        }
-
-        .clinic-detail-content strong {
-            display: block;
-            margin-bottom: 4px;
-            color: var(--text-dark);
-        }
-
-        .clinic-detail-content p {
-            color: var(--text-gray);
+        .location-info p {
+            color: #666;
             font-size: 14px;
-            margin: 0;
+            line-height: 1.6;
         }
 
         /* Contact Section */
         .contact {
-            background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);
-            color: white;
+            padding: 60px 40px;
+            background: #fafafa;
+        }
+
+        .contact-container {
+            max-width: 1200px;
+            margin: 0 auto;
             text-align: center;
         }
 
         .contact h2 {
-            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
 
         .contact p {
-            color: rgba(255, 255, 255, 0.9);
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 30px;
         }
 
         .contact-info {
             display: flex;
             justify-content: center;
-            gap: 48px;
-            margin-top: 40px;
-            flex-wrap: wrap;
+            gap: 50px;
+            margin-top: 30px;
         }
 
         .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .contact-item i {
-            font-size: 24px;
-        }
-
-        .contact-item div {
-            text-align: left;
+            font-size: 15px;
+            color: #666;
         }
 
         .contact-item strong {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 4px;
-            opacity: 0.9;
-        }
-
-        .contact-item span {
-            font-size: 18px;
+            color: #333;
             font-weight: 600;
         }
 
         /* Footer */
         footer {
             background: #1a1a1a;
-            color: white;
-            padding: 48px 24px 24px;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            color: #999;
             text-align: center;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            margin-bottom: 24px;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
+            padding: 25px;
+            font-size: 13px;
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: block;
+        @media (max-width: 968px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
             }
-
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                flex-direction: column;
-                padding: 24px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .hero h1 {
+            
+            .hero-content h1 {
                 font-size: 36px;
             }
-
-            .hero p {
-                font-size: 16px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-            }
-
-            .section-header h2 {
-                font-size: 32px;
-            }
-
-            .clinics-grid {
+            
+            .info-cards {
                 grid-template-columns: 1fr;
             }
 
+            .services-slide {
+                grid-template-columns: 1fr;
+            }
+
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+            
             .contact-info {
                 flex-direction: column;
-                gap: 24px;
+                gap: 20px;
             }
         }
     </style>
 </head>
 <body>
-</head>
-<body>
     <!-- Navigation -->
-    <nav id="navbar">
+    <nav>
         <div class="nav-container">
-            <a href="#" class="logo">
-                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="RMDC Logo">
+            <a href="#" class="logo" style="display: flex; align-items: center; gap: 10px;">
+                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="RMDC Logo" style="height: 40px; width: auto;">
                 <span>RMDC</span>
             </a>
-            
-            <ul class="nav-links" id="navLinks">
+            <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
-                <li><a href="#clinics">Clinics</a></li>
-                <li><a href="{{ route('login') }}" class="btn-primary">Book Appointment</a></li>
+                <li><a href="#locations">Locations</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ route('login') }}" class="btn-login">Login</a></li>
             </ul>
-            
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-container">
-            <h1>Robles Moncayo Dental Clinic</h1>
-            <p>Your trusted partner for comprehensive dental care in Bacoor. Professional, caring, and modern dentistry for the whole family.</p>
-            <div class="hero-buttons">
-                <a href="{{ route('login') }}" class="btn-hero btn-hero-primary">Schedule Appointment</a>
-                <a href="#clinics" class="btn-hero btn-hero-secondary">Find Our Clinics</a>
+            <div class="hero-content">
+                <h1>Robles-Moncayo Dental Clinic</h1>
+                <p>Experience modern dentistry with compassionate service. We provide comprehensive dental solutions for the whole family in Bacoor.</p>
+                <a href="{{ route('login') }}" class="hero-btn">Book Appointment</a>
+            </div>
+            <div class="hero-image">
+                               <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800&h=600&fit=crop" alt="Modern Dental Clinic">
+
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="section-container">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>1000+</h3>
-                    <p>Happy Patients</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-clinic-medical"></i>
-                    </div>
-                    <h3>2</h3>
-                    <p>Clinic Locations</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-tooth"></i>
-                    </div>
-                    <h3>{{ count($procedures) }}+</h3>
-                    <p>Dental Services</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <h3>15+</h3>
-                    <p>Years Experience</p>
-                </div>
+    <!-- Info Cards -->
+    <section class="info-section">
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>24+</h3>
+                <p>Dental Services</p>
             </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about">
-        <div class="section-container">
-            <div class="section-header">
-                <h2>About Us</h2>
-                <p>Providing exceptional dental care with a personal touch. Our experienced team is dedicated to maintaining and enhancing your oral health in a comfortable, modern environment.</p>
+            <div class="info-card">
+                <h3>50%</h3>
+                <p>Discounted Rates</p>
+            </div>
+            <div class="info-card">
+                <h3>2</h3>
+                <p>Clinic Locations</p>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section id="services">
-        <div class="section-container">
-            <div class="section-header">
-                <h2>Our Services</h2>
-                <p>Comprehensive dental treatments tailored to your needs</p>
-            </div>
+    <section class="services" id="services">
+        <div class="services-container">
+            <h2 class="section-title">Our Services</h2>
             
-            <div class="services-grid">
-                @foreach($procedures as $procedure)
-                <div class="service-card">
-                    @if($procedure->image_path)
-                        <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="{{ $procedure->procedure_name }}" class="service-image">
-                    @else
-                        <div class="service-image" style="background: linear-gradient(135deg, #5EBDCC 0%, #3A9FB5 100%);"></div>
-                    @endif
+            <div class="services-carousel">
+                <div class="services-wrapper" id="servicesWrapper">
+                    @php
+                        $chunks = $procedures->chunk(3);
+                    @endphp
                     
-                    <div class="service-content">
-                        <h3>{{ $procedure->procedure_name }}</h3>
-                        <p>{{ \Illuminate\Support\Str::limit($procedure->description, 120) }}</p>
-                        
-                        <div class="service-meta">
-                            <span class="service-duration">
-                                <i class="far fa-clock"></i> {{ $procedure->duration }} mins
-                            </span>
-                            <span class="service-price">₱{{ number_format($procedure->price, 2) }}</span>
+                    @foreach($chunks as $chunk)
+                    <div class="services-slide">
+                        @foreach($chunk as $procedure)
+                        <div class="service-card">
+                            @if($procedure->image_path)
+                                <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="{{ $procedure->procedure_name }}" class="service-image">
+                            @else
+                                <div class="service-image"></div>
+                            @endif
+                            
+                            <div class="service-content">
+                                <h3>{{ $procedure->procedure_name }}</h3>
+                                <p>{{ \Illuminate\Support\Str::limit($procedure->description, 80) }}</p>
+                                
+                                <div class="service-meta">
+                                    <span style="font-size: 12px; color: #999;"><i class="far fa-clock"></i> {{ $procedure->duration }} mins</span>
+                                    <span class="service-price">₱{{ number_format($procedure->price, 2) }}</span>
+                                </div>
+                            </div>
                         </div>
+                        @endforeach
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
+            </div>
+
+            <div class="carousel-controls">
+                <button class="carousel-btn" onclick="previousSlide()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="carousel-indicators" id="indicators">
+                    @for($i = 0; $i < $chunks->count(); $i++)
+                    <div class="carousel-dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $i }})"></div>
+                    @endfor
+                </div>
+                
+                <button class="carousel-btn" onclick="nextSlide()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Clinics Section -->
-    <section class="clinics" id="clinics">
-        <div class="section-container">
-            <div class="section-header">
-                <h2>Our Clinic Locations</h2>
-                <p>Visit us at either of our convenient locations in Bacoor</p>
-            </div>
+    <!-- Clinic Locations -->
+    <section class="locations" id="locations">
+        <div class="locations-container">
+            <h2 class="section-title">Our Clinic Locations</h2>
             
-            <div class="clinics-grid">
-                <!-- Clinic 1 -->
-                <div class="clinic-card">
-                    <div id="map1" class="clinic-map"></div>
-                    <div class="clinic-info">
-                        <h3>Clinic 1 - Niog</h3>
-                        
-                        <div class="clinic-detail">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="clinic-detail-content">
-                                <strong>Address</strong>
-                                <p>Unit F Medina Bldg, in front gate of Niog Elementary School, Bacoor, Philippines</p>
-                            </div>
-                        </div>
-                        
-                        <div class="clinic-detail">
-                            <i class="far fa-clock"></i>
-                            <div class="clinic-detail-content">
-                                <strong>Operating Hours</strong>
-                                <p>Monday to Saturday: 7:00 AM - 2:00 PM</p>
-                                <p style="color: #ef4444; margin-top: 4px;">Sunday: Closed</p>
-                            </div>
-                        </div>
+            <div class="locations-grid">
+                <div class="location-card">
+                    <div id="map1" class="location-map"></div>
+                    <div class="location-info">
+                        <h3><i class="fas fa-map-marker-alt"></i> Bacoor Main Clinic</h3>
+                        <p><strong>Address:</strong> 123 Main Street, Bacoor, Cavite</p>
+                        <p><strong>Hours:</strong> Mon-Sat: 9:00 AM - 6:00 PM</p>
+                        <p><strong>Phone:</strong> (+63) 912-3456-789</p>
                     </div>
                 </div>
 
-                <!-- Clinic 2 -->
-                <div class="clinic-card">
-                    <div id="map2" class="clinic-map"></div>
-                    <div class="clinic-info">
-                        <h3>Clinic 2 - F E De Castro Village</h3>
-                        
-                        <div class="clinic-detail">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="clinic-detail-content">
-                                <strong>Address</strong>
-                                <p>Marigold corner Hyacinth Sts, F E De Castro Village, Bacoor, Philippines</p>
-                            </div>
-                        </div>
-                        
-                        <div class="clinic-detail">
-                            <i class="far fa-clock"></i>
-                            <div class="clinic-detail-content">
-                                <strong>Operating Hours</strong>
-                                <p>Monday to Saturday: 3:00 PM - 8:00 PM</p>
-                                <p style="color: #16a34a; margin-top: 4px;">Sunday: 1:00 PM - 8:00 PM</p>
-                            </div>
-                        </div>
+                <div class="location-card">
+                    <div id="map2" class="location-map"></div>
+                    <div class="location-info">
+                        <h3><i class="fas fa-map-marker-alt"></i> Bacoor Branch</h3>
+                        <p><strong>Address:</strong> 456 Secondary Road, Bacoor, Cavite</p>
+                        <p><strong>Hours:</strong> Mon-Sat: 9:00 AM - 6:00 PM</p>
+                        <p><strong>Phone:</strong> (+63) 912-3456-790</p>
                     </div>
                 </div>
             </div>
@@ -737,28 +581,16 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="contact">
-        <div class="section-container">
-            <div class="section-header">
-                <h2>Get In Touch</h2>
-                <p>We're here to answer your questions and schedule your appointment</p>
-            </div>
-            
+    <section class="contact" id="contact">
+        <div class="contact-container">
+            <h2>Get In Touch</h2>
+            <p>Ready to schedule your appointment? Contact us today!</p>
             <div class="contact-info">
                 <div class="contact-item">
-                    <i class="fas fa-phone"></i>
-                    <div>
-                        <strong>Call Us</strong>
-                        <span>(+63) 912-3456-789</span>
-                    </div>
+                    <strong>Phone:</strong> (+63) 912-3456-789
                 </div>
-                
                 <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <div>
-                        <strong>Email Us</strong>
-                        <span>robles_moncayo@yahoo.com</span>
-                    </div>
+                    <strong>Email:</strong> robles_moncayo@yahoo.com
                 </div>
             </div>
         </div>
@@ -766,85 +598,63 @@
 
     <!-- Footer -->
     <footer>
-        <div class="footer-container">
-            <div class="logo" style="justify-content: center; margin-bottom: 24px; color: white;">
-                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="RMDC Logo">
-                <span>Robles Moncayo Dental Clinic</span>
-            </div>
-            
-            <div class="footer-links">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#services">Services</a>
-                <a href="#clinics">Clinics</a>
-                <a href="{{ route('login') }}">Login</a>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 Robles Moncayo Dental Clinic. All Rights Reserved.</p>
-            </div>
-        </div>
+        <p>&copy; 2025 Robles Moncayo Dental Clinic. All Rights Reserved.</p>
     </footer>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <script>
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
+        // Services Carousel
+        let currentSlide = 0;
+        const wrapper = document.getElementById('servicesWrapper');
+        const totalSlides = {{ $chunks->count() }};
+
+        function updateSlide() {
+            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Update dots
+            const dots = document.querySelectorAll('.carousel-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
         }
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateSlide();
+        }
 
-        // Initialize Leaflet Maps
-        document.addEventListener('DOMContentLoaded', function() {
-            // Clinic 1 - Niog Elementary School area (approximate coordinates)
-            const map1 = L.map('map1').setView([14.4167, 120.9667], 16);
+        function previousSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateSlide();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+        }
+
+        // Initialize Maps
+        function initMaps() {
+            // Main Clinic Map
+            const map1 = L.map('map1').setView([14.4164, 120.9539], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '© OpenStreetMap contributors'
             }).addTo(map1);
-            
-            L.marker([14.4167, 120.9667]).addTo(map1)
-                .bindPopup('<b>Clinic 1 - Niog</b><br>Unit F Medina Bldg<br>Near Niog Elementary School')
+            L.marker([14.4164, 120.9539]).addTo(map1)
+                .bindPopup('<b>RMDC Main Clinic</b><br>Bacoor, Cavite')
                 .openPopup();
 
-            // Clinic 2 - F E De Castro Village (approximate coordinates)
-            const map2 = L.map('map2').setView([14.4300, 120.9700], 16);
+            // Branch Clinic Map
+            const map2 = L.map('map2').setView([14.4200, 120.9600], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '© OpenStreetMap contributors'
             }).addTo(map2);
-            
-            L.marker([14.4300, 120.9700]).addTo(map2)
-                .bindPopup('<b>Clinic 2 - F E De Castro Village</b><br>Marigold corner Hyacinth Sts')
+            L.marker([14.4200, 120.9600]).addTo(map2)
+                .bindPopup('<b>RMDC Branch</b><br>Bacoor, Cavite')
                 .openPopup();
-        });
+        }
 
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    // Close mobile menu if open
-                    document.getElementById('navLinks').classList.remove('active');
-                }
-            });
-        });
+        // Initialize maps on page load
+        document.addEventListener('DOMContentLoaded', initMaps);
     </script>
 </body>
 </html>
-
