@@ -33,22 +33,31 @@ public function update(Request $request)
 {
     $user = $request->user();
     
-    // Validate and update user profile, including email
+    // Validate user profile data
     $validated = $request->validate([
         'name' => 'required|string|max:255',
-        'email' => 'required|email|max:255|unique:users,email,' . $user->id,  // Add email validation
+        'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         'bio' => 'nullable|string',
         'avatar' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
     ]);
     
-    // Update the user's profile with the validated data
-    $user->update($validated);
-    
     // Handle avatar upload if exists
     if ($request->hasFile('avatar')) {
-        $user->avatar = $request->file('avatar')->store('avatars', 'public');
-        $user->save();
+        // Delete old avatar if it exists and is not the default
+        if ($user->avatar && !str_starts_with($user->avatar, 'img/')) {
+            Storage::disk('public')->delete($user->avatar);
+        }
+        
+        // Store new avatar
+        $avatarPath = $request->file('avatar')->store('avatars', 'public');
+        $user->avatar = $avatarPath;
     }
+    
+    // Update the user's profile (exclude avatar from validated data)
+    $user->name = $validated['name'];
+    $user->email = $validated['email'];
+    $user->bio = $validated['bio'] ?? null;
+    $user->save();
     
     // Set flash message after update
     return redirect()->route('profile.edit')->with('status', 'Profile updated successfully!');
