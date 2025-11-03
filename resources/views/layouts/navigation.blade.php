@@ -1,29 +1,77 @@
-<nav x-data="{ open: false, notificationsOpen: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false, notificationsOpen: false, currentPage: 0 }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex items-center">
+            <div class="flex items-center" style="width: 100%;">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
                         <x-application-logo />
                     </a>
                 </div>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <!-- Navigation Links (Desktop Only) -->
-                <div class="hidden sm:flex space-x-8 sm:-my-px sm:ms-10">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="dark:text-white">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                <!--
-                    <x-nav-link :active="request()->routeIs('asklee')" class="dark:text-white">
-                        {{ __('Ask Lee AI?') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('usersettings')" :active="request()->routeIs('usersettings')" class="dark:text-white">
-                        {{ __('Settings') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('appointments')" :active="request()->routeIs('appointments')" class="dark:text-white">
-                        {{ __('Appointment') }}
-                    </x-nav-link> -->
+                
+                <!-- Modern Carousel Navigation -->
+                <div class="hidden sm:flex items-center justify-center flex-1">
+                    <!-- Previous Button -->
+                    <button @click="currentPage = Math.max(0, currentPage - 1)" 
+                            :disabled="currentPage === 0"
+                            :class="currentPage === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            class="p-2 rounded-full transition-all flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- Navigation Items Container - Shows 3 items at a time -->
+                    <div class="overflow-hidden mx-4" style="width: 600px;">
+                        <div class="flex transition-transform duration-300 ease-in-out" 
+                             :style="'transform: translateX(-' + (currentPage * 100) + '%)'">
+                            
+                            <!-- Page 1: Dashboard, My Dental Records, Ask Lee AI -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-home mr-2"></i>Dashboard
+                                </x-nav-link>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <x-nav-link :href="route('patient.dental_records')" :active="request()->routeIs('patient.dental_records')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-file-medical mr-2"></i>Dental Records
+                                </x-nav-link>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-robot mr-2"></i>Ask Lee AI?
+                                </div>
+                            </div>
+                            
+                            <!-- Page 2: Services, Settings, Log Out -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-concierge-bell mr-2"></i>Services
+                                </div>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-cog mr-2"></i>Settings
+                                </div>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 hover:text-gray-900 dark:hover:text-white whitespace-nowrap">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Log Out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Button -->
+                    <button @click="currentPage = Math.min(1, currentPage + 1)" 
+                            :disabled="currentPage === 1"
+                            :class="currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            class="p-2 rounded-full transition-all flex-shrink-0 -ml-2">
+                        <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -309,6 +357,7 @@ function formatDate(dateString) {
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
   <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Ask Lee AI?') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Services') }}</x-dropdown-link>
