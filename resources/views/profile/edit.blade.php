@@ -23,12 +23,10 @@
 
                     <!-- Avatar Display in Overview -->
                     <div class="mb-6">
-                        @if ($profile->avatar)
-                              <img src="{{ $profile->avatar_url }}" alt="Avatar" class="rounded-full w-60 h-60 mb-6 mx-auto">
-                        @else
-                        
-                            <div class="rounded-full w-40 h-40 bg-gray-300 mb-6 mx-auto"></div> <!-- Placeholder if no avatar -->
-                        @endif
+                        <img src="{{ $profile->avatar_url }}" 
+                             alt="Avatar" 
+                             onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
+                             class="rounded-full w-60 h-60 mb-6 mx-auto object-cover">
 
                         <p class="text-lg text-gray-700 dark:text-gray-400 mb-4 flex items-center justify-start"> <!-- Changed justify-center to justify-start -->
                             <img src="{{ asset('img/editusername.png') }}" alt="User Icon" class="w-11 h-10 mr-3"> <!-- Adjusted size -->
@@ -71,15 +69,13 @@
                         <div class="mb-4">
                             <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Avatar</label>
                             
-                            @if ($profile->avatar)
-                                <div class="mb-2">
-                                    <img id="avatar-preview" src="{{ $profile->avatar_url }}" alt="Avatar" class="rounded-full w-20 h-20">
-                                </div>
-                            @else
-                                <div class="mb-2">
-                                    <img id="avatar-preview" src="" alt="Avatar" class="rounded-full w-20 h-20" style="display: none;">
-                                </div>
-                            @endif
+                            <div class="mb-2">
+                                <img id="avatar-preview" 
+                                     src="{{ $profile->avatar_url }}" 
+                                     alt="Avatar" 
+                                     onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
+                                     class="rounded-full w-20 h-20 object-cover">
+                            </div>
 
                             <input type="file" name="avatar" id="avatar" class="mt-1 block w-full text-sm text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-600 rounded-md focus:ring-indigo-500 focus:border-indigo-500" onchange="previewAvatar(event)">
                         </div>
@@ -125,10 +121,12 @@
                 
                 reader.onload = function(e) {
                     preview.src = e.target.result;
-                    preview.style.display = 'block'; // Show the preview
                 };
                 
                 reader.readAsDataURL(file);
+            } else {
+                // If no file selected, revert to original avatar or default
+                preview.src = "{{ $profile->avatar_url }}";
             }
         }
     </script>
