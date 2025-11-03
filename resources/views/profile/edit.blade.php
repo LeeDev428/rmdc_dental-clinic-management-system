@@ -24,8 +24,9 @@
                     <!-- Avatar Display in Overview -->
                     <div class="mb-6">
                         @if ($profile->avatar)
-                            <img src="{{ asset('storage/' . $profile->avatar) }}" alt="Avatar" class="rounded-full w-60 h-60 mb-6 mx-auto">
+                              <img src="{{ $profile->avatar_url }}" alt="Avatar" class="rounded-full w-60 h-60 mb-6 mx-auto">
                         @else
+                        
                             <div class="rounded-full w-40 h-40 bg-gray-300 mb-6 mx-auto"></div> <!-- Placeholder if no avatar -->
                         @endif
 
@@ -72,7 +73,7 @@
                             
                             @if ($profile->avatar)
                                 <div class="mb-2">
-                                    <img id="avatar-preview" src="{{ asset('storage/' . $profile->avatar) }}" alt="Avatar" class="rounded-full w-20 h-20">
+                                    <img id="avatar-preview" src="{{ $profile->avatar_url }}" alt="Avatar" class="rounded-full w-20 h-20">
                                 </div>
                             @else
                                 <div class="mb-2">
