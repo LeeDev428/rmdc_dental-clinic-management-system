@@ -337,6 +337,29 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="unit">Unit Type:</label>
+                    <select id="unit" name="unit" class="form-control" required>
+                        <option value="pieces">Pieces</option>
+                        <option value="boxes">Boxes</option>
+                        <option value="packs">Packs</option>
+                        <option value="bottles">Bottles</option>
+                        <option value="sets">Sets</option>
+                        <option value="rolls">Rolls</option>
+                        <option value="pairs">Pairs</option>
+                        <option value="tubes">Tubes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="items_per_unit">Items per Unit:</label>
+                    <input type="number" id="items_per_unit" name="items_per_unit" class="form-control"
+                           placeholder="e.g., 10 masks per box" min="1" value="1" required>
+                    <small style="color: #9ca3af; font-size: 12px; display: block; margin-top: 4px;">
+                        How many individual items in one unit
+                    </small>
+                </div>
+
+                <div class="form-group">
                     <label for="expiration_type">Expiration Type:</label>
                     <select id="expiration_type" name="expiration_type" class="form-control"
                             required onchange="toggleExpirationField()">
@@ -399,11 +422,16 @@
                             <td>₱{{ $item->price }}</td>
                             <td>
                                 @if($item->quantity > 20)
-                                    <span class="status-badge status-instock">{{ $item->quantity }}</span>
+                                    <span class="status-badge status-instock">{{ $item->quantity }} {{ $item->unit ?? 'pieces' }}</span>
                                 @elseif($item->quantity > 0)
-                                    <span class="status-badge status-low">{{ $item->quantity }}</span>
+                                    <span class="status-badge status-low">{{ $item->quantity }} {{ $item->unit ?? 'pieces' }}</span>
                                 @else
                                     <span class="status-badge status-critical">Out of stock</span>
+                                @endif
+                                @if(isset($item->items_per_unit) && $item->items_per_unit > 1)
+                                    <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">
+                                        ({{ $item->items_per_unit }} items/{{ rtrim($item->unit ?? 'unit', 's') }})
+                                    </div>
                                 @endif
                             </td>
                             <td>
@@ -429,7 +457,7 @@
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn-edit" data-toggle="modal" data-target="#editModal"
-                                        onclick="editItem({{ $item->id }}, '{{ $item->name }}', '{{ $item->price }}', '{{ $item->quantity }}', '{{ $item->expiration_date }}', '{{ $item->supplier }}', '{{ $item->category }}')">
+                                        onclick="editItem({{ $item->id }}, '{{ $item->name }}', '{{ $item->price }}', '{{ $item->quantity }}', '{{ $item->expiration_date }}', '{{ $item->supplier }}', '{{ $item->category }}', '{{ $item->unit ?? 'pieces' }}', '{{ $item->items_per_unit ?? 1 }}')">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
                                     <button type="button" class="btn-delete" data-toggle="modal" data-target="#deleteModal"
@@ -474,6 +502,26 @@
                     <div class="form-group mb-3">
                         <label for="update_quantity" class="form-label">Quantity:</label>
                         <input type="number" id="update_quantity" name="quantity" class="form-control" min="0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="update_unit" class="form-label">Unit Type:</label>
+                        <select id="update_unit" name="unit" class="form-select" required>
+                            <option value="pieces">Pieces</option>
+                            <option value="boxes">Boxes</option>
+                            <option value="packs">Packs</option>
+                            <option value="bottles">Bottles</option>
+                            <option value="sets">Sets</option>
+                            <option value="rolls">Rolls</option>
+                            <option value="pairs">Pairs</option>
+                            <option value="tubes">Tubes</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="update_items_per_unit" class="form-label">Items per Unit:</label>
+                        <input type="number" id="update_items_per_unit" name="items_per_unit" class="form-control" min="1" value="1" required>
+                        <small style="color: #9ca3af; font-size: 12px; display: block; margin-top: 4px;">
+                            How many individual items in one unit
+                        </small>
                     </div>
                     <div class="form-group mb-3">
                         <label for="update_expiration_type" class="form-label">Expiration Type:</label>
@@ -585,10 +633,12 @@
     }
 
     // Function to set up item editing
-    function editItem(id, name, price, quantity, expirationDate, supplier, category) {
+    function editItem(id, name, price, quantity, expirationDate, supplier, category, unit, itemsPerUnit) {
         document.getElementById('update_name').value = name;
         document.getElementById('update_price').value = price;
         document.getElementById('update_quantity').value = quantity;
+        document.getElementById('update_unit').value = unit || 'pieces';
+        document.getElementById('update_items_per_unit').value = itemsPerUnit || 1;
         document.getElementById('update_expiration_date').value = expirationDate;
         document.getElementById('update_supplier').value = supplier;
 
