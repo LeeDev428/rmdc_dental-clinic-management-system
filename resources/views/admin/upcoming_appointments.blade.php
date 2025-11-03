@@ -57,16 +57,28 @@
     }
 
     .dropdown-menu {
-        min-width: 120px;
+        min-width: 150px;
     }
 
     .dropdown-item {
-        padding: 8px 12px;
+        padding: 10px 15px;
         cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
     }
 
     .dropdown-item:hover {
         background-color: #e0f7fa;
+    }
+    
+    .filter-buttons .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .filter-buttons .btn.active {
+        background-color: #0056b3;
+        color: white;
     }
 
     @media (max-width: 768px) {
@@ -90,13 +102,34 @@
     <!-- Search and Date Filter -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <form method="GET" action="{{ route('admin.upcoming_appointments') }}">
+            <form method="GET" action="{{ route('admin.upcoming_appointments') }}" id="searchForm">
                 <input type="text" name="search" class="form-control" placeholder="Search by procedure, status, or username" value="{{ request('search') }}">
+                <input type="hidden" name="date" id="hiddenDateInput" value="{{ request('date') }}">
             </form>
         </div>
         <div class="col-md-6">
-            <input type="date" id="datePicker" class="form-control" value="{{ request('date') }}">
+            <input type="date" id="dateFilter" class="form-control" value="{{ request('date') }}" placeholder="Filter by date">
         </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-buttons mb-3">
+        <a href="{{ route('admin.upcoming_appointments', ['filter' => 'today']) }}" 
+           class="btn btn-outline-primary {{ request('filter') == 'today' ? 'active' : '' }}">
+            Today
+        </a>
+        <a href="{{ route('admin.upcoming_appointments', ['filter' => 'week']) }}" 
+           class="btn btn-outline-primary {{ request('filter') == 'week' ? 'active' : '' }}">
+            This Week
+        </a>
+        <a href="{{ route('admin.upcoming_appointments', ['filter' => 'month']) }}" 
+           class="btn btn-outline-primary {{ request('filter') == 'month' ? 'active' : '' }}">
+            This Month
+        </a>
+        <a href="{{ route('admin.upcoming_appointments') }}" 
+           class="btn btn-outline-secondary {{ !request('filter') ? 'active' : '' }}">
+            All
+        </a>
     </div>
 
     <!-- Buttons -->
@@ -147,30 +180,25 @@
                     <td>{{ $appointment->created_at }}</td>
                     <td>{{ $appointment->updated_at }}</td>
                     <td>
-                        <!-- Actions Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-success dropdown-toggle" type="button" id="actionDropdown{{ $appointment->id }}" data-bs-toggle="dropdown" aria-expanded="false">
-                                Actions
+                        <!-- Accept and Decline Buttons (Vertically Aligned) -->
+                        <div class="d-flex  gap-2">
+                            <button class="btn btn-success btn-sm accept-action" data-appointment-id="{{ $appointment->id }}">
+                                Accept
                             </button>
-                            <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $appointment->id }}">
-                                <li>
-                                    <a class="dropdown-item accept-action" href="#" data-appointment-id="{{ $appointment->id }}">
-                                        Accept
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item decline-action" href="#" data-appointment-id="{{ $appointment->id }}">
-                                        Decline
-                                    </a>
-                                </li>
-                            </ul>
+                            <button class="btn btn-danger btn-sm decline-action" data-appointment-id="{{ $appointment->id }}">
+                                Decline
+                            </button>
                         </div>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-        {{ $appointments->links() }} <!-- Pagination links -->
+        
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4">
+            {{ $appointments->appends(request()->query())->links() }}
+        </div>
     </div>
 </div>
 
@@ -204,6 +232,13 @@
 
 <script>
     $(document).ready(function () {
+        // Date filter functionality
+        $('#dateFilter').on('change', function () {
+            const selectedDate = $(this).val();
+            $('#hiddenDateInput').val(selectedDate);
+            $('#searchForm').submit();
+        });
+
         // Accept action
         $('.accept-action').on('click', function (e) {
             e.preventDefault();
@@ -315,16 +350,5 @@
         overlay.appendChild(zoomedImg);
         document.body.appendChild(overlay);
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const datePicker = document.getElementById('datePicker');
-
-        datePicker.addEventListener('change', function () {
-            const selectedDate = datePicker.value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('date', selectedDate);
-            window.location.href = url.toString(); // Redirect with the selected date
-        });
-    });
 </script>
 @endsection
