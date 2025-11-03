@@ -12,9 +12,13 @@ class InventoryController extends Controller
     public function index()
     {
         $inventory = Inventory::paginate(20); // Paginate with 20 items per page
+        
+        // Get all inventory for statistics (not paginated)
+        $allInventory = Inventory::all();
+        
         $item = null; // Default value to avoid undefined variable issue
         $pendingCount = Appointment::where('status', 'pending')->count();
-        return view('admin.inventory_admin', compact('inventory', 'item', 'pendingCount'));
+        return view('admin.inventory_admin', compact('inventory', 'allInventory', 'item', 'pendingCount'));
     }
 
     // Store a new inventory item
