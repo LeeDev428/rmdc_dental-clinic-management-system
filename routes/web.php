@@ -20,6 +20,7 @@
     use App\Http\Controllers\WelcomeController;
     use App\Http\Controllers\Admin\TeethLayoutController;
     use App\Http\Controllers\Auth\CaptchaController;
+    use App\Http\Controllers\DentalRecordController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -147,6 +148,15 @@
         // Existing routes for inventory and procedure prices
         Route::get('/admin/procedure-prices', [ProcedurePriceController::class, 'index'])->name('admin.procedure_prices');
         Route::put('/admin/procedure-prices/{id}', [ProcedurePriceController::class, 'update'])->name('admin.procedure_prices.update');
+        
+        // Dental Records Routes
+        Route::get('/admin/patients/{userId}/dental-records', [DentalRecordController::class, 'index'])->name('admin.dental_records.index');
+        Route::get('/admin/patients/{userId}/dental-records/create', [DentalRecordController::class, 'create'])->name('admin.dental_records.create');
+        Route::post('/admin/patients/{userId}/dental-records', [DentalRecordController::class, 'store'])->name('admin.dental_records.store');
+        Route::get('/admin/patients/{userId}/dental-records/{recordId}', [DentalRecordController::class, 'show'])->name('admin.dental_records.show');
+        Route::get('/admin/patients/{userId}/dental-records/{recordId}/edit', [DentalRecordController::class, 'edit'])->name('admin.dental_records.edit');
+        Route::put('/admin/patients/{userId}/dental-records/{recordId}', [DentalRecordController::class, 'update'])->name('admin.dental_records.update');
+        Route::delete('/admin/patients/{userId}/dental-records/{recordId}', [DentalRecordController::class, 'destroy'])->name('admin.dental_records.destroy');
 
         // Add the store route for adding new procedure prices
         Route::post('/admin/procedure-prices', [ProcedurePriceController::class, 'store'])->name('admin.procedure_prices.store');
