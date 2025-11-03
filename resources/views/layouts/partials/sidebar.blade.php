@@ -44,7 +44,7 @@
             </a>
 
             <div class="sb-sidenav-menu-heading">Interface</div>
-            <a class="nav-link" href="{{ url('/profile') }}">
+            <a class="nav-link" href="{{ route('admin.profile.edit') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-user-edit"></i></div>
                 Edit Profile
             </a>
