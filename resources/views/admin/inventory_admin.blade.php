@@ -93,18 +93,6 @@
         margin-bottom: 50px;
     }
     
-    .form-card {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        padding: 0;
-        display: none; /* Hidden by default */
-    }
-    
-    .form-card.active {
-        display: block;
-    }
-    
     /* Floating Add Button */
     .floating-add-btn {
         position: fixed;
