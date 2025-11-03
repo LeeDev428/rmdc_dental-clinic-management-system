@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('users123'),
             'usertype' => 'admin',
             'bio' => 'System administrator for RMDC Dental Clinic',
-            'avatar' => 'default-admin.png',
+            'avatar' => 'img/default-dp.jpg',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -37,6 +37,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('users123'),
             'usertype' => 'user',
             'bio' => 'Front desk staff at RMDC Dental Clinic',
+            'avatar' => 'img/default-dp.jpg',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -48,8 +49,8 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('admin123'),
             'usertype' => 'admin',
-            'bio' => 'Specialist in orthodontics with 10 years of experience',
-            'avatar' => 'doctor-default.png',
+            'bio' => '',
+            'avatar' => 'img/default-dp.jpg',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
