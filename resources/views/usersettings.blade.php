@@ -65,7 +65,7 @@
                      <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">History Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Notification, Appointment, Billing History.</p>
-                        <a href="#" class="text-blue-600 hover:text-blue-400">History Settings</a>
+                        <a href="{{ route('history.settings') }}" class="text-blue-600 hover:text-blue-400">History Settings</a>
                     </div>
 
                     <!-- Advanced Settings Card
