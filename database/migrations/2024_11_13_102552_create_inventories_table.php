@@ -14,6 +14,7 @@ class CreateInventoriesTable extends Migration
             $table->decimal('price', 8, 2);
             $table->date('expiration_date')->nullable();
             $table->integer('quantity')->nullable();  // Make quantity nullable
+            $table->integer('low_stock_threshold')->default(10);  // Low stock threshold for alerts
             $table->string('unit')->default('pieces');  // Unit type (pieces, boxes, packs, bottles, etc.)
             $table->integer('items_per_unit')->default(1);  // How many items in one unit (e.g., 10 masks per box)
             $table->string('supplier');
