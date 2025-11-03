@@ -105,8 +105,6 @@
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{{ route('admin.profile.edit') }}"><i class="fas fa-user-edit me-2"></i>Edit Profile</a></li>
-                    <li><a class="dropdown-item" href="#!"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                    <li><a class="dropdown-item" href="#!"><i class="fas fa-history me-2"></i>Activity Log</a></li>
                     <li><hr class="dropdown-divider" /></li>
                     <li>
                         <form method="POST" action="{{ route('logout') }}">
