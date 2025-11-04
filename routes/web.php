@@ -24,6 +24,8 @@
     use App\Http\Controllers\PatientDentalRecordController;
     use App\Http\Controllers\AppointmentHistoryController;
     use App\Http\Controllers\HistorySettingsController;
+    use App\Http\Controllers\HealthProgressController;
+    use App\Http\Controllers\AdminAppointmentHistoryController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -70,6 +72,9 @@
     
     // History Settings
     Route::get('/history-settings', [HistorySettingsController::class, 'index'])->name('history.settings');
+    
+    // Health Progress
+    Route::get('/health-progress', [HealthProgressController::class, 'index'])->name('health.progress');
     });
 
 
@@ -88,6 +93,12 @@
         Route::get('/admin/profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
         Route::put('/admin/profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
         Route::put('/admin/profile/password', [AdminProfileController::class, 'updatePassword'])->name('admin.profile.password');
+        
+        // Admin Health Progress View
+        Route::get('/admin/health-progress/{userId}', [HealthProgressController::class, 'adminView'])->name('admin.health.progress');
+        
+        // Admin User Appointment History View
+        Route::get('/admin/user-appointments/{userId}', [AdminAppointmentHistoryController::class, 'show'])->name('admin.user.appointments');
     });
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
