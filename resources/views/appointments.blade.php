@@ -1183,6 +1183,9 @@ eventClick: function(info) {
                 }
             });
         </script>
+        
+        <!-- Include Feedback Modal -->
+        <x-feedback-modal />
 
     @endsection
 </x-app-layout>
