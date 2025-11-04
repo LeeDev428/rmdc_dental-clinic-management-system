@@ -10,8 +10,9 @@ class ProcedurePriceController extends Controller
     // Show the form with existing prices
     public function index()
     {
-        $procedures = ProcedurePrice::all();  // Get all procedure prices
-        return view('admin.procedure_prices', compact('procedures'));
+        $procedures = ProcedurePrice::paginate(20);  // Paginate with 20 items per page
+        $allProcedures = ProcedurePrice::all(); // For statistics
+        return view('admin.procedure_prices', compact('procedures', 'allProcedures'));
     }
 
     public function store(Request $request)
