@@ -44,7 +44,7 @@
                                 </x-nav-link>
                             </div>
                             
-                            <!-- Page 2: Appointments, Appointment History, Profile -->
+                            <!-- Page 2: Appointments, Appointment History, Cancel -->
                             <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('appointments')" :active="request()->routeIs('appointments')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
@@ -56,14 +56,19 @@
                                     <i class="fas fa-history mr-2"></i>History
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <x-nav-link :href="route('appointment.cancel')" :active="request()->routeIs('appointment.cancel')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-times-circle mr-2"></i>Cancel Appointment
+                                </x-nav-link>
+                            </div>
+                            
+                            <!-- Page 3: Profile, Services, Ask Lee AI -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-user mr-2"></i>Profile
                                 </x-nav-link>
-                            </div>
-                            
-                            <!-- Page 3: Services, Ask Lee AI, Settings -->
-                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap cursor-pointer">
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
                                 </div>
@@ -385,6 +390,7 @@ function formatDate(dateString) {
   <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.history')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('appointment.cancel')" class="text-gray-700 dark:text-white">{{ __('Cancel Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
         <x-dropdown-link :href="route('health.progress')" class="text-gray-700 dark:text-white">{{ __('Health Progress') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
