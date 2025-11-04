@@ -422,11 +422,85 @@
             width: 100%;
         }
     }
+    
+    /* Search Card */
+    .search-card {
+        background-color: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+    
+    .search-wrapper {
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 10px 12px 10px 40px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #0084ff;
+        box-shadow: 0 0 0 3px rgba(0, 132, 255, 0.1);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+    }
+    
+    /* Statistics Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .stat-content h6 {
+        font-size: 13px;
+        font-weight: 500;
+        color: #6b7280;
+        margin: 0 0 8px 0;
+    }
+    
+    .stat-content h3 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+    
+    .stat-icon {
+        font-size: 32px;
+        opacity: 0.2;
+    }
 </style>
 
 <div class="content-wrapper">
     <div class="page-header">
-        <h2 class="page-title">Procedure Prices</h2>
+        <h2 class="page-title">
+            <i class="fas fa-dollar-sign"></i> Procedure Prices
+        </h2>
     </div>
 
     <!-- Display success message with fade-out effect -->
@@ -438,6 +512,47 @@
             <div>{{ session('success') }}</div>
         </div>
     @endif
+
+    <!-- Search Bar -->
+    <div class="search-card">
+        <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search" class="search-input"
+                   placeholder="Search procedures..." onkeyup="searchProcedures()">
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-content">
+                <h6>Total Procedures</h6>
+                <h3>{{ count($allProcedures) }}</h3>
+            </div>
+            <i class="fas fa-procedures stat-icon" style="color: #0084ff;"></i>
+        </div>
+        <div class="stat-card">
+            <div class="stat-content">
+                <h6>Average Price</h6>
+                <h3>₱{{ number_format($allProcedures->avg('price'), 2) }}</h3>
+            </div>
+            <i class="fas fa-chart-line stat-icon" style="color: #16a34a;"></i>
+        </div>
+        <div class="stat-card">
+            <div class="stat-content">
+                <h6>Highest Price</h6>
+                <h3>₱{{ number_format($allProcedures->max('price'), 2) }}</h3>
+            </div>
+            <i class="fas fa-arrow-up stat-icon" style="color: #ef4444;"></i>
+        </div>
+        <div class="stat-card">
+            <div class="stat-content">
+                <h6>Lowest Price</h6>
+                <h3>₱{{ number_format($allProcedures->min('price'), 2) }}</h3>
+            </div>
+            <i class="fas fa-arrow-down stat-icon" style="color: #f59e0b;"></i>
+        </div>
+    </div>
 
     <!-- Table to display procedure prices -->
     <div class="table-container">
@@ -523,6 +638,11 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="mt-4 d-flex justify-content-center">
+            {{ $procedures->links('pagination::bootstrap-4') }}
         </div>
     </div>
 </div>
@@ -689,6 +809,41 @@
                 }
             }, 500);
         }
+    }, 5000);
+    
+    // Search function
+    function searchProcedures() {
+        const searchInput = document.getElementById('search').value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.data-table tbody tr');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchInput)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show message if no results found
+        const tbody = document.querySelector('.data-table tbody');
+        let noResultsRow = document.getElementById('no-results-row');
+        
+        if (visibleCount === 0 && searchInput !== '') {
+            if (!noResultsRow) {
+                noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'no-results-row';
+                noResultsRow.innerHTML = '<td colspan="6" style="text-align: center; padding: 40px; color: #9ca3af;"><i class="fas fa-search"></i> No procedures found matching "' + searchInput + '"</td>';
+                tbody.appendChild(noResultsRow);
+            }
+        } else {
+            if (noResultsRow) {
+                noResultsRow.remove();
+            }
+        }
+    }
     }, 3000);
 </script>
 
