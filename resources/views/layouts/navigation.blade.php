@@ -38,22 +38,31 @@
                                     <i class="fas fa-file-medical mr-2"></i>Dental Records
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <x-nav-link :href="route('health.progress')" :active="request()->routeIs('health.progress')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-chart-line mr-2"></i>Health Progress
+                                </x-nav-link>
+                            </div>
+                            
+                            <!-- Page 2: Appointments, Services, Settings -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-history mr-2"></i>Appointments
                                 </x-nav-link>
-                            </div>
-                            
-                            <!-- Page 2: Services, Settings, Log Out -->
-                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
                                 </div>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
+                                <x-nav-link :href="route('usersettings')" :active="request()->routeIs('usersettings')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-cog mr-2"></i>Settings
-                                </div>
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                </x-nav-link>
+                            </div>
+                            
+                            <!-- Page 3: Log Out -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
                                     <button type="submit" class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 hover:text-gray-900 dark:hover:text-white whitespace-nowrap">
@@ -65,9 +74,9 @@
                     </div>
                     
                     <!-- Next Button -->
-                    <button @click="currentPage = Math.min(1, currentPage + 1)" 
-                            :disabled="currentPage === 1"
-                            :class="currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    <button @click="currentPage = Math.min(2, currentPage + 1)" 
+                            :disabled="currentPage === 2"
+                            :class="currentPage === 2 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
                             class="p-2 rounded-full transition-all flex-shrink-0 -ml-2">
                         <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
