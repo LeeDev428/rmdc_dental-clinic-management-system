@@ -13,8 +13,8 @@
                 <div class="hidden sm:flex items-center justify-center flex-1">
                     <!-- Previous Button -->
                     <button @click="currentPage = Math.max(0, currentPage - 1)" 
-                            :disabled="currentPage === 0"
-                            :class="currentPage === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            :class="currentPage === 0 ? 'opacity-30' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            :style="currentPage === 0 ? 'cursor: not-allowed;' : 'cursor: pointer;'"
                             class="p-2 rounded-full transition-all flex-shrink-0">
                         <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -26,7 +26,7 @@
                         <div class="flex transition-transform duration-300 ease-in-out" 
                              :style="'transform: translateX(-' + (currentPage * 100) + '%)'">
                             
-                            <!-- Page 1: Dashboard, My Dental Records, Appointment History -->
+                            <!-- Page 1: Dashboard, Dental Records, Health Progress -->
                             <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
@@ -44,15 +44,32 @@
                                 </x-nav-link>
                             </div>
                             
-                            <!-- Page 2: Appointments, Services, Settings -->
+                            <!-- Page 2: Appointments, Appointment History, Profile -->
                             <div class="min-w-full flex items-center justify-center gap-3">
-                                <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
+                                <x-nav-link :href="route('appointments')" :active="request()->routeIs('appointments')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
-                                    <i class="fas fa-history mr-2"></i>Appointments
+                                    <i class="fas fa-calendar-plus mr-2"></i>Appointment
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
+                                <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-history mr-2"></i>History
+                                </x-nav-link>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.edit')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </x-nav-link>
+                            </div>
+                            
+                            <!-- Page 3: Services, Ask Lee AI, Settings -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap cursor-pointer">
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
+                                </div>
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap cursor-pointer">
+                                    <i class="fas fa-robot mr-2"></i>Ask Lee AI
                                 </div>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <x-nav-link :href="route('usersettings')" :active="request()->routeIs('usersettings')" 
@@ -61,7 +78,7 @@
                                 </x-nav-link>
                             </div>
                             
-                            <!-- Page 3: Log Out -->
+                            <!-- Page 4: Log Out -->
                             <div class="min-w-full flex items-center justify-center gap-3">
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
@@ -74,9 +91,9 @@
                     </div>
                     
                     <!-- Next Button -->
-                    <button @click="currentPage = Math.min(2, currentPage + 1)" 
-                            :disabled="currentPage === 2"
-                            :class="currentPage === 2 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                    <button @click="currentPage = Math.min(3, currentPage + 1)" 
+                            :class="currentPage === 3 ? 'opacity-30' : 'hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            :style="currentPage === 3 ? 'cursor: not-allowed;' : 'cursor: pointer;'"
                             class="p-2 rounded-full transition-all flex-shrink-0 -ml-2">
                         <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -362,7 +379,7 @@ function formatDate(dateString) {
             </svg>
         </div>
     </button>
- 
+
     <!-- Dropdown Menu -->
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
   <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
