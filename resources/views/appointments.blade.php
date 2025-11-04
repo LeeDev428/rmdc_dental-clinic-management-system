@@ -393,13 +393,34 @@ window.onclick = function(event) {
 
 
                 <br>
-                <div id="calendar" style="max-width: 900px; margin: auto;"></div>
+                
+                @if(isset($hasPendingAppointment) && $hasPendingAppointment)
+                <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-lg">Pending Appointment Exists</h4>
+                            <p class="text-sm mt-1">You already have a pending appointment. Please wait for it to be accepted or declined by the admin before booking a new appointment. This prevents appointment conflicts and ensures fair scheduling for all patients.</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+                
+                <div id="calendar" style="max-width: 900px; margin: auto; {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'opacity: 0.5; pointer-events: none;' : '' }}"></div>
 
                 <div id="booking-modal" class="hidden fixed z-10 inset-0 overflow-y-auto">
                     <div class="flex items-center justify-center min-h-screen">
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 w-96 border">
+                            @if(isset($hasPendingAppointment) && $hasPendingAppointment)
+                            <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md text-sm">
+                                <strong>⚠️ Booking Disabled:</strong> You have a pending appointment. Please wait for admin approval.
+                            </div>
+                            @endif
+                            
                             <h3 class="text-lg font-medium text-gray-900 dark:text-white">Book Appointment</h3>
-                            <form id="booking-form" method="POST" action="{{ route('appointments.store') }}" enctype="multipart/form-data">
+                            <form id="booking-form" method="POST" action="{{ route('appointments.store') }}" enctype="multipart/form-data" {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'onsubmit="return false;"' : '' }}>
                                 @csrf
                                 <input type="hidden" id="booking-id" name="id">
                                 <input type="hidden" id="booking-start" name="start">
@@ -630,8 +651,10 @@ window.onclick = function(event) {
                                 </script>
 
 
-                                    <button type="submit" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        Save Changes
+                                    <button type="submit" 
+                                            class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-800' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'disabled' : '' }}>
+                                        {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Save Changes' }}
                                     </button>
 
 
