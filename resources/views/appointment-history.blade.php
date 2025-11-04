@@ -11,12 +11,25 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h3 class="text-2xl font-bold mb-6">My Appointment History</h3>
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold">My Appointment History</h3>
+                        
+                        <!-- Filter Dropdown -->
+                        <div class="flex items-center gap-3">
+                            <label for="statusFilter" class="text-sm font-medium">Filter by Status:</label>
+                            <select id="statusFilter" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" onchange="filterAppointments()">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="accepted">Accepted</option>
+                                <option value="declined">Declined</option>
+                            </select>
+                        </div>
+                    </div>
                     
                     @if($appointments->count() > 0)
-                        <div class="space-y-4">
+                        <div class="space-y-4" id="appointments-container">
                             @foreach($appointments as $appointment)
-                                <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-gray-50 dark:bg-gray-700 hover:shadow-md transition">
+                                <div class="appointment-item border border-gray-300 dark:border-gray-600 rounded-lg p-6 bg-gray-50 dark:bg-gray-700 hover:shadow-md transition" data-status="{{ $appointment->status }}">
                                     <div class="flex justify-between items-start mb-4">
                                         <div>
                                             <h4 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
@@ -90,4 +103,21 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        function filterAppointments() {
+            const filter = document.getElementById('statusFilter').value;
+            const appointments = document.querySelectorAll('.appointment-item');
+            
+            appointments.forEach(appointment => {
+                const status = appointment.getAttribute('data-status');
+                
+                if (filter === 'all' || status === filter) {
+                    appointment.style.display = '';
+                } else {
+                    appointment.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </x-app-layout>
