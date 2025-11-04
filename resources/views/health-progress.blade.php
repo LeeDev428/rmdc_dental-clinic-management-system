@@ -356,6 +356,16 @@
     </div>
 </div>
 
+<!-- Monthly Trends -->
+@if($monthlyData->isNotEmpty())
+<div class="content-card">
+    <h2 class="card-title">Monthly Appointment Trends (Last 6 Months)</h2>
+    <div class="chart-container">
+        <canvas id="monthlyChart"></canvas>
+    </div>
+</div>
+@endif
+
 <!-- Treatment Timeline -->
 <div class="content-card">
     <h2 class="card-title">Treatment Timeline</h2>
@@ -389,15 +399,7 @@
     @endif
 </div>
 
-<!-- Monthly Trends -->
-@if($monthlyData->isNotEmpty())
-<div class="content-card">
-    <h2 class="card-title">Monthly Appointment Trends (Last 6 Months)</h2>
-    <div class="chart-container">
-        <canvas id="monthlyChart"></canvas>
-    </div>
-</div>
-@endif
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
