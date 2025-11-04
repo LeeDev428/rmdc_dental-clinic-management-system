@@ -42,6 +42,10 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-teeth"></i></div>
                 Teeth Layout Management
             </a>
+            <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+                Service Feedbacks
+            </a>
 
             <div class="sb-sidenav-menu-heading">Interface</div>
             <a class="nav-link" href="{{ route('admin.profile.edit') }}">
