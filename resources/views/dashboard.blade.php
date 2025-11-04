@@ -446,4 +446,7 @@
             position: relative;
         }
     </style>
+    
+    <!-- Include Feedback Modal -->
+    <x-feedback-modal />
 </x-app-layout>
