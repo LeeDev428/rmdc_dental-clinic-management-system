@@ -38,14 +38,19 @@
                                     <i class="fas fa-file-medical mr-2"></i>Dental Records
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
+                                <x-nav-link :href="route('health.progress')" :active="request()->routeIs('health.progress')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
+                                    <i class="fas fa-chart-line mr-2"></i>Health Progress
+                                </x-nav-link>
+                            </div>
+                            
+                            <!-- Page 2: Appointments, Services, Settings -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-history mr-2"></i>Appointments
                                 </x-nav-link>
-                            </div>
-                            
-                            <!-- Page 2: Services, Settings, Log Out -->
-                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
                                 </div>
@@ -54,7 +59,10 @@
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-cog mr-2"></i>Settings
                                 </x-nav-link>
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                            </div>
+                            
+                            <!-- Page 3: Log Out -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
                                     <button type="submit" class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 hover:text-gray-900 dark:hover:text-white whitespace-nowrap">
@@ -354,13 +362,14 @@ function formatDate(dateString) {
             </svg>
         </div>
     </button>
-
+ 
     <!-- Dropdown Menu -->
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
   <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.history')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
         <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('health.progress')" class="text-gray-700 dark:text-white">{{ __('Health Progress') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Ask Lee AI?') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Services') }}</x-dropdown-link>
