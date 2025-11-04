@@ -42,6 +42,7 @@
 
     //default 8080
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+    Route::get('/get-services', [WelcomeController::class, 'getServices'])->name('get.services');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
