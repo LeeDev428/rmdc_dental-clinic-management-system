@@ -209,16 +209,11 @@
             overflow: hidden;
         }
 
-        .services-wrapper {
-            display: flex;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .services-slide {
-            min-width: 100%;
+        .services-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+            min-height: 500px;
         }
 
         .service-card {
@@ -301,21 +296,10 @@
         .carousel-indicators {
             display: flex;
             gap: 8px;
-        }
-
-        .carousel-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #ddd;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .carousel-dot.active {
-            background: #333;
-            width: 30px;
-            border-radius: 5px;
+            align-items: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
         }
 
         /* Clinic Locations */
@@ -663,49 +647,21 @@
             <h2 class="section-title">Our Services</h2>
             
             <div class="services-carousel">
-                <div class="services-wrapper" id="servicesWrapper">
-                    @php
-                        $chunks = $procedures->chunk(3);
-                    @endphp
-                    
-                    @foreach($chunks as $chunk)
-                    <div class="services-slide">
-                        @foreach($chunk as $procedure)
-                        <div class="service-card">
-                            @if($procedure->image_path)
-                                <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="{{ $procedure->procedure_name }}" class="service-image">
-                            @else
-                                <div class="service-image"></div>
-                            @endif
-                            
-                            <div class="service-content">
-                                <h3>{{ $procedure->procedure_name }}</h3>
-                                <p>{{ \Illuminate\Support\Str::limit($procedure->description, 80) }}</p>
-                                
-                                <div class="service-meta">
-                                    <span style="font-size: 12px; color: #999;"><i class="far fa-clock"></i> {{ $procedure->duration }} mins</span>
-                                    <span class="service-price">₱{{ number_format($procedure->price, 2) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                    @endforeach
+                <div class="services-grid" id="servicesGrid">
+                    <!-- Services will be loaded here via AJAX -->
                 </div>
             </div>
 
             <div class="carousel-controls">
-                <button class="carousel-btn" onclick="previousSlide()">
+                <button class="carousel-btn" id="prevBtn" onclick="changePage('prev')">
                     <i class="fas fa-chevron-left"></i>
                 </button>
                 
-                <div class="carousel-indicators" id="indicators">
-                    @for($i = 0; $i < $chunks->count(); $i++)
-                    <div class="carousel-dot {{ $i === 0 ? 'active' : '' }}" onclick="goToSlide({{ $i }})"></div>
-                    @endfor
+                <div class="carousel-indicators" id="paginationInfo">
+                    <span id="currentPage">1</span> / <span id="totalPages">1</span>
                 </div>
                 
-                <button class="carousel-btn" onclick="nextSlide()">
+                <button class="carousel-btn" id="nextBtn" onclick="changePage('next')">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
@@ -908,42 +864,79 @@
         </div>
     </section>
 
-    
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Robles Moncayo Dental Clinic. All Rights Reserved.</p>
     </footer>
 
     <script>
-        // Services Carousel
-        let currentSlide = 0;
-        const wrapper = document.getElementById('servicesWrapper');
-        const totalSlides = {{ $chunks->count() }};
+        // Services Carousel with AJAX Pagination
+        let currentPage = 1;
+        let totalPages = 1;
 
-        function updateSlide() {
-            wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
-            
-            // Update dots
-            const dots = document.querySelectorAll('.carousel-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
+        function loadServices(page) {
+            fetch(`/get-services?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('servicesGrid');
+                    grid.innerHTML = '';
+                    
+                    data.data.forEach(procedure => {
+                        const card = document.createElement('div');
+                        card.className = 'service-card';
+                        
+                        let imageHtml = '';
+                        if (procedure.image_path) {
+                            imageHtml = `<img src="/storage/${procedure.image_path}" alt="${procedure.procedure_name}" class="service-image">`;
+                        } else {
+                            imageHtml = '<div class="service-image"></div>';
+                        }
+                        
+                        const description = procedure.description ? 
+                            (procedure.description.length > 80 ? procedure.description.substring(0, 80) + '...' : procedure.description) : '';
+                        
+                        card.innerHTML = `
+                            ${imageHtml}
+                            <div class="service-content">
+                                <h3>${procedure.procedure_name}</h3>
+                                <p>${description}</p>
+                                <div class="service-meta">
+                                    <span style="font-size: 12px; color: #999;"><i class="far fa-clock"></i> ${procedure.duration} mins</span>
+                                    <span class="service-price">₱${Number(procedure.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        grid.appendChild(card);
+                    });
+                    
+                    currentPage = data.current_page;
+                    totalPages = data.last_page;
+                    
+                    document.getElementById('currentPage').textContent = currentPage;
+                    document.getElementById('totalPages').textContent = totalPages;
+                    
+                    // Update button states
+                    document.getElementById('prevBtn').disabled = currentPage === 1;
+                    document.getElementById('nextBtn').disabled = currentPage === totalPages;
+                })
+                .catch(error => console.error('Error loading services:', error));
         }
 
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            updateSlide();
+        function changePage(direction) {
+            if (direction === 'prev' && currentPage > 1) {
+                loadServices(currentPage - 1);
+            } else if (direction === 'next' && currentPage < totalPages) {
+                loadServices(currentPage + 1);
+            }
         }
 
-        function previousSlide() {
-            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-            updateSlide();
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateSlide();
-        }
+        // Load services on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices(1);
+            initMaps();
+        });
 
         // Initialize Maps
         function initMaps() {
@@ -965,9 +958,6 @@
                 .bindPopup('<b>RMDC Branch</b><br>Bacoor, Cavite')
                 .openPopup();
         }
-
-                // Initialize maps on page load
-        document.addEventListener('DOMContentLoaded', initMaps);
 
         // FAQ Toggle Function
         function toggleFAQ(element) {
