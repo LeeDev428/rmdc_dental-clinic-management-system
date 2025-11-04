@@ -388,9 +388,9 @@
                     </td>
                     <td>{{ $appointment->status }}</td>
                     <td>{{ $appointment->procedure }}</td>
-                    <td>{{ $appointment->start }}</td>
-                    <td>{{ $appointment->created_at }}</td>
-                    <td>{{ $appointment->updated_at }}</td>
+                    <td style="font-size: 12px;">{{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y g:i A') }}</td>
+                    <td style="font-size: 12px;">{{ $appointment->created_at }}</td>
+                    <td style="font-size: 12px;">{{ $appointment->updated_at }}</td>
                     <td>
                         <div class="action-btn-group">
                             <button class="btn-accept accept-action" data-appointment-id="{{ $appointment->id }}">
