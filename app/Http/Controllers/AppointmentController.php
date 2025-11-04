@@ -14,6 +14,13 @@ class AppointmentController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
+        
+        // Check if user has any pending appointments
+        $hasPendingAppointment = Appointment::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->exists();
+        
         $appointments = Appointment::all();
         $procedurePrices = ProcedurePrice::all(); // Fetch procedure prices from the database
         $selectedDate = $request->input('date', now()->toDateString());
@@ -61,7 +68,7 @@ class AppointmentController extends Controller
         }
     
         // Return the HTML view for normal page load
-        return view('appointments', compact('availableTimes', 'selectedDate', 'appointments', 'procedurePrices', 'procedurePrice', 'selectedProcedure'));
+        return view('appointments', compact('availableTimes', 'selectedDate', 'appointments', 'procedurePrices', 'procedurePrice', 'selectedProcedure', 'hasPendingAppointment'));
     }
     
     
@@ -83,6 +90,19 @@ class AppointmentController extends Controller
 
 public function store(Request $request)
 {
+    $user_id = Auth::id();
+    
+    // ✅ CHECK: Prevent booking if user already has a pending appointment
+    $hasPendingAppointment = Appointment::where('user_id', $user_id)
+        ->where('status', 'pending')
+        ->exists();
+    
+    if ($hasPendingAppointment) {
+        return response()->json([
+            'error' => 'You already have a pending appointment. Please wait for it to be accepted or declined before booking another appointment.'
+        ], 422);
+    }
+    
     $validated = $request->validate([
         'title' => 'required|string',
         'procedure' => 'required|string',
@@ -91,7 +111,6 @@ public function store(Request $request)
         'image_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
     ]);
 
-    $user_id = Auth::id();
     $startTime = Carbon::parse($validated['start']);
     $today = Carbon::today();
 $now = Carbon::now();
