@@ -209,7 +209,7 @@
     <div class="search-section">
         <form method="GET" action="{{ route('admin.appointments') }}" id="appointmentSearchForm" class="search-input-group">
             <input type="text" name="search" class="search-input" 
-                   placeholder="Search by title or procedure" 
+                   placeholder="Search by name, title, or procedure" 
                    value="{{ request('search') }}">
             <input type="hidden" name="date" id="hiddenAppointmentDate" value="{{ request('date') }}">
             <input type="hidden" name="filter" value="{{ request('filter') }}">
@@ -248,6 +248,7 @@
                 <tr>
                     <th>No.</th>
                     <th>Priority</th>
+                    <th>Patient Name</th>
                     <th>Title</th>
                     <th>Procedure</th>
                     <th>Start Time</th>
@@ -277,6 +278,7 @@
                     <td>
                         <span class="priority-badge {{ $priorityClass }}">{{ $priorityLabel }}</span>
                     </td>
+                    <td>{{ $appointment->username ?? 'N/A' }}</td>
                     <td>{{ $appointment->title }}</td>
                     <td>{{ $appointment->procedure }}</td>
                     <td>{{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y h:i A') }}</td>
@@ -284,7 +286,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" style="text-align: center; color: #9ca3af;">No upcoming appointments found.</td>
+                    <td colspan="7" style="text-align: center; color: #9ca3af;">No upcoming appointments found.</td>
                 </tr>
                 @endforelse
             </tbody>
