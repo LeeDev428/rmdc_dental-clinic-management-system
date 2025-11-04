@@ -153,6 +153,31 @@
         text-align: center;
         font-size: 14px;
     }
+
+    .appointments-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        background-color: #f0f9ff;
+        color: #0284c7;
+        border: 1px solid #bae6fd;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .appointments-badge:hover {
+        background-color: #e0f2fe;
+        transform: translateY(-2px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .appointments-badge i {
+        font-size: 14px;
+    }
 </style>
 
 <div class="page-header">
@@ -190,6 +215,7 @@
                         <th>Created</th>
                         <th>Updated</th>
                         <th>Actions</th>
+                        <th>Appointments</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -215,6 +241,15 @@
                                    class="btn-primary" 
                                    style="text-decoration: none; display: inline-block;">
                                     <i class="fas fa-file-medical"></i> Dental Records
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ route('admin.user.appointments', $u->id) }}" 
+                                   class="appointments-badge" 
+                                   style="text-decoration: none;"
+                                   title="View all appointments for this patient">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    {{ $u->appointments_count ?? 0 }}
                                 </a>
                             </td>
                         </tr>
