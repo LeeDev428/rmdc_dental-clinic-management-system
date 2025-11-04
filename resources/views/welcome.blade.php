@@ -406,6 +406,159 @@
             font-weight: 600;
         }
 
+        /* FAQs Section */
+        .faqs {
+            padding: 80px 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+        }
+
+        .faqs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .faqs-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .knowledge-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .knowledge-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .knowledge-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00c8d7 0%, #03747c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 32px;
+        }
+
+        .knowledge-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 15px;
+        }
+
+        .knowledge-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .knowledge-tips {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        .knowledge-tips li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 13px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .knowledge-tips li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #00c8d7;
+            font-weight: bold;
+        }
+
+        .faq-section {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .faq-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .faq-question:hover {
+            background: #e9ecef;
+        }
+
+        .faq-question i {
+            transition: transform 0.3s;
+            color: #00c8d7;
+        }
+
+        .faq-question.active i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            color: #666;
+            line-height: 1.8;
+            padding: 0 20px;
+        }
+
+        .faq-answer.active {
+            max-height: 300px;
+            padding: 20px;
+        }
+
         /* Footer */
         footer {
             background: #1a1a1a;
@@ -441,6 +594,14 @@
             .contact-info {
                 flex-direction: column;
                 gap: 20px;
+            }
+
+            .knowledge-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .faq-section {
+                padding: 20px;
             }
         }
     </style>
@@ -580,7 +741,158 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
+  
+
+    <!-- FAQs / Knowledge Base -->
+    <section class="faqs" id="faqs">
+        <div class="faqs-container">
+            <h2 class="section-title">Oral Health Knowledge Base</h2>
+            <p class="faqs-subtitle">Essential information for maintaining your dental health</p>
+            
+            <div class="knowledge-grid">
+                <!-- Brushing Techniques -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-tooth"></i>
+                    </div>
+                    <h3>Proper Brushing Techniques</h3>
+                    <p>Brush twice daily for 2 minutes using circular motions. Hold your brush at a 45-degree angle to your gums. Don't forget to brush your tongue!</p>
+                    <ul class="knowledge-tips">
+                        <li>Use soft-bristled toothbrush</li>
+                        <li>Replace every 3-4 months</li>
+                        <li>Use fluoride toothpaste</li>
+                    </ul>
+                </div>
+
+                <!-- Flossing -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-teeth"></i>
+                    </div>
+                    <h3>Daily Flossing</h3>
+                    <p>Floss at least once daily to remove plaque and food particles between teeth where your brush can't reach. This prevents gum disease and cavities.</p>
+                    <ul class="knowledge-tips">
+                        <li>Use 18 inches of floss</li>
+                        <li>Curve around each tooth</li>
+                        <li>Use clean sections for each tooth</li>
+                    </ul>
+                </div>
+
+                <!-- Nutrition -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-apple-alt"></i>
+                    </div>
+                    <h3>Dental-Friendly Nutrition</h3>
+                    <p>Your diet affects your oral health. Limit sugary foods and drinks. Choose calcium-rich foods like dairy products, leafy greens, and almonds.</p>
+                    <ul class="knowledge-tips">
+                        <li>Drink plenty of water</li>
+                        <li>Eat crunchy vegetables</li>
+                        <li>Avoid frequent snacking</li>
+                    </ul>
+                </div>
+
+                <!-- Regular Checkups -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Regular Dental Visits</h3>
+                    <p>Visit your dentist every 6 months for professional cleaning and examination. Early detection prevents serious dental problems.</p>
+                    <ul class="knowledge-tips">
+                        <li>Professional cleaning twice yearly</li>
+                        <li>X-rays when needed</li>
+                        <li>Don't skip appointments</li>
+                    </ul>
+                </div>
+
+                <!-- Warning Signs -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Warning Signs</h3>
+                    <p>Contact your dentist immediately if you experience: bleeding gums, persistent bad breath, tooth sensitivity, or mouth pain.</p>
+                    <ul class="knowledge-tips">
+                        <li>Swollen or red gums</li>
+                        <li>Loose teeth</li>
+                        <li>Jaw pain or clicking</li>
+                    </ul>
+                </div>
+
+                <!-- Prevention -->
+                <div class="knowledge-card">
+                    <div class="knowledge-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Prevention Tips</h3>
+                    <p>Prevention is better than cure. Use mouthwash, avoid tobacco, limit alcohol, and protect your teeth during sports activities.</p>
+                    <ul class="knowledge-tips">
+                        <li>Use fluoride mouthwash</li>
+                        <li>Wear mouth guards for sports</li>
+                        <li>Don't use teeth as tools</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="faq-section">
+                <h3 class="faq-title">Frequently Asked Questions</h3>
+                
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>How often should I brush my teeth?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        You should brush your teeth at least twice a day - once in the morning and once before bed. Each brushing session should last at least 2 minutes to effectively remove plaque and food particles.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Is teeth whitening safe?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Professional teeth whitening performed by a dentist is safe and effective. Over-the-counter products can also be safe when used as directed. Always consult with your dentist before starting any whitening treatment.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>What causes tooth sensitivity?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Tooth sensitivity can be caused by worn enamel, exposed roots, cavities, cracked teeth, or gum disease. Using toothpaste for sensitive teeth and avoiding acidic foods can help. Consult your dentist for persistent sensitivity.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>Do I need to floss if I brush regularly?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Yes! Brushing alone cannot reach the tight spaces between teeth where food particles and plaque accumulate. Flossing daily is essential to prevent cavities and gum disease between teeth.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(this)">
+                        <span>When should children start visiting the dentist?</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Children should have their first dental visit when their first tooth appears or by their first birthday. Early visits help children become comfortable with dental care and allow dentists to catch any issues early.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+      <!-- Contact Section -->
     <section class="contact" id="contact">
         <div class="contact-container">
             <h2>Get In Touch</h2>
@@ -596,6 +908,7 @@
         </div>
     </section>
 
+    
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Robles Moncayo Dental Clinic. All Rights Reserved.</p>
@@ -653,8 +966,29 @@
                 .openPopup();
         }
 
-        // Initialize maps on page load
+                // Initialize maps on page load
         document.addEventListener('DOMContentLoaded', initMaps);
+
+        // FAQ Toggle Function
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const isActive = answer.classList.contains('active');
+            
+            // Close all FAQs
+            document.querySelectorAll('.faq-answer').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.faq-question').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked FAQ if it wasn't already open
+            if (!isActive) {
+                answer.classList.add('active');
+                element.classList.add('active');
+            }
+        }
     </script>
 </body>
 </html>
+```
