@@ -93,4 +93,10 @@ class User extends Authenticatable implements MustVerifyEmail
         {
             return $this->hasMany(Message::class);
         }
+
+        // Relationship with Appointment model
+        public function appointments()
+        {
+            return $this->hasMany(Appointment::class);
+        }
 }
