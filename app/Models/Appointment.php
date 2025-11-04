@@ -26,4 +26,22 @@ class Appointment extends Model
     // ];
 
     protected $guarded = [];
+    
+    // Relationship to User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    // Relationship to Feedback
+    public function feedback()
+    {
+        return $this->hasOne(ServiceFeedback::class);
+    }
+    
+    // Relationship to Cancellations
+    public function cancellations()
+    {
+        return $this->hasMany(AppointmentCancellation::class);
+    }
 }
