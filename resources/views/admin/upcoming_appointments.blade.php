@@ -377,17 +377,17 @@
 
                 @foreach($filteredAppointments as $index => $appointment)
                 <tr>
-                    <td>{{ $appointment->user_id }}</td>
-                    <td>{{ $appointment->username }}</td>
-                    <td>
+                    <td style="font-size: 12px;">{{ $appointment->user_id }}</td>
+                    <td style="font-size: 12px;">{{ $appointment->username }}</td>
+                    <td style="font-size: 12px;">
                         @if($appointment->image_path)
                             <img src="{{ Storage::url($appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
                         @else
                             <img src="https://via.placeholder.com/100" alt="Default ID Image" class="id-image">
                         @endif
                     </td>
-                    <td>{{ $appointment->status }}</td>
-                    <td>{{ $appointment->procedure }}</td>
+                    <td style="font-size: 12px;">{{ $appointment->status }}</td>
+                    <td style="font-size: 12px;">{{ $appointment->procedure }}</td>
                     <td style="font-size: 12px;">{{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y g:i A') }}</td>
                     <td style="font-size: 12px;">{{ $appointment->created_at }}</td>
                     <td style="font-size: 12px;">{{ $appointment->updated_at }}</td>
