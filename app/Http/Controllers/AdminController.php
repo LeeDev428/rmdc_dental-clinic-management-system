@@ -371,16 +371,19 @@ public function patientInformation(Request $request)
 {
     $now = now();
     
-    // Start query for accepted appointments
-    $query = Appointment::where('status', 'accepted')
-                        ->where('start', '>=', $now); // Only future appointments
+    // Start query for accepted appointments with user join
+    $query = Appointment::join('users', 'appointments.user_id', '=', 'users.id')
+                        ->select('appointments.*', 'users.name as username')
+                        ->where('appointments.status', 'accepted')
+                        ->where('appointments.start', '>=', $now); // Only future appointments
     
-    // Apply search filter if provided
+    // Apply search filter if provided (including name)
     if ($request->has('search') && $request->search != '') {
         $search = $request->search;
         $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%$search%")
-              ->orWhere('procedure', 'like', "%$search%");
+            $q->where('appointments.title', 'like', "%$search%")
+              ->orWhere('appointments.procedure', 'like', "%$search%")
+              ->orWhere('users.name', 'like', "%$search%"); // Search by user name
         });
     }
     
@@ -405,16 +408,15 @@ public function patientInformation(Request $request)
     
     // Apply specific date filter if provided
     if ($request->has('date') && $request->date != '') {
-        $query->whereDate('start', $request->date);
+        $query->whereDate('appointments.start', $request->date);
     }
     
     // Sort by nearest time first (closest to current time = highest priority)
-    $query->orderByRaw('ABS(TIMESTAMPDIFF(SECOND, start, NOW()))')
-          ->orderBy('start', 'asc');
+    $query->orderByRaw('ABS(TIMESTAMPDIFF(SECOND, appointments.start, NOW()))')
+          ->orderBy('appointments.start', 'asc');
     
     // Paginate the results (20 items per page)
-    $acceptedAppointments = $query->select('id', 'title', 'procedure', 'start', 'end', 'user_id')
-                                   ->paginate(20);
+    $acceptedAppointments = $query->paginate(20);
 
     // Count the number of pending appointments
     $pendingCount = Appointment::where('status', 'pending')->count();
