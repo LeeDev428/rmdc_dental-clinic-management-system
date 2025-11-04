@@ -26,6 +26,8 @@
     use App\Http\Controllers\HistorySettingsController;
     use App\Http\Controllers\HealthProgressController;
     use App\Http\Controllers\AdminAppointmentHistoryController;
+    use App\Http\Controllers\AppointmentCancellationController;
+    use App\Http\Controllers\ServiceFeedbackController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -76,6 +78,14 @@
     
     // Health Progress
     Route::get('/health-progress', [HealthProgressController::class, 'index'])->name('health.progress');
+    
+    // Appointment Cancellation
+    Route::get('/cancel-appointment', [AppointmentCancellationController::class, 'index'])->name('appointment.cancel');
+    Route::post('/appointments/{id}/cancel', [AppointmentCancellationController::class, 'cancel'])->name('appointments.cancel');
+    
+    // Service Feedback
+    Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
+    Route::post('/service-feedback', [ServiceFeedbackController::class, 'store'])->name('feedback.store');
     });
 
 
@@ -100,6 +110,9 @@
         
         // Admin User Appointment History View
         Route::get('/admin/user-appointments/{userId}', [AdminAppointmentHistoryController::class, 'show'])->name('admin.user.appointments');
+        
+        // Admin Service Feedbacks View
+        Route::get('/admin/service-feedbacks', [ServiceFeedbackController::class, 'index'])->name('admin.service.feedbacks');
     });
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
