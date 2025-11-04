@@ -38,19 +38,14 @@
                                     <i class="fas fa-file-medical mr-2"></i>Dental Records
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <x-nav-link :href="route('health.progress')" :active="request()->routeIs('health.progress')" 
-                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
-                                    <i class="fas fa-chart-line mr-2"></i>Health Progress
-                                </x-nav-link>
-                            </div>
-                            
-                            <!-- Page 2: Appointments, Services, Settings -->
-                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-history mr-2"></i>Appointments
                                 </x-nav-link>
-                                <span class="text-gray-300 dark:text-gray-600">|</span>
+                            </div>
+                            
+                            <!-- Page 2: Services, Settings, Log Out -->
+                            <div class="min-w-full flex items-center justify-center gap-3">
                                 <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
                                 </div>
@@ -59,10 +54,7 @@
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-cog mr-2"></i>Settings
                                 </x-nav-link>
-                            </div>
-                            
-                            <!-- Page 3: Log Out -->
-                            <div class="min-w-full flex items-center justify-center gap-3">
+                                <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <form method="POST" action="{{ route('logout') }}" class="inline">
                                     @csrf
                                     <button type="submit" class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 hover:text-gray-900 dark:hover:text-white whitespace-nowrap">
