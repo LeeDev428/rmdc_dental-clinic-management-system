@@ -327,8 +327,8 @@ public function patientInformation(Request $request)
         });
     }
 
-    // Fetch the filtered users, ordered by created_at in descending order
-    $user = $query->latest()->get();
+    // Fetch the filtered users with appointment counts, ordered by created_at in descending order
+    $user = $query->withCount('appointments')->latest()->get();
 
     // Log the filtered data (optional)
     logger()->info('Filtered Data:', $user->toArray());
