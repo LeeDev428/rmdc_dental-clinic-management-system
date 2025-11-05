@@ -1,0 +1,166 @@
+/* ============================================ */
+/* ANIMATED BACKGROUND EFFECTS */
+/* ============================================ */
+
+/* Particle animation background */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-20px) translateX(10px) rotate(90deg);
+    }
+    50% {
+        transform: translateY(-40px) translateX(-10px) rotate(180deg);
+    }
+    75% {
+        transform: translateY(-20px) translateX(10px) rotate(270deg);
+    }
+}
+
+.animated-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    background: linear-gradient(135deg, #e0f7ff 0%, #f0f9ff 50%, #e0f2fe 100%);
+}
+
+/* Floating particles */
+.animated-background::before,
+.animated-background::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: float 20s infinite ease-in-out;
+}
+
+.animated-background::before {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.animated-background::after {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 5s;
+}
+
+/* Additional floating circles */
+.floating-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: float 15s infinite ease-in-out;
+}
+
+.floating-circle.circle-1 {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    top: 30%;
+    right: 20%;
+    animation-delay: 2s;
+}
+
+.floating-circle.circle-2 {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    bottom: 30%;
+    left: 15%;
+    animation-delay: 7s;
+}
+
+.floating-circle.circle-3 {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    top: 50%;
+    left: 40%;
+    animation-delay: 4s;
+}
+
+/* Gradient animation for more dynamic feel */
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+/* Typing indicator bounce animation */
+@keyframes typingBounce {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    30% {
+        transform: translateY(-12px);
+        opacity: 0.7;
+    }
+}
+
+/* Fade in animation for messages */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
