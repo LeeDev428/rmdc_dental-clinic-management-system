@@ -52,6 +52,13 @@ STRICT RULES:
 3. Be professional, empathetic, and provide accurate dental information.
 4. For medical emergencies, advise to visit the clinic or seek immediate medical attention.
 
+FORMATTING GUIDELINES:
+- Use **bold** for important terms and headings
+- Use * for bullet points to create organized lists
+- Add blank lines between sections for better readability
+- Keep paragraphs concise (2-3 sentences max)
+- Use proper spacing and structure
+
 CLINIC INFORMATION:
 - Dentist: Dr. Cristina Moncayo
   Facebook: https://www.facebook.com/iten10
@@ -109,9 +116,12 @@ Now, answer this dental question professionally and empathetically: {$question}"
                 // Extract the AI response text
                 $aiResponse = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Sorry, I could not generate a response.';
                 
+                // Format the response for better display
+                $formattedResponse = $this->formatAIResponse($aiResponse);
+                
                 return response()->json([
                     'success' => true,
-                    'response' => $aiResponse
+                    'response' => $formattedResponse
                 ]);
             } else {
                 // Log the error for debugging
@@ -137,5 +147,70 @@ Now, answer this dental question professionally and empathetically: {$question}"
                 'message' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Format AI response for better display
+     * Converts markdown-style formatting to HTML
+     * 
+     * @param string $text
+     * @return string
+     */
+    private function formatAIResponse($text)
+    {
+        // Preserve line breaks and format for HTML display
+        
+        // Convert **bold** to <strong>
+        $text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
+        
+        // Convert *italic* to <em>
+        $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
+        
+        // Convert bullet points (*, -, •) to proper list items
+        // First, detect list blocks
+        $lines = explode("\n", $text);
+        $inList = false;
+        $formattedLines = [];
+        
+        foreach ($lines as $line) {
+            $trimmedLine = trim($line);
+            
+            // Check if line starts with bullet point
+            if (preg_match('/^[\*\-\•]\s+(.+)$/', $trimmedLine, $matches)) {
+                if (!$inList) {
+                    $formattedLines[] = '<ul class="ai-list">';
+                    $inList = true;
+                }
+                $formattedLines[] = '<li>' . $matches[1] . '</li>';
+            } else {
+                if ($inList) {
+                    $formattedLines[] = '</ul>';
+                    $inList = false;
+                }
+                
+                // Add paragraph tags for non-empty lines
+                if (!empty($trimmedLine)) {
+                    $formattedLines[] = '<p>' . $trimmedLine . '</p>';
+                } else {
+                    $formattedLines[] = '<br>';
+                }
+            }
+        }
+        
+        // Close list if still open
+        if ($inList) {
+            $formattedLines[] = '</ul>';
+        }
+        
+        $formatted = implode("\n", $formattedLines);
+        
+        // Convert URLs to clickable links
+        $formatted = preg_replace(
+            '/(https?:\/\/[^\s<]+)/',
+            '<a href="$1" target="_blank" class="ai-link">$1</a>',
+            $formatted
+        );
+        
+        return $formatted;
     }
 }
