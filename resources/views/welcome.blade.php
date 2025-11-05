@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
@@ -20,7 +21,21 @@
         body {
             font-family: 'Poppins', sans-serif;
             color: #1a1a1a;
-            background: #fafafa;
+            background: #fafafa url('{{ asset('img/dcms_bg.jpg') }}') center/cover fixed;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.55);
+            z-index: -1;
         }
 
         /* Navigation */
@@ -85,46 +100,28 @@
 
         /* Hero Section */
         .hero {
-            min-height: 100vh;
+            min-height: 85vh;
             display: flex;
             align-items: center;
-            padding: 80px 0 50px;
+            padding: 80px 0 40px;
             position: relative;
             overflow: hidden;
-        }
-        
-        /* Animated Background */
-        .animated-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            opacity: 0.1;
-            z-index: 0;
-        }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .hero-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 60px 40px;
+            padding: 40px 40px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 50px;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-content h1 {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 700;
             line-height: 1.2;
             margin-bottom: 20px;
@@ -133,25 +130,27 @@
 
         .hero-content p {
             font-size: 16px;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 25px;
         }
 
-        .hero-btn {
-            background: #00c8d7;
-            color: white;
-            padding: 14px 32px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
+        .btn-primary {
             display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 15px;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 119, 182, 0.2);
         }
 
-        .hero-btn:hover {
-            background: #03747c;
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 119, 182, 0.35);
         }
 
         .hero-image {
@@ -173,7 +172,7 @@
 
         /* Info Cards */
         .info-section {
-            background: #fafafa;
+            background: transparent;
             padding: 40px 0;
         }
 
@@ -209,7 +208,7 @@
         /* Services Section */
         .services {
             padding: 80px 40px;
-            background: white;
+            background: transparent;
         }
 
         .services-container {
@@ -326,7 +325,7 @@
         /* Clinic Locations */
         .locations {
             padding: 80px 40px;
-            background: #fafafa;
+            background: transparent;
         }
 
         .locations-container {
@@ -373,7 +372,7 @@
         /* Contact Section */
         .contact {
             padding: 60px 40px;
-            background: #fafafa;
+            background: transparent;
         }
 
         .contact-container {
@@ -414,7 +413,7 @@
         /* FAQs Section */
         .faqs {
             padding: 80px 40px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+            background: transparent;
         }
 
         .faqs-container {
@@ -567,10 +566,30 @@
         /* Footer */
         footer {
             background: #1a1a1a;
-            color: #999;
+            color: white;
+            padding: 30px 0;
             text-align: center;
-            padding: 25px;
-            font-size: 13px;
+            margin: 0;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .footer-content p {
+            margin: 8px 0;
+        }
+        
+        .footer-credits {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .footer-credits strong {
+            color: #00b4d8;
+            font-weight: 600;
         }
 
         /* Responsive */
@@ -622,7 +641,6 @@
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#services">Services</a></li>
-                <li><a href="#lee-ai">Lee AI</a></li>
                 <li><a href="#locations">Locations</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li><a href="{{ route('login') }}" class="btn-login">Login</a></li>
@@ -631,74 +649,21 @@
     </nav>
 
     <!-- Hero Section -->
-        <!-- Hero Section -->
     <section class="hero" id="home">
-        <div class="animated-background"></div>
+        <div class="animated-background">
+            <div class="floating-circle circle-1"></div>
+            <div class="floating-circle circle-2"></div>
+            <div class="floating-circle circle-3"></div>
+        </div>
         <div class="hero-container">
             <div class="hero-content">
-                <h1>Dr. Cristina Moncayo Dental Clinic</h1>
-                <p>Experience modern dentistry with compassionate service. We provide comprehensive dental solutions for the whole family in Bacoor.</p>
+                <h1>Robles-Moncayo Dental Clinic</h1>
+                <p>Experience modern dentistry with compassionate service. We provide comprehensive dental solutions for the whole family.</p>
                 <a href="{{ route('login') }}" class="btn-primary">Book Your Appointment</a>
             </div>
             
-            <!-- AI Chatbot replacing hero-image -->
-            <div class="hero-chatbot" id="lee-ai">
-                <div class="chatbot-card">
-                    <div class="chatbot-header">
-                        <div class="chatbot-avatar">
-                            <i class="fas fa-robot"></i>
-                        </div>
-                        <div class="chatbot-header-content">
-                            <h3>Lee AI Assistant</h3>
-                            <p class="chatbot-description">Your 24/7 dental health companion powered by AI</p>
-                            <div class="chatbot-status">
-                                <span class="status-dot"></span>
-                                <span class="status-text">Online - Ready to help!</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="chatbot-messages" id="publicChatMessages">
-                        <div class="welcome-message">
-                            <i class="fas fa-tooth"></i>
-                            <p>Hello! I'm Lee AI, your dental health assistant. I can help you with:</p>
-                            <ul>
-                                <li>Dental care tips and advice</li>
-                                <li>Information about our services</li>
-                                <li>Booking guidance</li>
-                                <li>General dental health questions</li>
-                            </ul>
-                            <p>How can I assist you today?</p>
-                        </div>
-                        <div class="typing-indicator" id="typingIndicator" style="display: none;">
-                            <div class="typing-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <span class="typing-text">Lee AI is typing...</span>
-                        </div>
-                    </div>                    <form id="publicChatForm" class="chatbot-input-form">
-                        @csrf
-                        <div class="chatbot-input-wrapper">
-                            <input 
-                                type="text" 
-                                id="publicChatInput" 
-                                placeholder="Ask about dental services, tooth pain, etc..." 
-                                maxlength="500"
-                                required
-                            />
-                            <button type="submit" id="publicSendBtn">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <p class="chatbot-footer-text">
-                        <i class="fas fa-lock"></i> Your privacy is protected
-                    </p>
-                </div>
-            </div>
+            <!-- AI Chatbot Component -->
+            <x-lee-ai-chatbot type="public" />
         </div>
     </section>
 
@@ -1060,432 +1025,8 @@
                 element.classList.add('active');
             }
         }
-        
-        // ============================================
-        // PUBLIC CHATBOT FUNCTIONALITY
-        // ============================================
-        const publicChatForm = document.getElementById('publicChatForm');
-        const publicChatInput = document.getElementById('publicChatInput');
-        const publicChatMessages = document.getElementById('publicChatMessages');
-        const publicSendBtn = document.getElementById('publicSendBtn');
-
-        function addPublicMessage(message, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${isUser ? 'user-message' : 'bot-message'}`;
-            
-            const icon = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <div class="message-icon">${icon}</div>
-                    <div class="message-text">
-                        <p>${message}</p>
-                        <span class="message-time">${time}</span>
-                    </div>
-                </div>
-            `;
-            
-            publicChatMessages.appendChild(messageDiv);
-            publicChatMessages.scrollTop = publicChatMessages.scrollHeight;
-        }
-
-        publicChatForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const question = publicChatInput.value.trim();
-            if (!question) return;
-            
-            // Add user message
-            addPublicMessage(question, true);
-            
-            // Clear input and disable
-            publicChatInput.value = '';
-            publicChatInput.disabled = true;
-            publicSendBtn.disabled = true;
-            publicSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            
-            try {
-                const response = await fetch('/ask-gemini-public', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                    },
-                    body: JSON.stringify({ question: question })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
-                    addPublicMessage(data.response, false);
-                } else {
-                    addPublicMessage('Sorry, I encountered an error. Please try again!', false);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                addPublicMessage('Connection error. Please check your internet and try again.', false);
-            } finally {
-                publicChatInput.disabled = false;
-                publicSendBtn.disabled = false;
-                publicSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
-                publicChatInput.focus();
-            }
-        });
     </script>
     
-    <style>
-        /* ============================================ */
-        /* CHATBOT STYLES */
-        /* ============================================ */
-        .hero-chatbot {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .chatbot-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            width: 100%;
-            max-width: 580px;
-            overflow: hidden;
-            border: 2px solid #f0f0f0;
-        }
-        
-        .chatbot-header {
-            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
-            padding: 20px;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .chatbot-header-content {
-            flex: 1;
-        }
-        
-        .chatbot-avatar {
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #0077b6;
-            flex-shrink: 0;
-        }
-        
-        .chatbot-header h3 {
-            margin: 0 0 4px 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .chatbot-description {
-            margin: 0 0 8px 0;
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        .chatbot-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-        
-        .status-text {
-            opacity: 0.95;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #4ade80;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .chatbot-messages {
-            height: 450px;
-            overflow-y: auto;
-            padding: 20px;
-            background: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .welcome-message {
-            background: white;
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 4px solid #00b4d8;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .welcome-message i {
-            font-size: 24px;
-            color: #00b4d8;
-            margin-bottom: 10px;
-        }
-        
-        .welcome-message p {
-            margin: 8px 0;
-            color: #333;
-            line-height: 1.6;
-            font-size: 14px;
-        }
-        
-        .welcome-message ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        
-        .welcome-message li {
-            margin: 5px 0;
-            color: #555;
-            font-size: 14px;
-        }
-        
-        /* Typing Indicator */
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            max-width: 200px;
-        }
-        
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-        
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: #00b4d8;
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
-        }
-        
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes typingBounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-10px);
-            }
-        }
-        
-        .typing-text {
-            font-size: 13px;
-            color: #666;
-            font-style: italic;
-        }
-        
-        .chat-message {
-            display: flex;
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .message-content {
-            display: flex;
-            gap: 10px;
-            max-width: 85%;
-        }
-        
-        .user-message {
-            justify-content: flex-end;
-        }
-        
-        .user-message .message-content {
-            flex-direction: row-reverse;
-        }
-        
-        .message-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 16px;
-        }
-        
-        .bot-message .message-icon {
-            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
-            color: white;
-        }
-        
-        .user-message .message-icon {
-            background: #e9ecef;
-            color: #495057;
-        }
-        
-        .message-text {
-            flex: 1;
-        }
-        
-        .message-text p {
-            background: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin: 0 0 4px 0;
-            color: #333;
-            line-height: 1.5;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .user-message .message-text p {
-            background: #00b4d8;
-            color: white;
-        }
-        
-        .message-time {
-            font-size: 11px;
-            color: #999;
-            padding-left: 4px;
-        }
-        
-        .chatbot-input-form {
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #e9ecef;
-        }
-        
-        .chatbot-input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .chatbot-input-wrapper input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .chatbot-input-wrapper input:focus {
-            border-color: #00b4d8;
-            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
-        }
-        
-        .chatbot-input-wrapper button {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-        
-        .chatbot-input-wrapper button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
-        }
-        
-        .chatbot-input-wrapper button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: scale(1);
-        }
-        
-        .chatbot-footer-text {
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            margin: 10px 0 0 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        .chatbot-footer-text i {
-            font-size: 10px;
-        }
-        
-        /* Scrollbar styling */
-        .chatbot-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .chatbot-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        .chatbot-messages::-webkit-scrollbar-thumb {
-            background: #00b4d8;
-            border-radius: 3px;
-        }
-        
-        .chatbot-messages::-webkit-scrollbar-thumb:hover {
-            background: #0077b6;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero-container {
-                flex-direction: column;
-            }
-            
-            .chatbot-card {
-                max-width: 100%;
-                margin-top: 30px;
-            }
-            
-            .chatbot-messages {
-                height: 300px;
-            }
-        }
-    </style>
 </body>
 </html>
 ```
