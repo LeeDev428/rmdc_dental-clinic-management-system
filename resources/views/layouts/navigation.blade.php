@@ -73,9 +73,10 @@
                                     <i class="fas fa-concierge-bell mr-2"></i>Services
                                 </div>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <div class="text-sm font-medium text-gray-600 dark:text-gray-300 px-4 py-2 whitespace-nowrap cursor-pointer">
+                                <x-nav-link :href="route('ask.lee.ai')" :active="request()->routeIs('ask.lee.ai')" 
+                                            class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-robot mr-2"></i>Ask Lee AI
-                                </div>
+                                </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <x-nav-link :href="route('usersettings')" :active="request()->routeIs('usersettings')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
@@ -394,7 +395,7 @@ function formatDate(dateString) {
         <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
         <x-dropdown-link :href="route('health.progress')" class="text-gray-700 dark:text-white">{{ __('Health Progress') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
-        <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Ask Lee AI?') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('ask.lee.ai')" class="text-gray-700 dark:text-white">{{ __('Ask Lee AI') }}</x-dropdown-link>
         <x-dropdown-link class="text-gray-700 dark:text-white">{{ __('Services') }}</x-dropdown-link>
         <x-dropdown-link :href="route('usersettings')" class="text-gray-700 dark:text-white">{{ __('Settings') }}</x-dropdown-link>
         <form method="POST" action="{{ route('logout') }}">
