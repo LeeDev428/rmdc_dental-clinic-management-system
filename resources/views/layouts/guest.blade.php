@@ -22,6 +22,18 @@
             margin: 0;
             padding: 0;
             height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.55);
+            z-index: -1;
         }
 
         /* Loading Screen */
