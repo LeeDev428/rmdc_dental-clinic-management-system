@@ -28,6 +28,7 @@
     use App\Http\Controllers\AdminAppointmentHistoryController;
     use App\Http\Controllers\AppointmentCancellationController;
     use App\Http\Controllers\ServiceFeedbackController;
+    use App\Http\Controllers\GeminiController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -45,6 +46,9 @@
     //default 8080
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
     Route::get('/get-services', [WelcomeController::class, 'getServices'])->name('get.services');
+    
+    // Public AI Chatbot (No authentication required)
+    Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])->name('ask.gemini.public');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
@@ -86,6 +90,10 @@
     // Service Feedback
     Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
     Route::post('/service-feedback', [ServiceFeedbackController::class, 'store'])->name('feedback.store');
+    
+    // Ask Lee AI - Gemini AI Chatbot
+    Route::get('/ask-lee-ai', [GeminiController::class, 'index'])->name('ask.lee.ai');
+    Route::post('/ask-gemini', [GeminiController::class, 'ask'])->name('ask.gemini');
     });
 
 
