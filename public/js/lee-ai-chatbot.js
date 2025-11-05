@@ -30,11 +30,14 @@ function initLeeAIChatbot(type, apiEndpoint) {
         const icon = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
         const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         
+        // For bot messages, render HTML. For user messages, escape HTML for security
+        const messageContent = isUser ? escapeHtml(message) : message;
+        
         messageDiv.innerHTML = `
             <div class="message-content-lee">
                 <div class="message-icon-lee">${icon}</div>
                 <div class="message-text-lee">
-                    <p>${escapeHtml(message)}</p>
+                    <div class="message-body-lee">${messageContent}</div>
                     <span class="message-time-lee">${time}</span>
                 </div>
             </div>
