@@ -436,6 +436,112 @@
     background: linear-gradient(to bottom, #0077b6, #005f8a);
 }
 
+/* AI Response Formatting Styles */
+.message-body-lee {
+    background: white;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #333;
+    line-height: 1.6;
+    font-size: 13px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    word-wrap: break-word;
+}
+
+.user-message-lee .message-body-lee {
+    background: linear-gradient(135deg, #00b4d8, #0077b6);
+    color: white;
+}
+
+/* Formatting within AI responses */
+.message-body-lee p {
+    margin: 8px 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+    color: inherit;
+    font-size: inherit;
+    line-height: 1.6;
+}
+
+.message-body-lee p:first-child {
+    margin-top: 0;
+}
+
+.message-body-lee p:last-child {
+    margin-bottom: 0;
+}
+
+.message-body-lee strong {
+    font-weight: 600;
+    color: #0077b6;
+}
+
+.user-message-lee .message-body-lee strong {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.message-body-lee em {
+    font-style: italic;
+    color: #555;
+}
+
+.message-body-lee ul.ai-list {
+    margin: 12px 0;
+    padding-left: 20px;
+    list-style: none;
+}
+
+.message-body-lee ul.ai-list li {
+    position: relative;
+    margin: 8px 0;
+    padding-left: 8px;
+    color: #444;
+    line-height: 1.6;
+}
+
+.message-body-lee ul.ai-list li::before {
+    content: "•";
+    position: absolute;
+    left: -12px;
+    color: #00b4d8;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.message-body-lee br {
+    display: block;
+    content: "";
+    margin: 4px 0;
+}
+
+.message-body-lee a.ai-link {
+    color: #0077b6;
+    text-decoration: underline;
+    transition: all 0.2s;
+}
+
+.message-body-lee a.ai-link:hover {
+    color: #00b4d8;
+    text-decoration: none;
+}
+
+.user-message-lee .message-body-lee a.ai-link {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Nested lists support */
+.message-body-lee ul.ai-list ul.ai-list {
+    margin: 6px 0 6px 15px;
+}
+
+.message-body-lee ul.ai-list ul.ai-list li::before {
+    content: "◦";
+    font-size: 14px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .chatbot-card-lee {
@@ -449,5 +555,13 @@
     
     .message-content-lee {
         max-width: 90%;
+    }
+    
+    .message-body-lee {
+        font-size: 12px;
+    }
+    
+    .message-body-lee ul.ai-list {
+        padding-left: 18px;
     }
 }
