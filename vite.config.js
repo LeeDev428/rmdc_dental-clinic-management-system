@@ -9,4 +9,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0', // Allow external access
+        port: 5173,
+        hmr: {
+            host: 'localhost'
+        }
+    }
 });
