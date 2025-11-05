@@ -8,125 +8,479 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <!-- AI Chat Interface Card -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                <!-- Header -->
-                <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
-                    <div class="flex items-center space-x-4">
-                        <div class="bg-white rounded-full p-3">
-                            <i class="fas fa-robot text-blue-600 text-3xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold">Lee AI</h3>
-                            <p class="text-blue-100 text-sm">Your 24/7 Dental Assistant</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
+            <!-- AI Chatbot Component -->
+            <div class="lee-ai-container">
+                <x-lee-ai-chatbot 
+                    type="protected" 
+                    :userName="Auth::user()->name" 
+                />
 
-                <!-- Chat Container -->
-                <div class="p-6">
-                    <!-- Introduction -->
-                    <div class="mb-6 bg-blue-50 dark:bg-gray-700 border-l-4 border-blue-500 p-4 rounded">
-                        <p class="text-gray-700 dark:text-gray-300">
-                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-                            Welcome! I'm Lee AI, your virtual dental assistant. Ask me anything about dental health, 
-                            symptoms, procedures, or general oral care. I'm here to help! 🦷
-                        </p>
-                    </div>
-
-                    <!-- Chat Messages Container -->
-                    <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
-                        <!-- Messages will appear here -->
-                    </div>
-
-                    <!-- Input Form -->
-                    <form id="askForm" class="space-y-4">
-                        @csrf
-                        <div>
-                            <label for="question" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <i class="fas fa-comment-dots mr-2"></i>Your Question
-                            </label>
-                            <textarea 
-                                id="question" 
-                                name="question" 
-                                rows="4" 
-                                maxlength="1000"
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white resize-none"
-                                placeholder="Example: My tooth hurts when I eat cold food. What should I do?"
-                                required
-                            ></textarea>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                <span id="charCount">0</span>/1000 characters
-                            </p>
-                        </div>
-
-                        <!-- Error Message -->
-                        <div id="errorMessage" class="hidden bg-red-50 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded">
-                            <p class="text-red-700 dark:text-red-200 text-sm">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
-                                <span id="errorText"></span>
-                            </p>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button 
-                            type="submit" 
-                            id="submitBtn"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200 flex items-center justify-center space-x-2"
-                        >
-                            <i class="fas fa-paper-plane"></i>
-                            <span id="btnText">Ask Lee AI</span>
+                <!-- Sample Questions -->
+                <div class="sample-questions-section">
+                    <h4><i class="fas fa-lightbulb"></i> Sample Questions</h4>
+                    <div class="sample-questions-grid">
+                        <button onclick="fillQuestion('What causes tooth sensitivity?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>What causes tooth sensitivity?</span>
                         </button>
-                    </form>
-
-                    <!-- Sample Questions -->
-                    <div class="mt-8">
-                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                            <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>Sample Questions:
-                        </p>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            <button onclick="fillQuestion('What causes tooth sensitivity?')" 
-                                    class="text-left text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-gray-700 p-3 rounded-lg transition">
-                                <i class="fas fa-chevron-right mr-2"></i>What causes tooth sensitivity?
-                            </button>
-                            <button onclick="fillQuestion('How often should I visit the dentist?')" 
-                                    class="text-left text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-gray-700 p-3 rounded-lg transition">
-                                <i class="fas fa-chevron-right mr-2"></i>How often should I visit the dentist?
-                            </button>
-                            <button onclick="fillQuestion('What are the signs of gum disease?')" 
-                                    class="text-left text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-gray-700 p-3 rounded-lg transition">
-                                <i class="fas fa-chevron-right mr-2"></i>What are the signs of gum disease?
-                            </button>
-                            <button onclick="fillQuestion('How can I whiten my teeth naturally?')" 
-                                    class="text-left text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 bg-blue-50 dark:bg-gray-700 p-3 rounded-lg transition">
-                                <i class="fas fa-chevron-right mr-2"></i>How can I whiten my teeth naturally?
-                            </button>
-                        </div>
+                        <button onclick="fillQuestion('How often should I visit the dentist?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>How often should I visit the dentist?</span>
+                        </button>
+                        <button onclick="fillQuestion('What are the signs of gum disease?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>What are the signs of gum disease?</span>
+                        </button>
+                        <button onclick="fillQuestion('How can I whiten my teeth naturally?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>How can I whiten my teeth naturally?</span>
+                        </button>
+                        <button onclick="fillQuestion('What should I do if I have a toothache?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>What should I do if I have a toothache?</span>
+                        </button>
+                        <button onclick="fillQuestion('How do I properly brush my teeth?')" class="sample-question-btn">
+                            <i class="fas fa-chevron-right"></i>
+                            <span>How do I properly brush my teeth?</span>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Disclaimer -->
-            <div class="mt-6 bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 rounded">
-                <p class="text-yellow-800 dark:text-yellow-200 text-sm">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    <strong>Disclaimer:</strong> Lee AI provides general dental information only. 
-                    For emergencies or specific medical advice, please contact our clinic or visit a dentist immediately.
-                </p>
+                <!-- Disclaimer -->
+                <div class="disclaimer-box">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        <strong>Disclaimer:</strong> Lee AI provides general dental information only. 
+                        For emergencies or specific medical advice, please contact our clinic or visit a dentist immediately.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .lee-ai-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 2px solid #f0f0f0;
+        }
+        
+        .chatbot-header-protected {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            padding: 25px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .chatbot-avatar-protected {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #0077b6;
+            flex-shrink: 0;
+        }
+        
+        .chatbot-header-content-protected {
+            flex: 1;
+        }
+        
+        .chatbot-header-content-protected h3 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .chatbot-description-protected {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .chatbot-status-protected {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .status-dot-protected {
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse-protected 2s infinite;
+        }
+        
+        @keyframes pulse-protected {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .chatbot-messages-protected {
+            height: 500px;
+            overflow-y: auto;
+            padding: 25px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .welcome-message-protected {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #00b4d8;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .welcome-message-protected i {
+            font-size: 28px;
+            color: #00b4d8;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .welcome-message-protected p {
+            margin: 10px 0;
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        
+        .welcome-message-protected ul {
+            margin: 12px 0;
+            padding-left: 25px;
+        }
+        
+        .welcome-message-protected li {
+            margin: 6px 0;
+            color: #555;
+            font-size: 15px;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator-protected {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 220px;
+        }
+        
+        .typing-dots-protected {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .typing-dots-protected span {
+            width: 10px;
+            height: 10px;
+            background: #00b4d8;
+            border-radius: 50%;
+            animation: typingBounce-protected 1.4s infinite;
+        }
+        
+        .typing-dots-protected span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots-protected span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingBounce-protected {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .typing-text-protected {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Chat Messages */
+        .chat-message-protected {
+            display: flex;
+            animation: fadeIn-protected 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn-protected {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-content-protected {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+        }
+        
+        .user-message-protected {
+            justify-content: flex-end;
+        }
+        
+        .user-message-protected .message-content-protected {
+            flex-direction: row-reverse;
+        }
+        
+        .message-icon-protected {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 18px;
+        }
+        
+        .bot-message-protected .message-icon-protected {
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+        }
+        
+        .user-message-protected .message-icon-protected {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .message-text-protected p {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 0 0 5px 0;
+            color: #333;
+            line-height: 1.6;
+            font-size: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-message-protected .message-text-protected p {
+            background: #00b4d8;
+            color: white;
+        }
+        
+        .message-time-protected {
+            font-size: 12px;
+            color: #999;
+            padding-left: 5px;
+        }
+        
+        /* Input Form */
+        .chatbot-input-form-protected {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .chatbot-input-wrapper-protected {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .chatbot-input-wrapper-protected input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .chatbot-input-wrapper-protected input:focus {
+            border-color: #00b4d8;
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+        }
+        
+        .chatbot-input-wrapper-protected button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .chatbot-input-wrapper-protected button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
+        }
+        
+        .chatbot-input-wrapper-protected button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        
+        .chatbot-char-count-protected {
+            font-size: 13px;
+            color: #999;
+            text-align: right;
+            margin: 5px 0;
+        }
+        
+        .chatbot-footer-text-protected {
+            text-align: center;
+            font-size: 13px;
+            color: #999;
+            margin: 10px 0 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        /* Sample Questions */
+        .sample-questions-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .sample-questions-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sample-questions-section h4 i {
+            color: #fbbf24;
+            font-size: 20px;
+        }
+        
+        .sample-questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+        
+        .sample-question-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 18px;
+            background: #f0f9ff;
+            border: 2px solid #e0f2fe;
+            border-radius: 12px;
+            color: #0077b6;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        
+        .sample-question-btn:hover {
+            background: #e0f2fe;
+            border-color: #00b4d8;
+            transform: translateX(5px);
+        }
+        
+        .sample-question-btn i {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        
+        /* Disclaimer */
+        .disclaimer-box {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            gap: 15px;
+            align-items: start;
+        }
+        
+        .disclaimer-box i {
+            color: #f59e0b;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        
+        .disclaimer-box div {
+            color: #78350f;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .disclaimer-box strong {
+            font-weight: 600;
+        }
+        
+        /* Scrollbar */
+        .chatbot-messages-protected::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chatbot-messages-protected::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chatbot-messages-protected::-webkit-scrollbar-thumb {
+            background: #00b4d8;
+            border-radius: 4px;
+        }
+        
+        .chatbot-messages-protected::-webkit-scrollbar-thumb:hover {
+            background: #0077b6;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sample-questions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chatbot-messages-protected {
+                height: 400px;
+            }
+        }
+    </style>
 
     <script>
         const questionInput = document.getElementById('question');
         const charCount = document.getElementById('charCount');
         const askForm = document.getElementById('askForm');
         const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
         const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
 
         // Character counter
         questionInput.addEventListener('input', function() {
@@ -135,25 +489,27 @@
 
         // Fill question from sample buttons
         function fillQuestion(text) {
-            questionInput.value = text;
-            charCount.textContent = text.length;
-            questionInput.focus();
+            // Get the protected chatbot input
+            const protectedInput = document.getElementById('protectedChatInput');
+            if (protectedInput) {
+                protectedInput.value = text;
+                protectedInput.focus();
+            }
         }
 
         // Add message to chat
         function addMessage(message, isUser = false) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            messageDiv.className = `chat-message-protected ${isUser ? 'user-message-protected' : 'bot-message-protected'}`;
             
             const messageContent = `
-                <div class="${isUser ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200'} rounded-lg px-4 py-3 max-w-[80%] shadow">
-                    <div class="flex items-start space-x-2">
-                        ${!isUser ? '<i class="fas fa-robot mt-1"></i>' : '<i class="fas fa-user mt-1"></i>'}
-                        <div class="flex-1">
-                            <p class="text-sm font-semibold mb-1">${isUser ? 'You' : 'Lee AI'}</p>
-                            <p class="text-sm whitespace-pre-wrap">${message}</p>
-                            <p class="text-xs mt-2 opacity-75">${new Date().toLocaleTimeString()}</p>
-                        </div>
+                <div class="message-content-protected">
+                    <div class="message-icon-protected">
+                        <i class="fas fa-${isUser ? 'user' : 'robot'}"></i>
+                    </div>
+                    <div class="message-text-protected">
+                        <p>${message}</p>
+                        <span class="message-time-protected">${new Date().toLocaleTimeString()}</span>
                     </div>
                 </div>
             `;
@@ -168,29 +524,23 @@
             e.preventDefault();
             
             const question = questionInput.value.trim();
+            if (!question) return;
             
-            if (!question) {
-                showError('Please enter a question.');
-                return;
-            }
-
-            // Hide error message
-            errorMessage.classList.add('hidden');
-            
-            // Add user message to chat
+            // Add user message
             addMessage(question, true);
             
-            // Disable form
-            submitBtn.disabled = true;
-            questionInput.disabled = true;
-            btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Thinking...';
-            
-            // Clear input
+            // Clear and disable input
             questionInput.value = '';
             charCount.textContent = '0';
+            questionInput.disabled = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
 
             try {
-                // Send request to backend
                 const response = await fetch('/ask-gemini', {
                     method: 'POST',
                     headers: {
@@ -201,34 +551,26 @@
                 });
 
                 const data = await response.json();
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
 
                 if (response.ok && data.success) {
-                    // Add AI response to chat
                     addMessage(data.response, false);
                 } else {
-                    showError(data.error || 'Failed to get response from AI.');
                     addMessage('Sorry, I encountered an error. Please try again later.', false);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showError('Network error. Please check your connection and try again.');
+                typingIndicator.style.display = 'none';
                 addMessage('Sorry, I could not connect to the server. Please try again.', false);
             } finally {
-                // Re-enable form
-                submitBtn.disabled = false;
                 questionInput.disabled = false;
-                btnText.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Ask Lee AI';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                questionInput.focus();
             }
         });
-
-        // Show error message
-        function showError(message) {
-            errorText.textContent = message;
-            errorMessage.classList.remove('hidden');
-            setTimeout(() => {
-                errorMessage.classList.add('hidden');
-            }, 5000);
-        }
 
         // Make fillQuestion available globally
         window.fillQuestion = fillQuestion;
