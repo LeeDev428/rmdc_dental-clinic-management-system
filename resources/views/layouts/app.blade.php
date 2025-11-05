@@ -7,6 +7,9 @@
      
         <title>{{ config('app.name', 'Laravel') }}</title>
         <link rel="icon" href="{{ asset('img/dcms_loading_logo.png') }}" type="image/png">
+        
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <!-- Pre-render Script to Set Theme -->
         <script>
