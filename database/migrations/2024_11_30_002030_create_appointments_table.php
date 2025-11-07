@@ -23,6 +23,14 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('image_path')->nullable(); // Add image path column
             $table->string('teeth_layout')->nullable();
+            
+            // Payment fields
+            $table->decimal('total_price', 10, 2)->nullable();
+            $table->decimal('down_payment', 10, 2)->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_reference')->nullable();
+            $table->string('payment_status')->default('pending');
+            $table->boolean('requires_payment')->default(true);
 
             $table->timestamps();
         });
