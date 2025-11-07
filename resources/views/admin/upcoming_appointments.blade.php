@@ -393,6 +393,9 @@
                     <td style="font-size: 12px;">{{ $appointment->updated_at }}</td>
                     <td>
                         <div class="action-btn-group">
+                            <button class="btn-view-details-pending" onclick="showPendingAppointmentDetails({{ $appointment->id }})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
                             <button class="btn-accept accept-action" data-appointment-id="{{ $appointment->id }}">
                                 Accept
                             </button>
@@ -561,5 +564,325 @@
         overlay.appendChild(zoomedImg);
         document.body.appendChild(overlay);
     }
+    
+    // Show pending appointment details modal
+    function showPendingAppointmentDetails(appointmentId) {
+        const modal = document.getElementById('pendingDetailsModal');
+        const content = document.getElementById('pendingDetailsContent');
+        
+        modal.style.display = 'flex';
+        content.innerHTML = '<div class="loading-details">Loading appointment details...</div>';
+        
+        // Fetch appointment details
+        fetch(`/admin/appointments/${appointmentId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                content.innerHTML = generatePendingDetailsHTML(data);
+            })
+            .catch(error => {
+                content.innerHTML = '<div class="loading-details" style="color: #ef4444;">Error loading details. Please try again.</div>';
+                console.error('Error:', error);
+            });
+    }
+    
+    // Generate pending appointment details HTML
+    function generatePendingDetailsHTML(appointment) {
+        const paymentStatus = appointment.payment_status || 'unpaid';
+        const paymentBadge = {
+            'unpaid': '<span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">UNPAID</span>',
+            'partially_paid': '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">PARTIALLY PAID</span>',
+            'fully_paid': '<span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">FULLY PAID</span>'
+        };
+        
+        let html = '<div class="details-grid">';
+        
+        // Patient Information
+        html += `
+            <div class="detail-box">
+                <div class="detail-label-pending">Patient Name</div>
+                <div class="detail-value-pending">${appointment.user?.name || 'N/A'}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Patient Email</div>
+                <div class="detail-value-pending">${appointment.user?.email || 'N/A'}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Contact Number</div>
+                <div class="detail-value-pending">${appointment.user?.phone || 'N/A'}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Appointment ID</div>
+                <div class="detail-value-pending">#${appointment.id}</div>
+            </div>
+            <div class="detail-box full">
+                <div class="detail-label-pending">Title</div>
+                <div class="detail-value-pending">${appointment.title}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Procedure</div>
+                <div class="detail-value-pending">${appointment.procedure}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Duration</div>
+                <div class="detail-value-pending">${appointment.duration} minutes</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Start Time</div>
+                <div class="detail-value-pending">${formatDateTime(appointment.start)}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">End Time</div>
+                <div class="detail-value-pending">${formatDateTime(appointment.end)}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Status</div>
+                <div class="detail-value-pending status ${appointment.status}">${appointment.status.toUpperCase()}</div>
+            </div>
+            <div class="detail-box">
+                <div class="detail-label-pending">Created At</div>
+                <div class="detail-value-pending">${formatDateTime(appointment.created_at)}</div>
+            </div>
+        `;
+        
+        // Payment Information
+        if (appointment.requires_payment || appointment.total_price) {
+            html += `
+                <div class="detail-box">
+                    <div class="detail-label-pending">Total Price</div>
+                    <div class="detail-value-pending">₱${parseFloat(appointment.total_price || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label-pending">Down Payment</div>
+                    <div class="detail-value-pending">₱${parseFloat(appointment.down_payment || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label-pending">Remaining Balance</div>
+                    <div class="detail-value-pending">₱${parseFloat((appointment.total_price || 0) - (appointment.down_payment || 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label-pending">Payment Status</div>
+                    <div class="detail-value-pending">${paymentBadge[paymentStatus]}</div>
+                </div>
+            `;
+        }
+        
+        // Valid ID Image
+        if (appointment.image_path) {
+            html += `
+                <div class="detail-box full">
+                    <div class="detail-label-pending">Valid ID / Supporting Document</div>
+                    <img src="/storage/${appointment.image_path}" alt="Valid ID" class="detail-image-pending">
+                </div>
+            `;
+        }
+        
+        // Teeth Layout
+        if (appointment.teeth_layout) {
+            html += `
+                <div class="detail-box full">
+                    <div class="detail-label-pending">Teeth Layout Information</div>
+                    <div class="detail-value-pending">${appointment.teeth_layout}</div>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        return html;
+    }
+    
+    // Format date time
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString) return 'N/A';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+    
+    // Close pending details modal
+    function closePendingDetailsModal() {
+        document.getElementById('pendingDetailsModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('pendingDetailsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePendingDetailsModal();
+        }
+    });
 </script>
+
+<!-- Pending Appointment Details Modal -->
+<div id="pendingDetailsModal" class="details-modal" style="display: none;">
+    <div class="details-modal-content">
+        <div class="details-modal-header">
+            <h2>Appointment Details</h2>
+            <span class="close-details-modal" onclick="closePendingDetailsModal()">&times;</span>
+        </div>
+        <div class="details-modal-body" id="pendingDetailsContent">
+            <div class="loading-details">Loading appointment details...</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-view-details-pending {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+        margin-right: 4px;
+    }
+    
+    .btn-view-details-pending:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+    
+    .details-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    
+    .details-modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 800px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .details-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .details-modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .close-details-modal {
+        font-size: 28px;
+        color: #9ca3af;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+    
+    .close-details-modal:hover {
+        color: #ef4444;
+    }
+    
+    .details-modal-body {
+        padding: 24px;
+    }
+    
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .detail-box {
+        background: #f9fafb;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .detail-box.full {
+        grid-column: 1 / -1;
+    }
+    
+    .detail-label-pending {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    
+    .detail-value-pending {
+        font-size: 15px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    
+    .detail-value-pending.status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .detail-value-pending.status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .detail-value-pending.status.accepted {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .detail-value-pending.status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .detail-image-pending {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .loading-details {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+</style>
+
 @endsection
