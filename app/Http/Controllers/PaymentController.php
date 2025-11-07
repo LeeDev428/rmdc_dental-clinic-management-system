@@ -13,15 +13,27 @@ class PaymentController extends Controller
     /**
      * Create PayMongo Checkout Session and redirect to hosted checkout page
      */
-    public function createPayment($appointmentId)
+    public function createPayment(Request $request)
     {
         try {
-            $appointment = Appointment::where('id', $appointmentId)
-                ->where('user_id', Auth::id())
-                ->firstOrFail();
+            // Get appointment data from session
+            $sessionKey = $request->query('session_key');
+            if (!$sessionKey) {
+                return redirect()->route('appointments')->with('error', 'Invalid payment session');
+            }
             
-            $paymentMethod = $appointment->payment_method;
-            $amount = (int)($appointment->down_payment * 100); // Convert to centavos (integer)
+            $appointmentData = session($sessionKey);
+            if (!$appointmentData) {
+                return redirect()->route('appointments')->with('error', 'Payment session expired. Please try again.');
+            }
+            
+            Log::info('Retrieved appointment data from session:', [
+                'session_key' => $sessionKey,
+                'data' => $appointmentData
+            ]);
+            
+            $paymentMethod = $appointmentData['payment_method'];
+            $amount = (int)($appointmentData['down_payment'] * 100); // Convert to centavos (integer)
             
             // Determine payment method types for checkout session
             $paymentMethodTypes = [];
@@ -43,26 +55,26 @@ class PaymentController extends Controller
                             'send_email_receipt' => true,
                             'show_description' => true,
                             'show_line_items' => true,
-                            'description' => "RMDC Dental Clinic - Appointment #{$appointmentId}",
+                            'description' => "RMDC Dental Clinic - {$appointmentData['procedure']}",
                             'line_items' => [
                                 [
                                     'currency' => 'PHP',
                                     'amount' => $amount,
-                                    'description' => $appointment->procedure,
+                                    'description' => $appointmentData['procedure'],
                                     'name' => 'Down Payment (20%)',
                                     'quantity' => 1,
                                 ]
                             ],
                             'payment_method_types' => $paymentMethodTypes,
-                            'success_url' => route('payment.success', ['appointment' => $appointmentId]),
-                            'cancel_url' => route('payment.failed', ['appointment' => $appointmentId]),
+                            'success_url' => route('payment.success') . '?session_key=' . $sessionKey,
+                            'cancel_url' => route('payment.failed') . '?session_key=' . $sessionKey,
                             'billing' => [
                                 'name' => Auth::user()->name,
                                 'email' => Auth::user()->email,
                                 'phone' => '09123456789', // Default phone for sandbox testing
                             ],
                             'metadata' => [
-                                'appointment_id' => (string)$appointmentId,
+                                'session_key' => $sessionKey,
                                 'user_id' => (string)Auth::id(),
                             ],
                         ]
@@ -74,18 +86,19 @@ class PaymentController extends Controller
                     'status' => $response->status(),
                     'body' => $response->json()
                 ]);
-                return back()->with('error', 'Failed to create checkout session. Please try again.');
+                // Clear session data
+                session()->forget($sessionKey);
+                return redirect()->route('appointments')->with('error', 'Failed to create checkout session. Please try again.');
             }
             
             $checkoutSession = $response->json()['data'];
             
-            // Store checkout session ID for verification
-            $appointment->update([
-                'payment_reference' => $checkoutSession['id'],
-            ]);
+            // Store checkout session ID in appointment data
+            $appointmentData['checkout_session_id'] = $checkoutSession['id'];
+            session([$sessionKey => $appointmentData]);
             
             Log::info('PayMongo Checkout Session Created:', [
-                'appointment_id' => $appointmentId,
+                'session_key' => $sessionKey,
                 'checkout_session_id' => $checkoutSession['id'],
                 'checkout_url' => $checkoutSession['attributes']['checkout_url']
             ]);
@@ -95,47 +108,82 @@ class PaymentController extends Controller
             
         } catch (\Exception $e) {
             Log::error('PayMongo Payment Creation Error: ' . $e->getMessage(), [
-                'appointment_id' => $appointmentId,
+                'session_key' => $sessionKey ?? 'unknown',
                 'trace' => $e->getTraceAsString()
             ]);
-            return back()->with('error', 'Failed to initialize payment. Please try again.');
+            // Clear session data
+            if (isset($sessionKey)) {
+                session()->forget($sessionKey);
+            }
+            return redirect()->route('appointments')->with('error', 'Failed to initialize payment. Please try again.');
         }
     }
     
     /**
      * Handle successful payment callback from PayMongo
      */
-    public function paymentSuccess(Request $request, $appointmentId)
+    public function paymentSuccess(Request $request)
     {
         try {
-            $appointment = Appointment::where('id', $appointmentId)
-                ->where('user_id', Auth::id())
-                ->firstOrFail();
+            // Get session key from URL
+            $sessionKey = $request->query('session_key');
+            if (!$sessionKey) {
+                return redirect()->route('dashboard')->with('error', 'Invalid payment session');
+            }
+            
+            $appointmentData = session($sessionKey);
+            if (!$appointmentData) {
+                return redirect()->route('dashboard')->with('error', 'Payment session expired');
+            }
+            
+            $checkoutSessionId = $appointmentData['checkout_session_id'] ?? null;
+            if (!$checkoutSessionId) {
+                return redirect()->route('dashboard')->with('error', 'Invalid checkout session');
+            }
             
             // Retrieve checkout session from PayMongo to verify payment
             $response = Http::withBasicAuth(config('paymongo.secret_key'), '')
-                ->get("https://api.paymongo.com/v1/checkout_sessions/{$appointment->payment_reference}");
+                ->get("https://api.paymongo.com/v1/checkout_sessions/{$checkoutSessionId}");
             
             if ($response->successful()) {
                 $checkoutSession = $response->json()['data'];
                 $paymentStatus = $checkoutSession['attributes']['payment_status'] ?? 'unpaid';
                 
                 Log::info('PayMongo Checkout Session Retrieved:', [
-                    'appointment_id' => $appointmentId,
+                    'session_key' => $sessionKey,
                     'payment_status' => $paymentStatus,
-                    'session' => $checkoutSession
+                    'checkout_session_id' => $checkoutSessionId
                 ]);
                 
                 if ($paymentStatus === 'paid') {
                     // Get payment details from checkout session
                     $payments = $checkoutSession['attributes']['payments'] ?? [];
-                    $paymentId = !empty($payments) ? $payments[0]['id'] : $appointment->payment_reference;
+                    $paymentId = !empty($payments) ? $payments[0]['id'] : $checkoutSessionId;
                     
-                    // Update appointment status to 'pending' (awaiting admin approval) after successful payment
-                    $appointment->update([
+                    // NOW CREATE THE APPOINTMENT after payment is confirmed
+                    $appointment = Appointment::create([
+                        'title' => $appointmentData['title'],
+                        'procedure' => $appointmentData['procedure'],
+                        'time' => $appointmentData['time'],
+                        'start' => $appointmentData['start'],
+                        'end' => $appointmentData['end'],
+                        'duration' => $appointmentData['duration'],
+                        'user_id' => $appointmentData['user_id'],
+                        'image_path' => $appointmentData['image_path'],
+                        'payment_method' => $appointmentData['payment_method'],
+                        'total_price' => $appointmentData['total_price'],
+                        'down_payment' => $appointmentData['down_payment'],
                         'payment_status' => 'paid',
                         'payment_reference' => $paymentId,
-                        'status' => 'pending', // Now ready for admin review
+                        'status' => 'pending', // Ready for admin approval
+                    ]);
+                    
+                    // Clear session data
+                    session()->forget($sessionKey);
+                    
+                    Log::info('Appointment created after successful payment:', [
+                        'appointment_id' => $appointment->id,
+                        'payment_reference' => $paymentId
                     ]);
                     
                     return redirect()->route('dashboard')
@@ -157,28 +205,27 @@ class PaymentController extends Controller
     /**
      * Handle failed/cancelled payment callback from PayMongo
      */
-    public function paymentFailed(Request $request, $appointmentId)
+    public function paymentFailed(Request $request)
     {
         try {
-            $appointment = Appointment::where('id', $appointmentId)
-                ->where('user_id', Auth::id())
-                ->firstOrFail();
+            // Get session key from URL
+            $sessionKey = $request->query('session_key');
             
-            $appointment->update([
-                'payment_status' => 'failed',
-            ]);
-            
-            Log::info('Payment Failed/Cancelled:', [
-                'appointment_id' => $appointmentId
-            ]);
+            // Clear session data (no appointment was created)
+            if ($sessionKey) {
+                session()->forget($sessionKey);
+                Log::info('Payment Failed/Cancelled - Session cleared:', [
+                    'session_key' => $sessionKey
+                ]);
+            }
             
             return redirect()->route('appointments')
                 ->with('error', 'Payment was cancelled or failed. Please try again or choose a different payment method.');
                 
         } catch (\Exception $e) {
             Log::error('Payment Failed Callback Error: ' . $e->getMessage());
-            return redirect()->route('dashboard')
-                ->with('error', 'An error occurred. Please contact support.');
+            return redirect()->route('appointments')
+                ->with('error', 'An error occurred. Please try booking again.');
         }
     }
 }
