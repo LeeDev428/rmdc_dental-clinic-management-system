@@ -1068,9 +1068,11 @@ window.onclick = function(event) {
                 
                 // Display validation errors more clearly
                 let errorMessage = 'An error occurred while booking your appointment';
+                let canClearSession = false;
                 
                 if (error.error) {
                     errorMessage = error.error;
+                    canClearSession = error.can_clear === true;
                 } else if (error.errors) {
                     // Show all validation errors
                     const errorList = Object.values(error.errors).flat();
@@ -1079,7 +1081,14 @@ window.onclick = function(event) {
                     errorMessage = error.message;
                 }
                 
-                showPopup('error', errorMessage);
+                // If there's a pending session, show clear button
+                if (canClearSession) {
+                    showPopupWithAction('error', errorMessage, 'Clear Pending Payment', function() {
+                        clearPendingSession();
+                    });
+                } else {
+                    showPopup('error', errorMessage);
+                }
             });
         });
 
@@ -1106,6 +1115,68 @@ window.onclick = function(event) {
                 popup.classList.add('opacity-0');
                 setTimeout(() => popup.remove(), 500); // Remove after fade-out
             }, 3000); // Show for 3 seconds
+        }
+        
+        // Function to show popup with action button
+        function showPopupWithAction(type, message, buttonText, callback) {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            popup.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span class="mr-2">${type === 'success' ? '✔️' : '❌'}</span>
+                        <span>${message}</span>
+                    </div>
+                    <button class="ml-4 px-3 py-1 bg-white text-red-600 rounded hover:bg-gray-100 font-bold" 
+                            onclick="this.parentElement.parentElement.remove()">
+                        ${buttonText}
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(popup);
+            
+            // Add click handler to button
+            const button = popup.querySelector('button');
+            button.addEventListener('click', function() {
+                callback();
+                popup.remove();
+            });
+
+            // Auto-hide after 10 seconds (longer for action popups)
+            setTimeout(() => {
+                popup.classList.add('opacity-0');
+                setTimeout(() => popup.remove(), 500);
+            }, 10000);
+        }
+        
+        // Function to clear pending payment session
+        function clearPendingSession() {
+            fetch("{{ route('appointments.clear-session') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPopup('success', data.message);
+                    // Reload page after 1.5 seconds
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showPopup('error', data.message || 'Failed to clear session');
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing session:', error);
+                showPopup('error', 'An error occurred while clearing the session');
+            });
         }
     });
 </script>
@@ -1372,6 +1443,11 @@ eventClick: function(info) {
         }, 5000);
     }
 
+                // OLD JQUERY SUBMIT HANDLER - COMMENTED OUT
+                // This was causing duplicate submissions without payment fields
+                // The new submit handler (line ~988) with payment fields is being used instead
+                
+                /*
                 $('#booking-form').on('submit', function(event) {
                 event.preventDefault();
 
@@ -1437,6 +1513,7 @@ eventClick: function(info) {
                     }
                 });
             });
+            */
 
                 $('#delete-appointment').on('click', function() {
                     const appointmentId = $('#booking-id').val();
