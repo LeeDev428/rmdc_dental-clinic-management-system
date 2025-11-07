@@ -59,6 +59,45 @@
                         </div>
                     </div>
                     
+                    @if($appointment->total_price)
+                        <div class="mt-3 pt-3 border-t border-gray-300 dark:border-gray-600">
+                            <h5 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Payment Information</h5>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        <strong>Total:</strong> ₱{{ number_format($appointment->total_price, 2) }}
+                                    </p>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-1">
+                                        <strong>Down Payment:</strong> ₱{{ number_format($appointment->down_payment ?? 0, 2) }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        <strong>Payment Method:</strong> {{ $appointment->payment_method ? strtoupper($appointment->payment_method) : 'N/A' }}
+                                    </p>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-1">
+                                        <strong>Reference:</strong> {{ $appointment->payment_reference ? substr($appointment->payment_reference, 0, 20) : 'N/A' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 dark:text-gray-400">
+                                        <strong>Payment Status:</strong>
+                                    </p>
+                                    <span class="inline-block mt-1 px-2 py-1 text-xs font-semibold rounded
+                                        @if($appointment->payment_status == 'paid')
+                                            bg-green-100 text-green-800
+                                        @elseif($appointment->payment_status == 'pending')
+                                            bg-yellow-100 text-yellow-800
+                                        @else
+                                            bg-red-100 text-red-800
+                                        @endif">
+                                        {{ strtoupper($appointment->payment_status ?? 'UNPAID') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
                     @if($appointment->notes)
                         <div class="mt-3 pt-3 border-t border-gray-300 dark:border-gray-600">
                             <p class="text-sm text-gray-600 dark:text-gray-400">
