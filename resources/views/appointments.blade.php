@@ -107,6 +107,99 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
             font-weight: 500;
         }
 
+        /* Landscape Booking Modal */
+        .booking-modal-landscape {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .booking-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .booking-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            border-bottom: 3px solid #00b4d8;
+            padding-bottom: 10px;
+        }
+
+        .payment-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .payment-breakdown {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .price-row.total {
+            border-top: 2px solid #e0e0e0;
+            padding-top: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #00b4d8;
+        }
+
+        .payment-methods {
+            margin-top: 20px;
+        }
+
+        .payment-method-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-method-option:hover {
+            border-color: #00b4d8;
+            background: #f0f9ff;
+        }
+
+        .payment-method-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .payment-method-option input[type="radio"]:checked + .payment-label {
+            color: #00b4d8;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .booking-modal-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .modal-body ul {
             list-style: none;
             padding: 0;
@@ -411,63 +504,56 @@ window.onclick = function(event) {
                 <div id="calendar" style="max-width: 900px; margin: auto; {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'opacity: 0.5; pointer-events: none;' : '' }}"></div>
 
                 <div id="booking-modal" class="hidden fixed z-10 inset-0 overflow-y-auto">
-                    <div class="flex items-center justify-center min-h-screen">
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-5 w-96 border">
+                    <div class="flex items-center justify-center min-h-screen p-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-6xl border booking-modal-landscape">
                             @if(isset($hasPendingAppointment) && $hasPendingAppointment)
                             <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md text-sm">
                                 <strong>⚠️ Booking Disabled:</strong> You have a pending appointment. Please wait for admin approval.
                             </div>
                             @endif
                             
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Book Appointment</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Book Your Appointment</h3>
+                            
                             <form id="booking-form" method="POST" action="{{ route('appointments.store') }}" enctype="multipart/form-data" {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'onsubmit="return false;"' : '' }}>
                                 @csrf
                                 <input type="hidden" id="booking-id" name="id">
                                 <input type="hidden" id="booking-start" name="start">
                                 <input type="hidden" id="booking-end" name="end">
 
-                                <!-- Event Title -->
-                                <div class="mb-4">
-                                    <label for="booking-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                                    <input type="text" id="booking-title" name="title" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                  
-           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-           placeholder="Select a procedure"
-           value="{{ __( auth()->user()->name) }}">
-                                </div>
+                                <div class="booking-modal-grid">
+                                    <!-- Left Column: Appointment Details -->
+                                    <div class="booking-column">
+                                        <h4 class="modal-section-title">Appointment Details</h4>
+                                        
+                                        <!-- Name -->
+                                        <div class="mb-4">
+                                            <label for="booking-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Patient Name</label>
+                                            <input type="text" id="booking-title" name="title" required 
+                                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5"
+                                                   value="{{ __( auth()->user()->name) }}" readonly style="background: #f5f5f5;">
+                                        </div>
 
-<!-- Procedure Dropdown -->
-<div class="mb-4">
-    <label for="operation-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Dental Procedure</label>
-    <select id="operation-type" name="procedure" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-        <option value="">Select a Procedure</option>
-        @foreach ($procedurePrices as $procedurePrice)
-            <option value="{{ $procedurePrice->procedure_name }}" {{ $procedurePrice->procedure_name == $selectedProcedure ? 'selected' : '' }}>
-                {{ $procedurePrice->procedure_name }}
-            </option>
-        @endforeach
-    </select>
-</div>
+                                        <!-- Procedure Dropdown -->
+                                        <div class="mb-4">
+                                            <label for="operation-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dental Procedure</label>
+                                            <select id="operation-type" name="procedure" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5">
+                                                <option value="">Select a Procedure</option>
+                                                @foreach ($procedurePrices as $procedurePrice)
+                                                    <option value="{{ $procedurePrice->procedure_name }}" data-price="{{ $procedurePrice->price }}" data-duration="{{ $procedurePrice->duration }}" {{ $procedurePrice->procedure_name == $selectedProcedure ? 'selected' : '' }}>
+                                                        {{ $procedurePrice->procedure_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
 
-
-
-<!-- Estimated Time Display -->
-<div class="mb-4">
-    <label for="estimated-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Duration</label>
-    <input type="text" id="estimated-time" name="estimated-time" readonly
-           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-           placeholder="Select a procedure"
-           value="{{ isset($procedurePrice) ? $procedurePrice->duration . ' minutes' : '' }}">
-</div>
-
-<!-- Procedure Price Display -->
-<div class="mb-4">
-    <label for="procedure-price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Procedure Price</label>
-    <input type="text" id="procedure-price" name="procedure-price" readonly
-           class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-           placeholder="Price"
-           value="{{ isset($procedurePrice) ? '₱' . number_format($procedurePrice->price, 2) : '' }}">
-</div>
+                                        <!-- Estimated Time Display -->
+                                        <div class="mb-4">
+                                            <label for="estimated-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Estimated Duration</label>
+                                            <input type="text" id="estimated-time" name="estimated-time" readonly
+                                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-4 py-2.5" style="background: #f5f5f5;"
+                                                   placeholder="Select a procedure"
+                                                   value="{{ isset($procedurePrice) ? $procedurePrice->duration . ' minutes' : '' }}">
+                                        </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -508,14 +594,14 @@ window.onclick = function(event) {
 
 
 
-                             <!-- Time Selection -->
-<div class="mb-4 w-full md:w-1/2">
-    <label for="appointment-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Time
-    </label>
-    <select id="appointment-time" name="time" required
-        class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm px-3 py-2">
-        <option value="" disabled selected>Select Time</option>
+                                        <!-- Time Selection -->
+                                        <div class="mb-4">
+                                            <label for="appointment-time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                Appointment Time
+                                            </label>
+                                            <select id="appointment-time" name="time" required
+                                                class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5">
+                                                <option value="" disabled selected>Select Time</option>
         <option value="08:00">08:00 AM</option>
         <option value="08:15">08:15 AM</option>
         <option value="08:30">08:30 AM</option>
@@ -559,22 +645,152 @@ window.onclick = function(event) {
         <option value="16:00">16:00 PM</option>
         <option value="16:15">16:15 PM</option>
         <option value="16:30">16:30 PM</option>
-        <option value="16:45">16:45 PM</option>
+                                                <option value="16:45">16:45 PM</option>
+                                            </select>
+                                        </div>
 
-    </select>
-</div>
+                                        <!-- Valid ID Upload -->
+                                        <div class="mb-4">
+                                            <label for="valid-id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Valid ID</label>
+                                            <input type="file" id="valid-id" name="image_path" accept="image/*" 
+                                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5" 
+                                                   onchange="previewImage(event)" required>
 
-                                <div class="mb-4">
-                                    <label for="valid-id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Upload Valid ID</label>
-                                    <input type="file" id="valid-id" name="image_path" accept="image/*" class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="previewImage(event)" required>
+                                            <!-- Small Preview of Image -->
+                                            <div id="image-preview-container" class="mt-3">
+                                                <img id="image-preview" src="#" alt="Image Preview" style="display:none; max-width: 120px; height: auto; border: 2px solid #00b4d8; border-radius: 8px; cursor: zoom-in;" onclick="zoomImage()">
+                                            </div>
 
-                                    <!-- Small Preview of Image -->
-                                    <div id="image-preview-container" class="mt-2">
-                                        <img id="image-preview" src="#" alt="Image Preview" style="display:none; width: 50px; height: auto; border: 1px solid #ccc; cursor: zoom-in;" onclick="zoomImage()">
+                                            <small class="text-gray-500 mt-2 block">Accepts image files (JPEG, PNG, JPG, SVG).</small>
+                                        </div>
+
+                                        <!-- Terms and Agreement -->
+                                        <div class="mb-4 mt-6">
+                                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                                                <div class="flex items-start">
+                                                    <div class="flex-shrink-0">
+                                                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-bold text-gray-800 mb-2">Terms and Conditions</p>
+                                                        <ul class="list-disc pl-5 text-xs text-gray-700 space-y-1">
+                                                            <li>Rescheduling and editing the appointment is not allowed once created.</li>
+                                                            <li>Deleting your appointment counts as a violation (max 3 violations).</li>
+                                                            <li>Only one appointment is allowed per day.</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="flex items-center mt-3">
+                                                <input type="checkbox" id="terms-checkbox" required class="mr-3 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                                <label for="terms-checkbox" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    I agree to the Terms and Conditions
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <small class="text-gray-500">Accepts image files (JPEG, PNG, JPG, SVG).</small>
+                                    <!-- Right Column: Payment Details -->
+                                    <div class="booking-column">
+                                        <h4 class="modal-section-title">Payment Information</h4>
+                                        
+                                        <div class="payment-section">
+                                            <div class="payment-breakdown">
+                                                <h5 class="font-semibold text-gray-800 mb-3 text-base">Price Breakdown</h5>
+                                                
+                                                <div class="price-row">
+                                                    <span class="text-gray-600">Procedure Price:</span>
+                                                    <span class="font-semibold" id="display-total-price">₱0.00</span>
+                                                </div>
+                                                
+                                                <div class="price-row">
+                                                    <span class="text-gray-600">Down Payment (20%):</span>
+                                                    <span class="font-semibold text-green-600" id="display-down-payment">₱0.00</span>
+                                                </div>
+                                                
+                                                <div class="price-row">
+                                                    <span class="text-gray-600">Remaining Balance:</span>
+                                                    <span class="font-semibold text-orange-600" id="display-balance">₱0.00</span>
+                                                </div>
+                                                
+                                                <div class="price-row total">
+                                                    <span>Amount to Pay Now:</span>
+                                                    <span id="display-amount-to-pay">₱0.00</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="payment-methods">
+                                                <h5 class="font-semibold text-gray-800 mb-3 text-base">Select Payment Method</h5>
+                                                
+                                                <label class="payment-method-option">
+                                                    <input type="radio" name="payment_method" value="gcash" required>
+                                                    <div class="payment-label flex items-center gap-3">
+                                                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/GCash_logo.svg" 
+                                                             alt="GCash" 
+                                                             class="w-16 h-16 object-contain"
+                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwN0RGRiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5HPC90ZXh0Pjwvc3ZnPg==';">
+                                                        <div>
+                                                            <p class="font-semibold text-gray-800">GCash</p>
+                                                            <p class="text-xs text-gray-500">E-wallet payment</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+
+                                                <label class="payment-method-option">
+                                                    <input type="radio" name="payment_method" value="paymaya">
+                                                    <div class="payment-label flex items-center gap-3">
+                                                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/PayMaya_Logo.svg" 
+                                                             alt="PayMaya" 
+                                                             class="w-16 h-16 object-contain"
+                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
+                                                        <div>
+                                                            <p class="font-semibold text-gray-800">PayMaya</p>
+                                                            <p class="text-xs text-gray-500">E-wallet payment</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+
+                                                <label class="payment-method-option">
+                                                    <input type="radio" name="payment_method" value="card">
+                                                    <div class="payment-label flex items-center gap-3">
+                                                        <div class="flex gap-2">
+                                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png" 
+                                                                 alt="Visa" 
+                                                                 class="h-8 object-contain">
+                                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/320px-Mastercard-logo.svg.png" 
+                                                                 alt="Mastercard" 
+                                                                 class="h-8 object-contain">
+                                                        </div>
+                                                        <div>
+                                                            <p class="font-semibold text-gray-800">Credit/Debit Card</p>
+                                                            <p class="text-xs text-gray-500">Visa, Mastercard</p>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+
+                                            <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
+                                                <div class="flex items-start">
+                                                    <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                    </svg>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm text-blue-800">
+                                                            <strong>Payment Note:</strong> A 20% down payment is required to secure your appointment. The remaining balance can be paid at the clinic.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <!-- Hidden fields for payment -->
+                                <input type="hidden" id="total-price-hidden" name="total_price" value="0">
+                                <input type="hidden" id="down-payment-hidden" name="down_payment" value="0">
 
 
                                 <!-- Modal for Image Zoom -->
@@ -607,64 +823,66 @@ window.onclick = function(event) {
                                         };
                                     }
                                 </script>
-                               <!-- Terms and Agreement Section Below the Time Input -->
-<div class="mb-4">
-    <label for="terms-checkbox" class="text-sm text-gray-600 dark:text-gray-300">
-       &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  <span class="font-bold">🔺 Terms and Conditions 🔺</span>
-
-        <ul class="list-disc pl-5 text-gray-600 dark:text-gray-300">
-            <li>Rescheduling and editing the appointment is not allowed once the appointment was created.</li>
-            <li>If you delete your appointment, it will be counted as the first violation. You are allowed a maximum of 3 violations. On the 3rd violation, you will be restricted from the system.</li>
-            <li>Only one appointment is allowed per day.</li>
-        </ul>
-    </label>
-    <!-- Move checkbox below -->
-    <div class="flex items-center mt-2">
-        <input type="checkbox" id="terms-checkbox" required class="mr-2">
-        <label for="terms-checkbox" class="text-sm text-gray-600 dark:text-gray-300">
-            I agree to the Terms and Conditions
-        </label>
-    </div>
-</div>
-
-
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        const termsCheckbox = document.getElementById('terms-checkbox');
-
-                                        // Retrieve the stored value from localStorage (if any)
-                                        const termsAccepted = localStorage.getItem('termsAccepted');
-
-                                        // If the value exists and is 'true', set the checkbox as checked
-                                        if (termsAccepted === 'true') {
-                                            termsCheckbox.checked = true;
-                                        } else {
-                                            // If no saved state, leave it unchecked
-                                            termsCheckbox.checked = false;
-                                        }
-
-                                        // When the checkbox state changes, update localStorage
-                                        termsCheckbox.addEventListener('change', function () {
-                                            localStorage.setItem('termsAccepted', termsCheckbox.checked);
-                                        });
-                                    });
-                                </script>
-
-
-                                    <button type="submit" 
-                                            class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-800' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'disabled' : '' }}>
-                                        {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Save Changes' }}
+                                <!-- Form Action Buttons -->
+                                <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                                    <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                        Cancel
                                     </button>
-
-
-                                <button id="delete-appointment" type="button" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
-                                    Delete Appointment
-                                </button>
+                                    
+                                    <button id="delete-appointment" type="button" class="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
+                                        Delete Appointment
+                                    </button>
+                                    
+                                    <button type="submit" 
+                                            class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'disabled' : '' }}>
+                                        <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Book Appointment & Pay' }}
+                                    </button>
+                                </div>
                             </form>
 
+                            <script>
+                                // Payment Calculation
+                                document.getElementById('operation-type').addEventListener('change', function() {
+                                    const selectedOption = this.options[this.selectedIndex];
+                                    const price = parseFloat(selectedOption.dataset.price) || 0;
+                                    const duration = selectedOption.dataset.duration || '';
+                                    
+                                    // Calculate payments
+                                    const downPayment = price * 0.20;
+                                    const balance = price - downPayment;
+                                    
+                                    // Update display fields
+                                    document.getElementById('display-total-price').textContent = '₱' + price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                    document.getElementById('display-down-payment').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                    document.getElementById('display-balance').textContent = '₱' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                    document.getElementById('display-amount-to-pay').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                                    
+                                    // Update hidden fields
+                                    document.getElementById('total-price-hidden').value = price.toFixed(2);
+                                    document.getElementById('down-payment-hidden').value = downPayment.toFixed(2);
+                                    
+                                    // Update duration
+                                    document.getElementById('estimated-time').value = duration ? duration + ' minutes' : '';
+                                });
 
-                            <button id="close-modal" class="mt-2 inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Close</button>
+                                // Terms checkbox localStorage
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const termsCheckbox = document.getElementById('terms-checkbox');
+                                    const termsAccepted = localStorage.getItem('termsAccepted');
+
+                                    if (termsAccepted === 'true') {
+                                        termsCheckbox.checked = true;
+                                    }
+
+                                    termsCheckbox.addEventListener('change', function () {
+                                        localStorage.setItem('termsAccepted', termsCheckbox.checked);
+                                    });
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
