@@ -109,6 +109,9 @@ public function store(Request $request)
         'time' => 'required|string',
         'start' => 'required|date',
         'image_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+        'payment_method' => 'nullable|string|in:gcash,paymaya,card',
+        'total_price' => 'nullable|numeric|min:0',
+        'down_payment' => 'nullable|numeric|min:0',
     ]);
 
     $startTime = Carbon::parse($validated['start']);
