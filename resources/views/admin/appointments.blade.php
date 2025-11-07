@@ -253,6 +253,7 @@
                     <th>Procedure</th>
                     <th>Start Time</th>
                     <th>End Time</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -283,10 +284,15 @@
                     <td>{{ $appointment->procedure }}</td>
                     <td>{{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y h:i A') }}</td>
                     <td>{{ \Carbon\Carbon::parse($appointment->end)->format('M d, Y h:i A') }}</td>
+                    <td>
+                        <button class="btn-view-details" onclick="showAppointmentDetails({{ $appointment->id }})" title="View Details">
+                            <i class="fas fa-eye"></i> Details
+                        </button>
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; color: #9ca3af;">No upcoming appointments found.</td>
+                    <td colspan="8" style="text-align: center; color: #9ca3af;">No upcoming appointments found.</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -299,12 +305,335 @@
     </div>
 </div>
 
+<!-- Appointment Details Modal -->
+<div id="appointmentDetailsModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2>Appointment Details</h2>
+            <span class="close-modal" onclick="closeDetailsModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="appointmentDetailsContent">
+            <div class="loading">Loading appointment details...</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-view-details {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .btn-view-details:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+    }
+    
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.3s ease;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .close-modal {
+        font-size: 28px;
+        color: #9ca3af;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
+    }
+    
+    .close-modal:hover {
+        color: #ef4444;
+    }
+    
+    .modal-body {
+        padding: 24px;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .detail-item {
+        background: #f9fafb;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 3px solid #3b82f6;
+    }
+    
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .detail-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    
+    .detail-value {
+        font-size: 15px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    
+    .detail-value.status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .detail-value.status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .detail-value.status.accepted {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .detail-value.status.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    .appointment-image {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+        font-size: 14px;
+    }
+</style>
+
 <script>
     // Date filter functionality
     document.getElementById('appointmentDateFilter').addEventListener('change', function() {
         const selectedDate = this.value;
         document.getElementById('hiddenAppointmentDate').value = selectedDate;
         document.getElementById('appointmentSearchForm').submit();
+    });
+    
+    // Show appointment details modal
+    function showAppointmentDetails(appointmentId) {
+        const modal = document.getElementById('appointmentDetailsModal');
+        const content = document.getElementById('appointmentDetailsContent');
+        
+        modal.style.display = 'flex';
+        content.innerHTML = '<div class="loading">Loading appointment details...</div>';
+        
+        // Fetch appointment details
+        fetch(`/admin/appointments/${appointmentId}/details`)
+            .then(response => response.json())
+            .then(data => {
+                content.innerHTML = generateAppointmentDetailsHTML(data);
+            })
+            .catch(error => {
+                content.innerHTML = '<div class="loading" style="color: #ef4444;">Error loading appointment details. Please try again.</div>';
+                console.error('Error:', error);
+            });
+    }
+    
+    // Generate appointment details HTML
+    function generateAppointmentDetailsHTML(appointment) {
+        const paymentStatus = appointment.payment_status || 'unpaid';
+        const paymentBadge = {
+            'unpaid': '<span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">UNPAID</span>',
+            'partially_paid': '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">PARTIALLY PAID</span>',
+            'fully_paid': '<span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">FULLY PAID</span>'
+        };
+        
+        let html = '<div class="detail-grid">';
+        
+        // Patient Information
+        html += `
+            <div class="detail-item">
+                <div class="detail-label">Patient Name</div>
+                <div class="detail-value">${appointment.user?.name || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Patient Email</div>
+                <div class="detail-value">${appointment.user?.email || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Contact Number</div>
+                <div class="detail-value">${appointment.user?.phone || 'N/A'}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Appointment ID</div>
+                <div class="detail-value">#${appointment.id}</div>
+            </div>
+        `;
+        
+        // Appointment Details
+        html += `
+            <div class="detail-item full-width">
+                <div class="detail-label">Title</div>
+                <div class="detail-value">${appointment.title}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Procedure</div>
+                <div class="detail-value">${appointment.procedure}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Duration</div>
+                <div class="detail-value">${appointment.duration} minutes</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Start Time</div>
+                <div class="detail-value">${formatDateTime(appointment.start)}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">End Time</div>
+                <div class="detail-value">${formatDateTime(appointment.end)}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Status</div>
+                <div class="detail-value status ${appointment.status}">${appointment.status.toUpperCase()}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label">Created At</div>
+                <div class="detail-value">${formatDateTime(appointment.created_at)}</div>
+            </div>
+        `;
+        
+        // Payment Information
+        if (appointment.requires_payment || appointment.total_price) {
+            html += `
+                <div class="detail-item">
+                    <div class="detail-label">Total Price</div>
+                    <div class="detail-value">₱${parseFloat(appointment.total_price || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Down Payment</div>
+                    <div class="detail-value">₱${parseFloat(appointment.down_payment || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Remaining Balance</div>
+                    <div class="detail-value">₱${parseFloat((appointment.total_price || 0) - (appointment.down_payment || 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Payment Status</div>
+                    <div class="detail-value">${paymentBadge[paymentStatus]}</div>
+                </div>
+            `;
+        }
+        
+        // Valid ID Image
+        if (appointment.image_path) {
+            html += `
+                <div class="detail-item full-width">
+                    <div class="detail-label">Valid ID / Supporting Document</div>
+                    <img src="/storage/${appointment.image_path}" alt="Valid ID" class="appointment-image">
+                </div>
+            `;
+        }
+        
+        // Teeth Layout
+        if (appointment.teeth_layout) {
+            html += `
+                <div class="detail-item full-width">
+                    <div class="detail-label">Teeth Layout Information</div>
+                    <div class="detail-value">${appointment.teeth_layout}</div>
+                </div>
+            `;
+        }
+        
+        html += '</div>';
+        return html;
+    }
+    
+    // Format date time
+    function formatDateTime(dateTimeString) {
+        if (!dateTimeString) return 'N/A';
+        const date = new Date(dateTimeString);
+        return date.toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+    
+    // Close modal
+    function closeDetailsModal() {
+        document.getElementById('appointmentDetailsModal').style.display = 'none';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('appointmentDetailsModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDetailsModal();
+        }
     });
 </script>
 @endsection
