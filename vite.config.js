@@ -14,10 +14,7 @@ export default defineConfig({
         port: 5173,
         strictPort: false,
         hmr: {
-            protocol: 'wss',
-            host: process.env.VITE_HMR_HOST || 'localhost',
-            port: 5173,
-            clientPort: 443
+            host: 'localhost'
         },
         watch: {
             usePolling: true
