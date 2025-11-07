@@ -29,6 +29,7 @@
     use App\Http\Controllers\AppointmentCancellationController;
     use App\Http\Controllers\ServiceFeedbackController;
     use App\Http\Controllers\GeminiController;
+    use App\Http\Controllers\PaymentController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -90,6 +91,11 @@
     // Service Feedback
     Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
     Route::post('/service-feedback', [ServiceFeedbackController::class, 'store'])->name('feedback.store');
+    
+    // Payment Routes - PayMongo Checkout Sessions API
+    Route::get('/payment/create/{appointment}', [PaymentController::class, 'createPayment'])->name('payment.create');
+    Route::get('/payment/success/{appointment}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/payment/failed/{appointment}', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
     
     // Ask Lee AI - Gemini AI Chatbot
     Route::get('/ask-lee-ai', [GeminiController::class, 'index'])->name('ask.lee.ai');
