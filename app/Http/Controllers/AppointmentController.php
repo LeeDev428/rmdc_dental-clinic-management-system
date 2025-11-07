@@ -93,15 +93,46 @@ public function store(Request $request)
 {
     $user_id = Auth::id();
     
-    // ✅ CHECK: Prevent booking if user already has a pending or unpaid appointment
+    // ✅ CHECK 1: Check and clean up expired pending payment sessions (older than 30 minutes)
+    $allSessions = session()->all();
+    $hasPendingSession = false;
+    $currentTime = time();
+    
+    foreach ($allSessions as $key => $value) {
+        if (strpos($key, 'pending_appointment_' . $user_id . '_') === 0) {
+            // Extract timestamp from session key: pending_appointment_{user_id}_{timestamp}
+            $parts = explode('_', $key);
+            $sessionTimestamp = end($parts);
+            
+            // If session is older than 30 minutes (1800 seconds), delete it
+            if (is_numeric($sessionTimestamp) && ($currentTime - $sessionTimestamp) > 1800) {
+                session()->forget($key);
+                Log::info('Auto-cleared expired session', [
+                    'session_key' => $key, 
+                    'age_minutes' => round(($currentTime - $sessionTimestamp) / 60)
+                ]);
+            } else {
+                // Session is still fresh (less than 30 minutes old)
+                $hasPendingSession = true;
+            }
+        }
+    }
+    
+    if ($hasPendingSession) {
+        return response()->json([
+            'error' => 'You have a pending payment. Please complete it or wait 30 minutes before booking again.',
+            'can_clear' => true // Front-end can show a "Clear Pending Payment" button
+        ], 422);
+    }
+    
+    // ✅ CHECK 2: Prevent booking if user already has a pending appointment in database
     $hasActiveAppointment = Appointment::where('user_id', $user_id)
-        ->whereIn('status', ['pending', 'unpaid'])
-        ->where('created_at', '>', now()->subHours(2)) // Only check appointments within last 2 hours
+        ->whereIn('status', ['pending', 'accepted'])
         ->exists();
     
     if ($hasActiveAppointment) {
         return response()->json([
-            'error' => 'You already have an active appointment. Please complete or cancel it before booking another one.'
+            'error' => 'You already have a pending appointment. Please wait for admin/dentist approval before booking another one.'
         ], 422);
     }
     
@@ -244,17 +275,6 @@ $endTime = $startTime->copy()->addMinutes($duration);
         'message' => 'Redirecting to payment gateway...',
         'payment_url' => $paymentUrl,
         'redirect' => true,
-        'appointment' => [
-            'procedure' => $validated['procedure'],
-            'duration' => $appointment->duration,
-            'user_id' => $appointment->user_id,
-            'image_path' => $appointment->image_path ? Storage::url($appointment->image_path) : null,
-            'payment_method' => $appointment->payment_method,
-            'total_price' => $appointment->total_price,
-            'down_payment' => $appointment->down_payment,
-        ],
-        'payment_url' => $paymentUrl,
-        'redirect' => true,
     ]);
 }
 
@@ -318,5 +338,33 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $appointment->delete();
 
         return response()->json(['success' => 'Appointment deleted successfully.']);
+    }
+    
+    /**
+     * Clear pending payment session for the authenticated user
+     */
+    public function clearPendingSession(Request $request)
+    {
+        $user_id = Auth::id();
+        
+        // Find and clear all pending sessions for this user
+        $allSessions = session()->all();
+        $clearedCount = 0;
+        
+        foreach ($allSessions as $key => $value) {
+            if (strpos($key, 'pending_appointment_' . $user_id . '_') === 0) {
+                session()->forget($key);
+                $clearedCount++;
+                Log::info('Cleared pending session', ['session_key' => $key, 'user_id' => $user_id]);
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => $clearedCount > 0 
+                ? "Cleared $clearedCount pending payment session(s). You can now book a new appointment." 
+                : 'No pending sessions found.',
+            'cleared_count' => $clearedCount
+        ]);
     }
 }
