@@ -147,19 +147,33 @@ class PaymentController extends Controller
             
             if ($response->successful()) {
                 $checkoutSession = $response->json()['data'];
-                $paymentStatus = $checkoutSession['attributes']['payment_status'] ?? 'unpaid';
+                $payments = $checkoutSession['attributes']['payments'] ?? [];
                 
-                Log::info('PayMongo Checkout Session Retrieved:', [
-                    'session_key' => $sessionKey,
-                    'payment_status' => $paymentStatus,
-                    'checkout_session_id' => $checkoutSessionId
-                ]);
+                // CHECK PAYMENT STATUS FROM THE ACTUAL PAYMENT, NOT THE CHECKOUT SESSION
+                $isPaid = false;
+                $paymentId = null;
                 
-                if ($paymentStatus === 'paid') {
-                    // Get payment details from checkout session
-                    $payments = $checkoutSession['attributes']['payments'] ?? [];
-                    $paymentId = !empty($payments) ? $payments[0]['id'] : $checkoutSessionId;
+                if (!empty($payments)) {
+                    $latestPayment = $payments[0];
+                    $paymentStatus = $latestPayment['attributes']['status'] ?? 'unpaid';
+                    $paymentId = $latestPayment['id'] ?? null;
+                    $isPaid = ($paymentStatus === 'paid');
                     
+                    Log::info('PayMongo Payment Retrieved:', [
+                        'session_key' => $sessionKey,
+                        'payment_id' => $paymentId,
+                        'payment_status' => $paymentStatus,
+                        'is_paid' => $isPaid,
+                        'amount' => $latestPayment['attributes']['amount'] ?? 0
+                    ]);
+                } else {
+                    Log::warning('No payments found in checkout session', [
+                        'session_key' => $sessionKey,
+                        'checkout_session_id' => $checkoutSessionId
+                    ]);
+                }
+                
+                if ($isPaid && $paymentId) {
                     // NOW CREATE THE APPOINTMENT after payment is confirmed
                     $appointment = Appointment::create([
                         'title' => $appointmentData['title'],
@@ -178,17 +192,39 @@ class PaymentController extends Controller
                         'status' => 'pending', // Ready for admin approval
                     ]);
                     
-                    // Clear session data
+                    // Clear session data and save to database
                     session()->forget($sessionKey);
+                    session()->save(); // Force save to database immediately
                     
-                    Log::info('Appointment created after successful payment:', [
+                    Log::info('✅ APPOINTMENT CREATED SUCCESSFULLY:', [
                         'appointment_id' => $appointment->id,
-                        'payment_reference' => $paymentId
+                        'user_id' => $appointment->user_id,
+                        'procedure' => $appointment->procedure,
+                        'payment_reference' => $paymentId,
+                        'payment_status' => 'paid',
+                        'status' => 'pending'
                     ]);
                     
                     return redirect()->route('dashboard')
-                        ->with('success', 'Payment successful! Your appointment is now pending approval from the clinic.');
+                        ->with('success', 'Payment successful! Your appointment (ID: ' . $appointment->id . ') is now pending approval from the clinic.');
+                } else {
+                    // Payment not completed yet
+                    Log::warning('Payment not completed or not found', [
+                        'session_key' => $sessionKey,
+                        'checkout_session_id' => $checkoutSessionId,
+                        'payments_count' => count($payments),
+                        'has_payment_id' => !empty($paymentId)
+                    ]);
+                    
+                    // Don't forget the session - user might complete payment later
+                    return redirect()->route('dashboard')
+                        ->with('warning', 'Payment verification failed. Please check your payment status or try booking again.');
                 }
+            } else {
+                Log::error('Failed to retrieve checkout session from PayMongo', [
+                    'status_code' => $response->status(),
+                    'response' => $response->body()
+                ]);
             }
             
             // If payment not confirmed, redirect with warning
@@ -214,6 +250,7 @@ class PaymentController extends Controller
             // Clear session data (no appointment was created)
             if ($sessionKey) {
                 session()->forget($sessionKey);
+                session()->save(); // Force save to database immediately
                 Log::info('Payment Failed/Cancelled - Session cleared:', [
                     'session_key' => $sessionKey
                 ]);
