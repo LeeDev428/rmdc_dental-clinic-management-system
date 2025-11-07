@@ -313,6 +313,19 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
 
 Route::get('/user/teeth-layout', [TeethLayoutController::class, 'getUserTeethLayout']);
 
+// PayMongo Payment Routes
+use App\Http\Controllers\PayMongoController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payment/create-source', [PayMongoController::class, 'createPaymentSource'])->name('payment.create-source');
+    Route::post('/payment/create-intent', [PayMongoController::class, 'createPaymentIntent'])->name('payment.create-intent');
+    Route::post('/payment/attach-method', [PayMongoController::class, 'attachPaymentMethod'])->name('payment.attach-method');
+    Route::get('/payment/success', [PayMongoController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/payment/failed', [PayMongoController::class, 'paymentFailed'])->name('payment.failed');
+});
+
+// PayMongo Webhook (no auth required)
+Route::post('/payment/webhook', [PayMongoController::class, 'webhook'])->name('payment.webhook');
 
     Route::get('/captcha/image', [CaptchaController::class, 'generate'])->name('captcha.image');
 
