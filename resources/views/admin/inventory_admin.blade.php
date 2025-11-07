@@ -588,7 +588,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="unit">Unit Type:</label>
-                                <select id="unit" name="unit" class="form-control" required>
+                                <select id="unit" name="unit" class="form-control" required onchange="toggleQuantityField()">
                                     <option value="pieces">Pieces</option>
                                     <option value="boxes">Boxes</option>
                                     <option value="packs">Packs</option>
@@ -698,7 +698,7 @@
                     </div>
                     <div class="form-group mb-3">
                         <label for="update_unit" class="form-label">Unit Type:</label>
-                        <select id="update_unit" name="unit" class="form-select" required>
+                        <select id="update_unit" name="unit" class="form-select" required onchange="toggleUpdateQuantityField()">
                             <option value="pieces">Pieces</option>
                             <option value="boxes">Boxes</option>
                             <option value="packs">Packs</option>
@@ -826,6 +826,107 @@
         }
     }
 
+    // Function to toggle quantity field based on unit type
+    function toggleQuantityField() {
+        const unitType = document.getElementById('unit').value;
+        const quantityInput = document.getElementById('quantity');
+        const itemsPerUnitInput = document.getElementById('items_per_unit');
+        
+        if (unitType === 'pieces') {
+            // For pieces, use items_per_unit as the quantity
+            quantityInput.disabled = true;
+            quantityInput.style.backgroundColor = '#f3f4f6';
+            quantityInput.style.cursor = 'not-allowed';
+            quantityInput.removeAttribute('required');
+            
+            // Sync quantity with items_per_unit
+            quantityInput.value = itemsPerUnitInput.value || '0';
+            
+            // Add a note if not already present
+            let note = document.getElementById('quantity-note');
+            if (!note) {
+                note = document.createElement('small');
+                note.id = 'quantity-note';
+                note.style.color = '#6b7280';
+                note.style.fontSize = '12px';
+                note.style.display = 'block';
+                note.style.marginTop = '4px';
+                note.textContent = 'Quantity is auto-synced with Items per Unit for Pieces';
+                quantityInput.parentElement.appendChild(note);
+            }
+            
+            // Auto-sync items_per_unit changes to quantity
+            itemsPerUnitInput.addEventListener('input', function() {
+                quantityInput.value = this.value;
+            });
+        } else {
+            // For other units, enable manual quantity entry
+            quantityInput.disabled = false;
+            quantityInput.style.backgroundColor = '';
+            quantityInput.style.cursor = '';
+            quantityInput.setAttribute('required', 'required');
+            
+            // Remove note if present
+            const note = document.getElementById('quantity-note');
+            if (note) {
+                note.remove();
+            }
+            
+            // Reset to default if it was 0
+            if (quantityInput.value === '0' || quantityInput.value === '') {
+                quantityInput.value = '';
+            }
+        }
+    }
+
+    // Function to toggle update form quantity field
+    function toggleUpdateQuantityField() {
+        const unitType = document.getElementById('update_unit').value;
+        const quantityInput = document.getElementById('update_quantity');
+        const itemsPerUnitInput = document.getElementById('update_items_per_unit');
+        
+        if (unitType === 'pieces') {
+            // For pieces, use items_per_unit as the quantity
+            quantityInput.disabled = true;
+            quantityInput.style.backgroundColor = '#f3f4f6';
+            quantityInput.style.cursor = 'not-allowed';
+            quantityInput.removeAttribute('required');
+            
+            // Sync quantity with items_per_unit
+            quantityInput.value = itemsPerUnitInput.value || '0';
+            
+            // Add a note if not already present
+            let note = document.getElementById('update-quantity-note');
+            if (!note) {
+                note = document.createElement('small');
+                note.id = 'update-quantity-note';
+                note.style.color = '#6b7280';
+                note.style.fontSize = '12px';
+                note.style.display = 'block';
+                note.style.marginTop = '4px';
+                note.textContent = 'Quantity is auto-synced with Items per Unit for Pieces';
+                quantityInput.parentElement.appendChild(note);
+            }
+            
+            // Auto-sync items_per_unit changes to quantity
+            itemsPerUnitInput.addEventListener('input', function() {
+                quantityInput.value = this.value;
+            });
+        } else {
+            // For other units, enable manual quantity entry
+            quantityInput.disabled = false;
+            quantityInput.style.backgroundColor = '';
+            quantityInput.style.cursor = '';
+            quantityInput.setAttribute('required', 'required');
+            
+            // Remove note if present
+            const note = document.getElementById('update-quantity-note');
+            if (note) {
+                note.remove();
+            }
+        }
+    }
+
     // Function to search inventory items with enhanced functionality
     function searchInventory() {
         const searchInput = document.getElementById('search').value.toLowerCase().trim();
@@ -889,6 +990,9 @@
         const expirationTypeSelect = document.getElementById('update_expiration_type');
         expirationTypeSelect.value = (expirationDate && expirationDate !== '') ? 'expirable' : 'inexpirable';
         toggleUpdateExpirationField();
+        
+        // Toggle quantity field based on unit type
+        toggleUpdateQuantityField();
 
         // Set the form action URL
         const formAction = '/admin/inventory-admin/update/' + id;
@@ -904,6 +1008,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initial call to toggle expiration field
         toggleExpirationField();
+        // Initial call to toggle quantity field based on unit type
+        toggleQuantityField();
     });
 </script>
 
