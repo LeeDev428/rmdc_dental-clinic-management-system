@@ -580,8 +580,16 @@
                     <div class="detail-value">₱${parseFloat((appointment.total_price || 0) - (appointment.down_payment || 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-label">Payment Method</div>
+                    <div class="detail-value">${appointment.payment_method ? appointment.payment_method.toUpperCase() : 'N/A'}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">Payment Status</div>
                     <div class="detail-value">${paymentBadge[paymentStatus]}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Payment Reference</div>
+                    <div class="detail-value">${appointment.payment_reference || 'N/A'}</div>
                 </div>
             `;
         }
