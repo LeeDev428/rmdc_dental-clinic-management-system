@@ -211,39 +211,41 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $image_path = $path;
     }
 
-    // Create appointment with payment details
-    // Status is 'unpaid' until payment is completed, then changes to 'pending' for admin approval
-    $appointment = Appointment::create([
+    // Store appointment data in session instead of creating appointment immediately
+    // This ensures appointment is only created AFTER successful payment
+    $appointmentData = [
         'title' => $validated['title'],
         'procedure' => $validated['procedure'],
         'time' => $validated['time'],
-        'start' => $startTime,
-        'end' => $endTime,
+        'start' => $startTime->toDateTimeString(),
+        'end' => $endTime->toDateTimeString(),
         'duration' => $duration,
         'user_id' => $user_id,
         'image_path' => $image_path,
-        'payment_method' => $validated['payment_method'] ?? null,
-        'total_price' => $validated['total_price'] ?? 0,
-        'down_payment' => $validated['down_payment'] ?? 0,
-        'payment_status' => 'unpaid', // Set to unpaid initially
-        'status' => 'unpaid', // Set appointment status to unpaid until payment confirmed
+        'payment_method' => $validated['payment_method'],
+        'total_price' => $validated['total_price'],
+        'down_payment' => $validated['down_payment'],
+    ];
+    
+    // Store in session with unique key
+    $sessionKey = 'pending_appointment_' . $user_id . '_' . time();
+    session([$sessionKey => $appointmentData]);
+    
+    Log::info('Appointment data stored in session:', [
+        'session_key' => $sessionKey,
+        'data' => $appointmentData
     ]);
 
-    // Generate PayMongo payment URL
-    $paymentUrl = null;
-    if ($validated['payment_method']) {
-        $paymentUrl = route('payment.create', ['appointment' => $appointment->id]);
-    }
+    // Generate PayMongo payment URL with session key
+    $paymentUrl = route('payment.create') . '?session_key=' . $sessionKey;
 
     return response()->json([
         'success' => true,
-        'message' => 'Appointment created successfully! Redirecting to payment...',
+        'message' => 'Redirecting to payment gateway...',
+        'payment_url' => $paymentUrl,
+        'redirect' => true,
         'appointment' => [
-            'id' => $appointment->id,
-            'title' => $appointment->title,
-            'start' => $appointment->start,
-            'end' => $appointment->end,
-            'procedure' => $appointment->procedure,
+            'procedure' => $validated['procedure'],
             'duration' => $appointment->duration,
             'user_id' => $appointment->user_id,
             'image_path' => $appointment->image_path ? Storage::url($appointment->image_path) : null,
