@@ -286,5 +286,20 @@ Message::create([
     return redirect()->back()->with('error', 'Invalid action.');
 }
 
+    /**
+     * Get appointment details for modal display
+     */
+    public function getAppointmentDetails($id)
+    {
+        try {
+            $appointment = Appointment::with('user')->findOrFail($id);
+            
+            return response()->json($appointment);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Appointment not found'
+            ], 404);
+        }
+    }
 
 }
