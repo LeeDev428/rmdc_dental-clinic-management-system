@@ -18,6 +18,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             color: #1a1a1a;
@@ -25,6 +29,51 @@
             position: relative;
             margin: 0;
             padding: 0;
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .scale-in.visible {
+            opacity: 1;
+            transform: scale(1);
         }
         
         body::before {
@@ -205,121 +254,162 @@
             font-size: 14px;
         }
 
-        /* Services Section */
-        .services {
-            padding: 80px 40px;
-            background: transparent;
+        /* Services Section - Using Tailwind classes from dashboard */
+        .service-card {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        .services-container {
+        /* Pagination styling */
+        #services-pagination .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        #services-pagination .page-item {
+            list-style: none;
+        }
+        
+        #services-pagination .page-link {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            color: #374151;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        #services-pagination .page-link:hover {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        #services-pagination .page-item.active .page-link {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        #services-pagination .page-item.disabled .page-link {
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 100px 40px;
+            background: transparent;
+            position: relative;
+        }
+
+        .about-container {
             max-width: 1200px;
             margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
         }
 
-        .section-title {
-            text-align: center;
-            font-size: 32px;
+        .about-content h2 {
+            font-size: 42px;
             font-weight: 700;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
             color: #1a1a1a;
         }
 
-        .services-carousel {
-            position: relative;
-            overflow: hidden;
+        .about-content h2 span {
+            color: #00b4d8;
         }
 
-        .services-grid {
+        .about-content p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .about-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            min-height: 500px;
+            gap: 30px;
+            margin-top: 40px;
         }
 
-        .service-card {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #00b4d8 0%, #03828b 100%);
+            border-radius: 12px;
+            color: white;
             transition: all 0.3s;
         }
 
-        .service-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,180,216,0.3);
         }
 
-        .service-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #555, #777);
-        }
-
-        .service-content {
-            padding: 20px;
-        }
-
-        .service-content h3 {
-            font-size: 18px;
-            font-weight: 600;
+        .stat-card h3 {
+            font-size: 36px;
+            font-weight: 800;
             margin-bottom: 8px;
         }
 
-        .service-content p {
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 16px;
-            line-height: 1.5;
+        .stat-card p {
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            margin: 0;
         }
 
-        .service-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid #eee;
+        .about-image {
+            width: 100%;
+            height: 500px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
         }
 
-        .service-price {
-            font-size: 18px;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .carousel-controls {
-            display: flex;
-            justify-content: center;
+        .about-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
             margin-top: 30px;
-            align-items: center;
         }
 
-        .carousel-btn {
-            background: #333;
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
+        .value-item {
+            display: flex;
+            align-items: start;
+            gap: 15px;
+        }
+
+        .value-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00b4d8, #03828b);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
         }
 
-        .carousel-btn:hover {
-            background: #555;
+        .value-text h4 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #1a1a1a;
         }
 
-        .carousel-indicators {
-            display: flex;
-            gap: 8px;
-            align-items: center;
+        .value-text p {
             font-size: 14px;
             color: #666;
-            font-weight: 500;
+            margin: 0;
+            line-height: 1.6;
         }
 
         /* Clinic Locations */
@@ -640,6 +730,7 @@
             </a>
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#locations">Locations</a></li>
                 <li><a href="#contact">Contact</a></li>
@@ -667,58 +758,105 @@
         </div>
     </section>
 
-    <!-- Info Cards -->
-    <section class="info-section">
-        <div class="info-cards">
-            <div class="info-card">
-                <h3>24+</h3>
-                <p>Dental Services</p>
+    <!-- About Section -->
+    <section class="about-section fade-in" id="about">
+        <div class="about-container">
+            <div class="about-content slide-in-left">
+                <h2><span>About</span> Our Clinic</h2>
+                <p>
+                    Welcome to Robles-Moncayo Dental Clinic, where your smile is our passion. With over a decade of experience in providing exceptional dental care, we combine modern technology with a personal touch to ensure every patient receives the highest quality treatment.
+                </p>
+                <p>
+                    Our team of experienced dental professionals is dedicated to creating beautiful, healthy smiles in a comfortable and welcoming environment. We believe that excellent dental care goes beyond just treating teeth – it's about building lasting relationships with our patients and their families.
+                </p>
+
+                <div class="about-values">
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="value-text">
+                            <h4>Patient-Centered Care</h4>
+                            <p>Your comfort and well-being are our top priorities</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="value-text">
+                            <h4>Quality Assurance</h4>
+                            <p>We use only the best materials and latest techniques</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="value-text">
+                            <h4>Experienced Team</h4>
+                            <p>Highly skilled professionals dedicated to your care</p>
+                        </div>
+                    </div>
+                    <div class="value-item">
+                        <div class="value-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="value-text">
+                            <h4>Excellence</h4>
+                            <p>Committed to delivering outstanding results</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="info-card">
-                <h3>50%</h3>
-                <p>Discounted Rates</p>
-            </div>
-            <div class="info-card">
-                <h3>2</h3>
-                <p>Clinic Locations</p>
+            
+            <div class="slide-in-right">
+                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="Robles-Moncayo Dental Clinic" class="about-image">
+                
+                <div class="about-stats scale-in">
+                    <div class="stat-card">
+                        <h3>10+</h3>
+                        <p>Years Experience</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>43+</h3>
+                        <p>Services Offered</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>2</h3>
+                        <p>Clinic Locations</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section class="services" id="services">
-        <div class="services-container">
-            <h2 class="section-title">Our Services</h2>
-            
-            <div class="services-carousel">
-                <div class="services-grid" id="servicesGrid">
-                    <!-- Services will be loaded here via AJAX -->
-                </div>
+    <div class="py-10 fade-in" id="services">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 bg-white dark:bg-blue-800 shadow-sm rounded-lg relative">
+            <div class="text-center font-semibold text-3xl text-gray-800 dark:text-white mt-6 mb-8 fade-in">
+                <span class="text-blue-600">Our</span> Services
             </div>
 
-            <div class="carousel-controls">
-                <button class="carousel-btn" id="prevBtn" onclick="changePage('prev')">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <div class="carousel-indicators" id="paginationInfo">
-                    <span id="currentPage">1</span> / <span id="totalPages">1</span>
-                </div>
-                
-                <button class="carousel-btn" id="nextBtn" onclick="changePage('next')">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
+            <!-- Grid Layout for Services (3 cards per row) -->
+            <div id="services-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 fade-in">
+                <!-- Services will be loaded here via AJAX -->
+            </div>
+
+            <!-- Pagination -->
+            <div id="services-pagination" class="flex justify-center py-6">
+                <!-- Pagination will be loaded here -->
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Clinic Locations -->
-    <section class="locations" id="locations">
+    <section class="locations fade-in" id="locations">
         <div class="locations-container">
-            <h2 class="section-title">Our Clinic Locations</h2>
+            <h2 class="section-title fade-in">Our Clinic Locations</h2>
             
             <div class="locations-grid">
-                <div class="location-card">
+                <div class="location-card slide-in-left">
                     <div id="map1" class="location-map"></div>
                     <div class="location-info">
                         <h3><i class="fas fa-map-marker-alt"></i> Clinic 1 - Morning Branch</h3>
@@ -728,7 +866,7 @@
                     </div>
                 </div>
 
-                <div class="location-card">
+                <div class="location-card slide-in-right">
                     <div id="map2" class="location-map"></div>
                     <div class="location-info">
                         <h3><i class="fas fa-map-marker-alt"></i> Clinic 2 - Afternoon & Evening</h3>
@@ -741,17 +879,35 @@
         </div>
     </section>
 
+       <!-- Info Cards -->
+    <section class="info-section fade-in">
+        <div class="info-cards">
+            <div class="info-card scale-in">
+                <h3>24+</h3>
+                <p>Dental Services</p>
+            </div>
+            <div class="info-card scale-in">
+                <h3>50%</h3>
+                <p>Discounted Rates</p>
+            </div>
+            <div class="info-card scale-in">
+                <h3>2</h3>
+                <p>Clinic Locations</p>
+            </div>
+        </div>
+    </section>
+
   
 
     <!-- FAQs / Knowledge Base -->
-    <section class="faqs" id="faqs">
+    <section class="faqs fade-in" id="faqs">
         <div class="faqs-container">
-            <h2 class="section-title">Oral Health Knowledge Base</h2>
-            <p class="faqs-subtitle">Essential information for maintaining your dental health</p>
+            <h2 class="section-title fade-in">Oral Health Knowledge Base</h2>
+            <p class="faqs-subtitle fade-in">Essential information for maintaining your dental health</p>
             
-            <div class="knowledge-grid">
+            <div class="knowledge-grid fade-in">
                 <!-- Brushing Techniques -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-tooth"></i>
                     </div>
@@ -765,7 +921,7 @@
                 </div>
 
                 <!-- Flossing -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-teeth"></i>
                     </div>
@@ -779,7 +935,7 @@
                 </div>
 
                 <!-- Nutrition -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-apple-alt"></i>
                     </div>
@@ -793,7 +949,7 @@
                 </div>
 
                 <!-- Regular Checkups -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-calendar-check"></i>
                     </div>
@@ -807,7 +963,7 @@
                 </div>
 
                 <!-- Warning Signs -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
@@ -821,7 +977,7 @@
                 </div>
 
                 <!-- Prevention -->
-                <div class="knowledge-card">
+                <div class="knowledge-card scale-in">
                     <div class="knowledge-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
@@ -918,70 +1074,34 @@
     </footer>
 
     <script>
-        // Services Carousel with AJAX Pagination
-        let currentPage = 1;
-        let totalPages = 1;
-
-        function loadServices(page) {
-            fetch(`/get-services?page=${page}`)
-                .then(response => response.json())
-                .then(data => {
-                    const grid = document.getElementById('servicesGrid');
-                    grid.innerHTML = '';
-                    
-                    data.data.forEach(procedure => {
-                        const card = document.createElement('div');
-                        card.className = 'service-card';
-                        
-                        let imageHtml = '';
-                        if (procedure.image_path) {
-                            imageHtml = `<img src="/storage/${procedure.image_path}" alt="${procedure.procedure_name}" class="service-image">`;
-                        } else {
-                            imageHtml = '<div class="service-image"></div>';
-                        }
-                        
-                        const description = procedure.description ? 
-                            (procedure.description.length > 80 ? procedure.description.substring(0, 80) + '...' : procedure.description) : '';
-                        
-                        card.innerHTML = `
-                            ${imageHtml}
-                            <div class="service-content">
-                                <h3>${procedure.procedure_name}</h3>
-                                <p>${description}</p>
-                                <div class="service-meta">
-                                    <span style="font-size: 12px; color: #999;"><i class="far fa-clock"></i> ${procedure.duration} mins</span>
-                                    <span class="service-price">₱${Number(procedure.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                                </div>
-                            </div>
-                        `;
-                        
-                        grid.appendChild(card);
-                    });
-                    
-                    currentPage = data.current_page;
-                    totalPages = data.last_page;
-                    
-                    document.getElementById('currentPage').textContent = currentPage;
-                    document.getElementById('totalPages').textContent = totalPages;
-                    
-                    // Update button states
-                    document.getElementById('prevBtn').disabled = currentPage === 1;
-                    document.getElementById('nextBtn').disabled = currentPage === totalPages;
-                })
-                .catch(error => console.error('Error loading services:', error));
-        }
-
-        function changePage(direction) {
-            if (direction === 'prev' && currentPage > 1) {
-                loadServices(currentPage - 1);
-            } else if (direction === 'next' && currentPage < totalPages) {
-                loadServices(currentPage + 1);
-            }
-        }
-
-        // Load services on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        // Services with AJAX Pagination
+        $(document).ready(function() {
+            // Load initial services
             loadServices(1);
+
+            // Handle pagination clicks
+            $(document).on('click', '#services-pagination .pagination a', function(e) {
+                e.preventDefault();
+                let page = $(this).attr('href').split('page=')[1];
+                loadServices(page);
+            });
+            
+            function loadServices(page) {
+                $.ajax({
+                    url: "/get-services?page=" + page,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $('#services-container').html(data.html);
+                        $('#services-pagination').html(data.pagination);
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading services:', xhr);
+                    }
+                });
+            }
+
+            // Initialize maps after DOM is ready
             initMaps();
         });
 
@@ -1025,6 +1145,31 @@
                 element.classList.add('active');
             }
         }
+
+        // Scroll Animation Observer
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            elements.forEach(element => {
+                observer.observe(element);
+            });
+        };
+
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            animateOnScroll();
+        });
     </script>
     
 </body>
