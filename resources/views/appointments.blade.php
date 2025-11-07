@@ -759,10 +759,10 @@ window.onclick = function(event) {
                                                         <div class="flex gap-2">
                                                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png" 
                                                                  alt="Visa" 
-                                                                 class="h-8 object-contain">
+                                                                 class="h-4 object-contain">
                                                             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/320px-Mastercard-logo.svg.png" 
                                                                  alt="Mastercard" 
-                                                                 class="h-8 object-contain">
+                                                                 class="h-4 object-contain">
                                                         </div>
                                                         <div>
                                                             <p class="font-semibold text-gray-800">Credit/Debit Card</p>
@@ -983,29 +983,104 @@ window.onclick = function(event) {
             });
         });
 
-        // Show rating modal 7 seconds after "Save Changes"
+        // Show rating modal after successful booking
         document.getElementById('booking-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent default form submission
 
-            // Simulate form submission success
-            setTimeout(() => {
-                ratingModal.classList.remove('hidden');
-            }, 6000); // Show modal after 7 seconds
-
-            // Proceed with the actual form submission logic
             const form = event.target;
             const formData = new FormData(form);
+            
+            // Ensure payment method is selected and explicitly added
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+            if (!paymentMethod) {
+                showPopup('error', 'Please select a payment method');
+                return;
+            }
+            
+            // Explicitly add payment method to formData
+            formData.set('payment_method', paymentMethod.value);
+            
+            // Ensure hidden payment fields are included
+            const totalPrice = document.getElementById('total-price-hidden');
+            const downPayment = document.getElementById('down-payment-hidden');
+            
+            if (!totalPrice || !totalPrice.value) {
+                showPopup('error', 'Total price is missing. Please select a procedure.');
+                return;
+            }
+            if (!downPayment || !downPayment.value) {
+                showPopup('error', 'Down payment is missing. Please select a procedure.');
+                return;
+            }
+            
+            formData.set('total_price', totalPrice.value);
+            formData.set('down_payment', downPayment.value);
+            
+            // Debug: Log what we're sending
+            console.log('Submitting appointment with:');
+            console.log('Payment Method:', paymentMethod.value);
+            console.log('Total Price:', totalPrice.value);
+            console.log('Down Payment:', downPayment.value);
 
             fetch(form.action, {
                 method: form.method,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
                 body: formData,
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw err;
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Form submitted successfully:', data);
-                // Optionally handle success response
+                
+                if (data.error) {
+                    showPopup('error', data.error);
+                } else if (data.success && data.payment_url) {
+                    // Redirect to payment gateway
+                    showPopup('success', data.message || 'Redirecting to payment gateway...');
+                    setTimeout(() => {
+                        window.location.href = data.payment_url;
+                    }, 1500);
+                } else {
+                    showPopup('success', data.message || 'Appointment booked successfully!');
+                    
+                    // Show rating modal after 3 seconds
+                    setTimeout(() => {
+                        ratingModal.classList.remove('hidden');
+                    }, 3000);
+                    
+                    // Optionally reload page after rating modal
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 10000);
+                }
             })
-            .catch(error => console.error('Error submitting form:', error));
+            .catch(error => {
+                console.error('Error submitting form:', error);
+                
+                // Display validation errors more clearly
+                let errorMessage = 'An error occurred while booking your appointment';
+                
+                if (error.error) {
+                    errorMessage = error.error;
+                } else if (error.errors) {
+                    // Show all validation errors
+                    const errorList = Object.values(error.errors).flat();
+                    errorMessage = errorList.join('\n');
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                showPopup('error', errorMessage);
+            });
         });
 
         // Close rating modal
