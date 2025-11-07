@@ -58,7 +58,6 @@
         Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy'); // Updated for consistency
         Route::post('/calculate-price', [AppointmentController::class, 'calculatePrice']);
         Route::get('appointments/check', [AppointmentController::class, 'check'])->name('appointments.check');
-        Route::post('/appointments/clear-pending-session', [AppointmentController::class, 'clearPendingSession'])->name('appointments.clear-session');
     });
 
     // Route for the user dashboard with UserMiddleware
