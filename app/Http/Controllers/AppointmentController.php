@@ -93,48 +93,37 @@ public function store(Request $request)
 {
     $user_id = Auth::id();
     
-    // ✅ CHECK 1: Check and clean up expired pending payment sessions (older than 30 minutes)
-    $allSessions = session()->all();
-    $hasPendingSession = false;
-    $currentTime = time();
-    
-    foreach ($allSessions as $key => $value) {
-        if (strpos($key, 'pending_appointment_' . $user_id . '_') === 0) {
-            // Extract timestamp from session key: pending_appointment_{user_id}_{timestamp}
-            $parts = explode('_', $key);
-            $sessionTimestamp = end($parts);
-            
-            // If session is older than 30 minutes (1800 seconds), delete it
-            if (is_numeric($sessionTimestamp) && ($currentTime - $sessionTimestamp) > 1800) {
-                session()->forget($key);
-                Log::info('Auto-cleared expired session', [
-                    'session_key' => $key, 
-                    'age_minutes' => round(($currentTime - $sessionTimestamp) / 60)
-                ]);
-            } else {
-                // Session is still fresh (less than 30 minutes old)
-                $hasPendingSession = true;
-            }
-        }
-    }
-    
-    if ($hasPendingSession) {
-        return response()->json([
-            'error' => 'You have a pending payment. Please complete it or wait 30 minutes before booking again.',
-            'can_clear' => true // Front-end can show a "Clear Pending Payment" button
-        ], 422);
-    }
-    
-    // ✅ CHECK 2: Prevent booking if user already has a pending appointment in database
-    $hasActiveAppointment = Appointment::where('user_id', $user_id)
+    // ✅ CHECK 1: Prevent booking if user already has a pending or accepted appointment in database
+    // User must wait for admin to accept/decline before booking another appointment
+    $pendingAppointment = Appointment::where('user_id', $user_id)
         ->whereIn('status', ['pending', 'accepted'])
-        ->exists();
+        ->first();
     
-    if ($hasActiveAppointment) {
+    if ($pendingAppointment) {
+        Log::info('Blocked booking - user has pending appointment', [
+            'user_id' => $user_id,
+            'existing_appointment_id' => $pendingAppointment->id,
+            'status' => $pendingAppointment->status,
+            'procedure' => $pendingAppointment->procedure
+        ]);
+        
+        $statusText = $pendingAppointment->status === 'accepted' 
+            ? 'an accepted appointment' 
+            : 'a pending appointment waiting for approval';
+        
         return response()->json([
-            'error' => 'You already have a pending appointment. Please wait for admin/dentist approval before booking another one.'
+            'error' => "You already have {$statusText}. Please complete or cancel it before booking another appointment.",
+            'existing_appointment' => [
+                'id' => $pendingAppointment->id,
+                'procedure' => $pendingAppointment->procedure,
+                'start' => $pendingAppointment->start,
+                'status' => $pendingAppointment->status
+            ]
         ], 422);
     }
+    
+    // ✅ CHECK 2: REMOVED - Session check was causing issues with persistent database sessions
+    // User can book multiple times and go to payment - database check above prevents duplicate confirmed appointments
     
     // Log the incoming request for debugging
     Log::info('Appointment Request Data:', [
@@ -261,6 +250,7 @@ $endTime = $startTime->copy()->addMinutes($duration);
     // Store in session with unique key
     $sessionKey = 'pending_appointment_' . $user_id . '_' . time();
     session([$sessionKey => $appointmentData]);
+    session()->save(); // Force save to database immediately
     
     Log::info('Appointment data stored in session:', [
         'session_key' => $sessionKey,
@@ -350,14 +340,33 @@ $endTime = $startTime->copy()->addMinutes($duration);
         // Find and clear all pending sessions for this user
         $allSessions = session()->all();
         $clearedCount = 0;
+        $clearedKeys = [];
         
         foreach ($allSessions as $key => $value) {
+            // Only clear keys that match the exact pattern and are valid appointment data
             if (strpos($key, 'pending_appointment_' . $user_id . '_') === 0) {
-                session()->forget($key);
-                $clearedCount++;
-                Log::info('Cleared pending session', ['session_key' => $key, 'user_id' => $user_id]);
+                // Validate it's actually appointment data
+                if (is_array($value) && isset($value['procedure'])) {
+                    session()->forget($key);
+                    $clearedCount++;
+                    $clearedKeys[] = $key;
+                    Log::info('Manually cleared pending session', [
+                        'session_key' => $key, 
+                        'user_id' => $user_id,
+                        'procedure' => $value['procedure'] ?? 'unknown'
+                    ]);
+                }
             }
         }
+        
+        // Force save session to database
+        session()->save();
+        
+        Log::info('Session clear summary', [
+            'user_id' => $user_id,
+            'cleared_count' => $clearedCount,
+            'cleared_keys' => $clearedKeys
+        ]);
         
         return response()->json([
             'success' => true,
