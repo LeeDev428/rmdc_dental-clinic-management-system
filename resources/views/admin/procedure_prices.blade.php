@@ -622,10 +622,10 @@
                             <form id="updateForm_{{ $procedure->id }}" action="{{ route('admin.procedure_prices.update', ['id' => $procedure->id]) }}" method="POST" enctype="multipart/form-data" style="display: none;">
                                 @csrf
                                 @method('PUT')
-                                <input type="hidden" name="price" id="hidden_price_{{ $procedure->id }}">
-                                <input type="hidden" name="duration" id="hidden_duration_{{ $procedure->id }}">
-                                <input type="hidden" name="description" id="hidden_description_{{ $procedure->id }}">
-                                <input type="file" name="image_path" id="hidden_image_path_{{ $procedure->id }}">
+                                <input type="hidden" name="price" value="">
+                                <input type="hidden" name="duration" value="">
+                                <textarea name="description" style="display: none;"></textarea>
+                                <input type="file" name="image_path" style="display: none;">
                             </form>
 
                             <!-- Delete Form -->
@@ -753,16 +753,24 @@
 <script>
     // Function to handle file input display
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle the custom file input for main form
-        $('.custom-file-input').on('change', function() {
-            var fileName = $(this).val().split('\\').pop();
-            $(this).next('.custom-file-label').html(fileName || 'Choose image...');
-        });
-
         // Handle the custom file input for modal form
-        $('#modal_image_path').on('change', function() {
-            var fileName = $(this).val().split('\\').pop();
-            $(this).next('.custom-file-label').html(fileName || 'Choose image...');
+        const modalFileInput = document.getElementById('modal_image_path');
+        if (modalFileInput) {
+            modalFileInput.addEventListener('change', function() {
+                const fileName = this.value.split('\\').pop() || this.value.split('/').pop();
+                const label = this.nextElementSibling;
+                if (label && label.classList.contains('custom-file-label')) {
+                    label.textContent = fileName || 'Choose image...';
+                }
+            });
+        }
+        
+        // Handle table row file inputs
+        document.querySelectorAll('input[type="file"][id^="image_path_"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                const fileName = this.value.split('\\').pop() || this.value.split('/').pop();
+                console.log('File selected:', fileName);
+            });
         });
     });
 
@@ -771,15 +779,25 @@
         document.getElementById('modalMessage').innerText = 'Are you sure you want to update this procedure price?';
 
         document.getElementById('confirmAction').onclick = function() {
-            document.getElementById('hidden_price_' + id).value = document.getElementById('price_' + id).value;
-            document.getElementById('hidden_duration_' + id).value = document.getElementById('duration_' + id).value;
-            document.getElementById('hidden_description_' + id).value = document.getElementById('description_' + id).value;
+            const form = document.getElementById('updateForm_' + id);
+            const priceInput = form.querySelector('input[type="hidden"][name="price"]');
+            const durationInput = form.querySelector('input[type="hidden"][name="duration"]');
+            const descriptionTextarea = form.querySelector('textarea[name="description"]');
+            const imageFileInput = form.querySelector('input[type="file"][name="image_path"]');
+            
+            priceInput.value = document.getElementById('price_' + id).value;
+            durationInput.value = document.getElementById('duration_' + id).value;
+            descriptionTextarea.value = document.getElementById('description_' + id).value;
+            
             const imageInput = document.getElementById('image_path_' + id);
-            if (imageInput.files.length > 0) {
-                document.getElementById('hidden_image_path_' + id).files = imageInput.files;
+            if (imageInput && imageInput.files && imageInput.files.length > 0) {
+                // Create a new DataTransfer to clone the files
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageInput.files[0]);
+                imageFileInput.files = dataTransfer.files;
             }
 
-            document.getElementById('updateForm_' + id).submit();
+            form.submit();
         };
 
         $('#confirmationModal').modal('show');
@@ -844,7 +862,6 @@
             }
         }
     }
-    }, 3000);
 </script>
 
 @endsection
