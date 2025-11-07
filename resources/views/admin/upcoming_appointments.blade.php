@@ -660,8 +660,16 @@
                     <div class="detail-value-pending">₱${parseFloat((appointment.total_price || 0) - (appointment.down_payment || 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
                 </div>
                 <div class="detail-box">
+                    <div class="detail-label-pending">Payment Method</div>
+                    <div class="detail-value-pending">${appointment.payment_method ? appointment.payment_method.toUpperCase() : 'N/A'}</div>
+                </div>
+                <div class="detail-box">
                     <div class="detail-label-pending">Payment Status</div>
                     <div class="detail-value-pending">${paymentBadge[paymentStatus]}</div>
+                </div>
+                <div class="detail-box">
+                    <div class="detail-label-pending">Payment Reference</div>
+                    <div class="detail-value-pending">${appointment.payment_reference || 'N/A'}</div>
                 </div>
             `;
         }
