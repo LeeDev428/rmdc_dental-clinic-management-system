@@ -215,6 +215,9 @@
 Route::delete('admin/appointments/delete-all-declined', [AdminAppointment::class, 'deleteAllDeclined'])
     ->name('appointments.deleteAllDeclined');
 
+    Route::get('admin/appointments/{id}/details', [AdminAppointment::class, 'getAppointmentDetails'])
+        ->name('admin.appointments.details');
+
     Route::post('admin/appointment/{id}/{action}', [AdminAppointment::class, 'messageFromAdmin'])->name('appointment.messageFromAdmin');
 
     });
