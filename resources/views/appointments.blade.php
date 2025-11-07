@@ -708,12 +708,12 @@ window.onclick = function(event) {
                                                 
                                                 <div class="price-row">
                                                     <span class="text-gray-600">Down Payment (20%):</span>
-                                                    <span class="font-semibold text-green-600" id="display-down-payment">₱0.00</span>
+                                                    <span class="font-semibold" id="display-down-payment">₱0.00</span>
                                                 </div>
                                                 
                                                 <div class="price-row">
                                                     <span class="text-gray-600">Remaining Balance:</span>
-                                                    <span class="font-semibold text-orange-600" id="display-balance">₱0.00</span>
+                                                    <span class="font-semibold" id="display-balance">₱0.00</span>
                                                 </div>
                                                 
                                                 <div class="price-row total">
@@ -728,7 +728,7 @@ window.onclick = function(event) {
                                                 <label class="payment-method-option">
                                                     <input type="radio" name="payment_method" value="gcash" required>
                                                     <div class="payment-label flex items-center gap-3">
-                                                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/GCash_logo.svg" 
+                                                        <img src="{{ asset('payment-logo/gcash.png') }}" 
                                                              alt="GCash" 
                                                              class="w-16 h-16 object-contain"
                                                              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwN0RGRiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5HPC90ZXh0Pjwvc3ZnPg==';">
@@ -742,12 +742,12 @@ window.onclick = function(event) {
                                                 <label class="payment-method-option">
                                                     <input type="radio" name="payment_method" value="paymaya">
                                                     <div class="payment-label flex items-center gap-3">
-                                                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/PayMaya_Logo.svg" 
+                                                        <img src="{{ asset('payment-logo/maya.png') }}" 
                                                              alt="PayMaya" 
                                                              class="w-16 h-16 object-contain"
                                                              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
                                                         <div>
-                                                            <p class="font-semibold text-gray-800">PayMaya</p>
+                                                            <p class="font-semibold text-gray-800">PayMaya/Maya</p>
                                                             <p class="text-xs text-gray-500">E-wallet payment</p>
                                                         </div>
                                                     </div>
