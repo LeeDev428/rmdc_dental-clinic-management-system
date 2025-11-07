@@ -12,8 +12,25 @@ export default defineConfig({
     server: {
         host: '0.0.0.0', // Allow external access
         port: 5173,
+        strictPort: false,
         hmr: {
-            host: 'localhost'
+            protocol: 'wss',
+            host: process.env.VITE_HMR_HOST || 'localhost',
+            port: 5173,
+            clientPort: 443
+        },
+        watch: {
+            usePolling: true
         }
-    }
+    },
+    // Build optimizations for production
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+            },
+        },
+    },
 });
