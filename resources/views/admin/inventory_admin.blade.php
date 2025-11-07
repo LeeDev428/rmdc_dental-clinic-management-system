@@ -826,104 +826,46 @@
         }
     }
 
-    // Function to toggle quantity field based on unit type
+    // Function to toggle items per unit field based on unit type
     function toggleQuantityField() {
         const unitType = document.getElementById('unit').value;
-        const quantityInput = document.getElementById('quantity');
         const itemsPerUnitInput = document.getElementById('items_per_unit');
+        const itemsPerUnitGroup = itemsPerUnitInput.closest('.form-group');
         
         if (unitType === 'pieces') {
-            // For pieces, use items_per_unit as the quantity
-            quantityInput.disabled = true;
-            quantityInput.style.backgroundColor = '#f3f4f6';
-            quantityInput.style.cursor = 'not-allowed';
-            quantityInput.removeAttribute('required');
-            
-            // Sync quantity with items_per_unit
-            quantityInput.value = itemsPerUnitInput.value || '0';
-            
-            // Add a note if not already present
-            let note = document.getElementById('quantity-note');
-            if (!note) {
-                note = document.createElement('small');
-                note.id = 'quantity-note';
-                note.style.color = '#6b7280';
-                note.style.fontSize = '12px';
-                note.style.display = 'block';
-                note.style.marginTop = '4px';
-                note.textContent = 'Quantity is auto-synced with Items per Unit for Pieces';
-                quantityInput.parentElement.appendChild(note);
-            }
-            
-            // Auto-sync items_per_unit changes to quantity
-            itemsPerUnitInput.addEventListener('input', function() {
-                quantityInput.value = this.value;
-            });
+            // For pieces, disable and hide items per unit field
+            itemsPerUnitInput.value = '1';
+            itemsPerUnitInput.disabled = true;
+            itemsPerUnitInput.removeAttribute('required');
+            itemsPerUnitGroup.style.display = 'none';
         } else {
-            // For other units, enable manual quantity entry
-            quantityInput.disabled = false;
-            quantityInput.style.backgroundColor = '';
-            quantityInput.style.cursor = '';
-            quantityInput.setAttribute('required', 'required');
-            
-            // Remove note if present
-            const note = document.getElementById('quantity-note');
-            if (note) {
-                note.remove();
-            }
-            
-            // Reset to default if it was 0
-            if (quantityInput.value === '0' || quantityInput.value === '') {
-                quantityInput.value = '';
+            // For other units, show and enable items per unit field
+            itemsPerUnitInput.disabled = false;
+            itemsPerUnitInput.setAttribute('required', 'required');
+            itemsPerUnitGroup.style.display = 'block';
+            if (itemsPerUnitInput.value === '1') {
+                itemsPerUnitInput.value = '';
             }
         }
     }
 
-    // Function to toggle update form quantity field
+    // Function to toggle update form items per unit field
     function toggleUpdateQuantityField() {
         const unitType = document.getElementById('update_unit').value;
-        const quantityInput = document.getElementById('update_quantity');
         const itemsPerUnitInput = document.getElementById('update_items_per_unit');
+        const itemsPerUnitGroup = itemsPerUnitInput.closest('.form-group');
         
         if (unitType === 'pieces') {
-            // For pieces, use items_per_unit as the quantity
-            quantityInput.disabled = true;
-            quantityInput.style.backgroundColor = '#f3f4f6';
-            quantityInput.style.cursor = 'not-allowed';
-            quantityInput.removeAttribute('required');
-            
-            // Sync quantity with items_per_unit
-            quantityInput.value = itemsPerUnitInput.value || '0';
-            
-            // Add a note if not already present
-            let note = document.getElementById('update-quantity-note');
-            if (!note) {
-                note = document.createElement('small');
-                note.id = 'update-quantity-note';
-                note.style.color = '#6b7280';
-                note.style.fontSize = '12px';
-                note.style.display = 'block';
-                note.style.marginTop = '4px';
-                note.textContent = 'Quantity is auto-synced with Items per Unit for Pieces';
-                quantityInput.parentElement.appendChild(note);
-            }
-            
-            // Auto-sync items_per_unit changes to quantity
-            itemsPerUnitInput.addEventListener('input', function() {
-                quantityInput.value = this.value;
-            });
+            // For pieces, disable and hide items per unit field
+            itemsPerUnitInput.value = '1';
+            itemsPerUnitInput.disabled = true;
+            itemsPerUnitInput.removeAttribute('required');
+            itemsPerUnitGroup.style.display = 'none';
         } else {
-            // For other units, enable manual quantity entry
-            quantityInput.disabled = false;
-            quantityInput.style.backgroundColor = '';
-            quantityInput.style.cursor = '';
-            quantityInput.setAttribute('required', 'required');
-            
-            // Remove note if present
-            const note = document.getElementById('update-quantity-note');
-            if (note) {
-                note.remove();
-            }
+            // For other units, show and enable items per unit field
+            itemsPerUnitInput.disabled = false;
+            itemsPerUnitInput.setAttribute('required', 'required');
+            itemsPerUnitGroup.style.display = 'block';
         }
     }
 
