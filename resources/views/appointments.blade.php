@@ -1064,11 +1064,9 @@ window.onclick = function(event) {
                 
                 // Display validation errors more clearly
                 let errorMessage = 'An error occurred while booking your appointment';
-                let canClearSession = false;
                 
                 if (error.error) {
                     errorMessage = error.error;
-                    canClearSession = error.can_clear === true;
                 } else if (error.errors) {
                     // Show all validation errors
                     const errorList = Object.values(error.errors).flat();
@@ -1077,14 +1075,7 @@ window.onclick = function(event) {
                     errorMessage = error.message;
                 }
                 
-                // If there's a pending session, show clear button
-                if (canClearSession) {
-                    showPopupWithAction('error', errorMessage, 'Clear Pending Payment', function() {
-                        clearPendingSession();
-                    });
-                } else {
-                    showPopup('error', errorMessage);
-                }
+                showPopup('error', errorMessage);
             });
         });
 
