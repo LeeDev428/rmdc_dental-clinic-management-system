@@ -169,7 +169,7 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
         .payment-method-option {
             display: flex;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
             background: white;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
@@ -730,7 +730,7 @@ window.onclick = function(event) {
                                                     <div class="payment-label flex items-center gap-3">
                                                         <img src="{{ asset('payment-logo/gcash.png') }}" 
                                                              alt="GCash" 
-                                                             class="w-16 h-16 object-contain"
+                                                             class="w-20 h-20 object-contain"
                                                              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwN0RGRiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5HPC90ZXh0Pjwvc3ZnPg==';">
                                                         <div>
                                                             <p class="font-semibold text-gray-800">GCash</p>
@@ -744,7 +744,7 @@ window.onclick = function(event) {
                                                     <div class="payment-label flex items-center gap-3">
                                                         <img src="{{ asset('payment-logo/maya.png') }}" 
                                                              alt="PayMaya" 
-                                                             class="w-16 h-16 object-contain"
+                                                             class="w-20 h-20 object-contain"
                                                              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
                                                         <div>
                                                             <p class="font-semibold text-gray-800">PayMaya/Maya</p>
@@ -755,15 +755,11 @@ window.onclick = function(event) {
 
                                                 <label class="payment-method-option">
                                                     <input type="radio" name="payment_method" value="card">
-                                                    <div class="payment-label flex items-center gap-3">
-                                                        <div class="flex gap-2">
-                                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/320px-Visa_Inc._logo.svg.png" 
-                                                                 alt="Visa" 
-                                                                 class="h-4 object-contain">
-                                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/320px-Mastercard-logo.svg.png" 
-                                                                 alt="Mastercard" 
-                                                                 class="h-4 object-contain">
-                                                        </div>
+                                                     <div class="payment-label flex items-center gap-3">
+                                                        <img src="{{ asset('payment-logo/card.png') }}" 
+                                                             alt="PayMaya" 
+                                                             class="w-20 h-20 object-contain"
+                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
                                                         <div>
                                                             <p class="font-semibold text-gray-800">Credit/Debit Card</p>
                                                             <p class="text-xs text-gray-500">Visa, Mastercard</p>
@@ -1117,67 +1113,7 @@ window.onclick = function(event) {
             }, 3000); // Show for 3 seconds
         }
         
-        // Function to show popup with action button
-        function showPopupWithAction(type, message, buttonText, callback) {
-            const popup = document.createElement('div');
-            popup.className = `fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            }`;
-            popup.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <span class="mr-2">${type === 'success' ? '✔️' : '❌'}</span>
-                        <span>${message}</span>
-                    </div>
-                    <button class="ml-4 px-3 py-1 bg-white text-red-600 rounded hover:bg-gray-100 font-bold" 
-                            onclick="this.parentElement.parentElement.remove()">
-                        ${buttonText}
-                    </button>
-                </div>
-            `;
-            document.body.appendChild(popup);
-            
-            // Add click handler to button
-            const button = popup.querySelector('button');
-            button.addEventListener('click', function() {
-                callback();
-                popup.remove();
-            });
 
-            // Auto-hide after 10 seconds (longer for action popups)
-            setTimeout(() => {
-                popup.classList.add('opacity-0');
-                setTimeout(() => popup.remove(), 500);
-            }, 10000);
-        }
-        
-        // Function to clear pending payment session
-        function clearPendingSession() {
-            fetch("{{ route('appointments.clear-session') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showPopup('success', data.message);
-                    // Reload page after 1.5 seconds
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    showPopup('error', data.message || 'Failed to clear session');
-                }
-            })
-            .catch(error => {
-                console.error('Error clearing session:', error);
-                showPopup('error', 'An error occurred while clearing the session');
-            });
-        }
     });
 </script>
             </div>
