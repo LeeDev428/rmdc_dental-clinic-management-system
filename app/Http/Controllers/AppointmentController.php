@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Models\ProcedurePrice;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -92,27 +93,64 @@ public function store(Request $request)
 {
     $user_id = Auth::id();
     
-    // ✅ CHECK: Prevent booking if user already has a pending appointment
-    $hasPendingAppointment = Appointment::where('user_id', $user_id)
-        ->where('status', 'pending')
+    // ✅ CHECK: Prevent booking if user already has a pending or unpaid appointment
+    $hasActiveAppointment = Appointment::where('user_id', $user_id)
+        ->whereIn('status', ['pending', 'unpaid'])
+        ->where('created_at', '>', now()->subHours(2)) // Only check appointments within last 2 hours
         ->exists();
     
-    if ($hasPendingAppointment) {
+    if ($hasActiveAppointment) {
         return response()->json([
-            'error' => 'You already have a pending appointment. Please wait for it to be accepted or declined before booking another appointment.'
+            'error' => 'You already have an active appointment. Please complete or cancel it before booking another one.'
         ], 422);
     }
     
-    $validated = $request->validate([
-        'title' => 'required|string',
-        'procedure' => 'required|string',
-        'time' => 'required|string',
-        'start' => 'required|date',
-        'image_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
-        'payment_method' => 'nullable|string|in:gcash,paymaya,card',
-        'total_price' => 'nullable|numeric|min:0',
-        'down_payment' => 'nullable|numeric|min:0',
+    // Log the incoming request for debugging
+    Log::info('Appointment Request Data:', [
+        'has_payment_method' => $request->has('payment_method'),
+        'payment_method' => $request->input('payment_method'),
+        'has_total_price' => $request->has('total_price'),
+        'total_price' => $request->input('total_price'),
+        'has_down_payment' => $request->has('down_payment'),
+        'down_payment' => $request->input('down_payment'),
+        'all_data' => $request->except(['image_path'])
     ]);
+    
+    try {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'procedure' => 'required|string',
+            'time' => 'required|string',
+            'start' => 'required|date',
+            'image_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
+            'payment_method' => 'required|string|in:gcash,paymaya,card',
+            'total_price' => 'required|numeric|min:0.01',
+            'down_payment' => 'required|numeric|min:0.01',
+        ], [
+            'payment_method.required' => 'Please select a payment method (GCash, PayMaya, or Card)',
+            'total_price.required' => 'Total price is missing. Please refresh and select a procedure again.',
+            'down_payment.required' => 'Down payment is missing. Please refresh and select a procedure again.',
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        Log::error('Appointment Validation Failed:', [
+            'errors' => $e->errors(),
+            'request_data' => $request->except(['image_path'])
+        ]);
+        
+        // Return more detailed error message
+        $errors = $e->errors();
+        $firstError = reset($errors)[0] ?? 'Validation failed';
+        $totalErrors = count($errors);
+        $errorMessage = $firstError;
+        if ($totalErrors > 1) {
+            $errorMessage .= " (and " . ($totalErrors - 1) . " more error" . ($totalErrors > 2 ? "s" : "") . ")";
+        }
+        
+        return response()->json([
+            'error' => $errorMessage,
+            'errors' => $errors
+        ], 422);
+    }
 
     $startTime = Carbon::parse($validated['start']);
     $today = Carbon::today();
@@ -173,7 +211,8 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $image_path = $path;
     }
 
-    // Create appointment
+    // Create appointment with payment details
+    // Status is 'unpaid' until payment is completed, then changes to 'pending' for admin approval
     $appointment = Appointment::create([
         'title' => $validated['title'],
         'procedure' => $validated['procedure'],
@@ -183,17 +222,37 @@ $endTime = $startTime->copy()->addMinutes($duration);
         'duration' => $duration,
         'user_id' => $user_id,
         'image_path' => $image_path,
+        'payment_method' => $validated['payment_method'] ?? null,
+        'total_price' => $validated['total_price'] ?? 0,
+        'down_payment' => $validated['down_payment'] ?? 0,
+        'payment_status' => 'unpaid', // Set to unpaid initially
+        'status' => 'unpaid', // Set appointment status to unpaid until payment confirmed
     ]);
 
+    // Generate PayMongo payment URL
+    $paymentUrl = null;
+    if ($validated['payment_method']) {
+        $paymentUrl = route('payment.create', ['appointment' => $appointment->id]);
+    }
+
     return response()->json([
-        'id' => $appointment->id,
-        'title' => $appointment->title,
-        'start' => $appointment->start,
-        'end' => $appointment->end,
-        'procedure' => $appointment->procedure,
-        'duration' => $appointment->duration,
-        'user_id' => $appointment->user_id,
-        'image_path' => $appointment->image_path ? Storage::url($appointment->image_path) : null,
+        'success' => true,
+        'message' => 'Appointment created successfully! Redirecting to payment...',
+        'appointment' => [
+            'id' => $appointment->id,
+            'title' => $appointment->title,
+            'start' => $appointment->start,
+            'end' => $appointment->end,
+            'procedure' => $appointment->procedure,
+            'duration' => $appointment->duration,
+            'user_id' => $appointment->user_id,
+            'image_path' => $appointment->image_path ? Storage::url($appointment->image_path) : null,
+            'payment_method' => $appointment->payment_method,
+            'total_price' => $appointment->total_price,
+            'down_payment' => $appointment->down_payment,
+        ],
+        'payment_url' => $paymentUrl,
+        'redirect' => true,
     ]);
 }
 
