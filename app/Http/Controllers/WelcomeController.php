@@ -15,10 +15,17 @@ class WelcomeController extends Controller
     
     public function getServices(Request $request)
     {
-        $page = $request->input('page', 1);
-        $perPage = 12;
+        $procedures = ProcedurePrice::paginate(9); // 3x3 grid like dashboard
         
-        $procedures = ProcedurePrice::paginate($perPage);
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('partials.services-cards', compact('procedures'))->render();
+            $pagination = $procedures->render('pagination::bootstrap-4');
+            
+            return response()->json([
+                'html' => $html,
+                'pagination' => $pagination
+            ]);
+        }
         
         return response()->json([
             'data' => $procedures->items(),
