@@ -15,7 +15,7 @@ class WelcomeController extends Controller
     
     public function getServices(Request $request)
     {
-        $procedures = ProcedurePrice::paginate(9); // 3x3 grid like dashboard
+        $procedures = ProcedurePrice::paginate(12); // Match dashboard: 12 items per page (3x4 grid)
         
         if ($request->ajax() || $request->wantsJson()) {
             $html = view('partials.services-cards', compact('procedures'))->render();
