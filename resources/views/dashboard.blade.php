@@ -138,7 +138,16 @@
                         </td>
                         <td class="px-4 py-2 text-center text-sm text-gray-600"> <span id="estimated-time"></span></td>
                         <td class="px-4 py-2 text-center text-sm text-gray-600">₱<span id="procedure-price"></span></td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600"><span id=""></span></td>
+                        <td class="px-4 py-2 text-center text-sm text-gray-600">
+                            @if($appointments && $appointments->payment_status)
+                                <span class="px-2 py-1 rounded text-xs font-semibold
+                                    {{ $appointments->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ strtoupper($appointments->payment_status) }}
+                                </span>
+                            @else
+                                <span class="text-gray-400">N/A</span>
+                            @endif
+                        </td>
                     </tr>
                 </tbody>
             </table>
