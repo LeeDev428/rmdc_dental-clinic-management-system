@@ -254,47 +254,148 @@
             font-size: 14px;
         }
 
-        /* Services Section - Using Tailwind classes from dashboard */
-        .service-card {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
+        /* Services Section */
+        .services {
+            padding: 80px 40px;
+            background: transparent;
         }
 
-        /* Pagination styling */
-        #services-pagination .pagination {
+        .services-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            color: #1a1a1a;
+        }
+
+        .services-carousel {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .services-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+            margin-top: -10px;
+            margin-bottom: 40px;
+        }
+
+        .services-grid-modern {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .service-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .service-image {
+            width: 100%;
+            height: 176px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #00b4d8, #03828b);
+        }
+
+        .service-content {
+            padding: 16px;
+        }
+
+        .service-content h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .service-content p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .service-meta {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .service-meta p {
+            margin-bottom: 4px;
+        }
+
+        .service-meta strong {
+            color: #333;
+        }
+
+        .carousel-controls {
             display: flex;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 30px;
+            margin-top: 50px;
+            align-items: center;
         }
-        
-        #services-pagination .page-item {
-            list-style: none;
-        }
-        
-        #services-pagination .page-link {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            color: #374151;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        
-        #services-pagination .page-link:hover {
-            background-color: #3b82f6;
+
+        .carousel-btn {
+            background: #00b4d8;
             color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
         }
-        
-        #services-pagination .page-item.active .page-link {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
+
+        .carousel-btn:hover {
+            background: #03828b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,180,216,0.3);
         }
-        
-        #services-pagination .page-item.disabled .page-link {
-            color: #9ca3af;
+
+        .carousel-btn:disabled {
+            background: #ccc;
             cursor: not-allowed;
+            transform: none;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 15px;
+            color: #666;
+            font-weight: 600;
+            padding: 8px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         /* About Section */
@@ -832,23 +933,30 @@
     </section>
 
     <!-- Services Section -->
-    <div class="py-10 fade-in" id="services">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 bg-white dark:bg-blue-800 shadow-sm rounded-lg relative">
-            <div class="text-center font-semibold text-3xl text-gray-800 dark:text-white mt-6 mb-8 fade-in">
-                <span class="text-blue-600">Our</span> Services
-            </div>
-
-            <!-- Grid Layout for Services (3 cards per row) -->
-            <div id="services-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 fade-in">
+    <section class="services fade-in" id="services">
+        <div class="services-container">
+            <h2 class="section-title fade-in"><span style="color: #00b4d8;">Our</span> Services</h2>
+            <p class="services-subtitle fade-in">Comprehensive dental care for your complete oral health</p>
+            
+            <div class="services-grid-modern fade-in" id="servicesGrid">
                 <!-- Services will be loaded here via AJAX -->
             </div>
 
-            <!-- Pagination -->
-            <div id="services-pagination" class="flex justify-center py-6">
-                <!-- Pagination will be loaded here -->
+            <div class="carousel-controls">
+                <button class="carousel-btn" id="prevBtn" onclick="changePage('prev')">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                
+                <div class="carousel-indicators" id="paginationInfo">
+                    Page <span id="currentPage">1</span> of <span id="totalPages">1</span>
+                </div>
+                
+                <button class="carousel-btn" id="nextBtn" onclick="changePage('next')">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Clinic Locations -->
     <section class="locations fade-in" id="locations">
@@ -1073,38 +1181,73 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <script>
-        // Services with AJAX Pagination
-        $(document).ready(function() {
-            // Load initial services
-            loadServices(1);
+        // Services Carousel with AJAX Pagination
+        let currentPage = 1;
+        let totalPages = 1;
 
-            // Handle pagination clicks
-            $(document).on('click', '#services-pagination .pagination a', function(e) {
-                e.preventDefault();
-                let page = $(this).attr('href').split('page=')[1];
-                loadServices(page);
-            });
-            
-            function loadServices(page) {
-                $.ajax({
-                    url: "/get-services?page=" + page,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $('#services-container').html(data.html);
-                        $('#services-pagination').html(data.pagination);
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading services:', xhr);
-                    }
-                });
+        function loadServices(page) {
+            fetch(`/get-services?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('servicesGrid');
+                    grid.innerHTML = '';
+                    
+                    data.data.forEach(procedure => {
+                        const card = document.createElement('div');
+                        card.className = 'service-card';
+                        
+                        let imageHtml = '';
+                        if (procedure.image_path) {
+                            imageHtml = `<img src="/storage/${procedure.image_path}" alt="${procedure.procedure_name}" class="service-image">`;
+                        } else {
+                            imageHtml = '<div class="service-image"></div>';
+                        }
+                        
+                        const description = procedure.description ? 
+                            (procedure.description.length > 80 ? procedure.description.substring(0, 80) + '...' : procedure.description) : '';
+                        
+                        const fullDescription = procedure.description || 'No description available.';
+                        
+                        card.innerHTML = `
+                            ${imageHtml}
+                            <div class="service-content">
+                                <h3>${procedure.procedure_name}</h3>
+                                <p>${fullDescription}</p>
+                                <div class="service-meta">
+                                    <p><strong>Estimated Time:</strong> ${procedure.duration} Minutes</p>
+                                    <p><strong>Price:</strong> ₱${Number(procedure.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                                </div>
+                            </div>
+                        `;
+                        
+                        grid.appendChild(card);
+                    });
+                    
+                    currentPage = data.current_page;
+                    totalPages = data.last_page;
+                    
+                    document.getElementById('currentPage').textContent = currentPage;
+                    document.getElementById('totalPages').textContent = totalPages;
+                    
+                    // Update button states
+                    document.getElementById('prevBtn').disabled = currentPage === 1;
+                    document.getElementById('nextBtn').disabled = currentPage === totalPages;
+                })
+                .catch(error => console.error('Error loading services:', error));
+        }
+
+        function changePage(direction) {
+            if (direction === 'prev' && currentPage > 1) {
+                loadServices(currentPage - 1);
+            } else if (direction === 'next' && currentPage < totalPages) {
+                loadServices(currentPage + 1);
             }
+        }
 
-            // Initialize maps after DOM is ready
+        // Load services on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadServices(1);
             initMaps();
         });
 
