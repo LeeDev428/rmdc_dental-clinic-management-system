@@ -15,8 +15,16 @@ class LoginController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
-            return redirect()->route('verification.notice')->withErrors(['email' => 'Please verify your email address before logging in.']);
+
+        // Attempt to authenticate
+        if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended('dashboard');
         }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.',
+        ])->onlyInput('email');
     }
 }
 
