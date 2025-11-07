@@ -58,6 +58,7 @@
         Route::delete('/appointments/{id}', [AppointmentController::class, 'destroy'])->name('appointments.destroy'); // Updated for consistency
         Route::post('/calculate-price', [AppointmentController::class, 'calculatePrice']);
         Route::get('appointments/check', [AppointmentController::class, 'check'])->name('appointments.check');
+        Route::post('/appointments/clear-pending-session', [AppointmentController::class, 'clearPendingSession'])->name('appointments.clear-session');
     });
 
     // Route for the user dashboard with UserMiddleware
@@ -92,10 +93,10 @@
     Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
     Route::post('/service-feedback', [ServiceFeedbackController::class, 'store'])->name('feedback.store');
     
-    // Payment Routes - PayMongo Checkout Sessions API
-    Route::get('/payment/create/{appointment}', [PaymentController::class, 'createPayment'])->name('payment.create');
-    Route::get('/payment/success/{appointment}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-    Route::get('/payment/failed/{appointment}', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
+    // Payment Routes - PayMongo Checkout Sessions API (session-based, no appointment created until payment succeeds)
+    Route::get('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
+    Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+    Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
     
     // Ask Lee AI - Gemini AI Chatbot
     Route::get('/ask-lee-ai', [GeminiController::class, 'index'])->name('ask.lee.ai');
@@ -322,19 +323,14 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
 
 Route::get('/user/teeth-layout', [TeethLayoutController::class, 'getUserTeethLayout']);
 
-// PayMongo Payment Routes
-use App\Http\Controllers\PayMongoController;
-
-Route::middleware(['auth'])->group(function () {
-    Route::post('/payment/create-source', [PayMongoController::class, 'createPaymentSource'])->name('payment.create-source');
-    Route::post('/payment/create-intent', [PayMongoController::class, 'createPaymentIntent'])->name('payment.create-intent');
-    Route::post('/payment/attach-method', [PayMongoController::class, 'attachPaymentMethod'])->name('payment.attach-method');
-    Route::get('/payment/success', [PayMongoController::class, 'paymentSuccess'])->name('payment.success');
-    Route::get('/payment/failed', [PayMongoController::class, 'paymentFailed'])->name('payment.failed');
-});
-
-// PayMongo Webhook (no auth required)
-Route::post('/payment/webhook', [PayMongoController::class, 'webhook'])->name('payment.webhook');
+// Old PayMongo Controller routes commented out - now using session-based PaymentController
+// use App\Http\Controllers\PayMongoController;
+// Route::middleware(['auth'])->group(function () {
+//     Route::post('/payment/create-source', [PayMongoController::class, 'createPaymentSource'])->name('payment.create-source');
+//     Route::post('/payment/create-intent', [PayMongoController::class, 'createPaymentIntent'])->name('payment.create-intent');
+//     Route::post('/payment/attach-method', [PayMongoController::class, 'attachPaymentMethod'])->name('payment.attach-method');
+// });
+// Route::post('/payment/webhook', [PayMongoController::class, 'webhook'])->name('payment.webhook');
 
     Route::get('/captcha/image', [CaptchaController::class, 'generate'])->name('captcha.image');
 
