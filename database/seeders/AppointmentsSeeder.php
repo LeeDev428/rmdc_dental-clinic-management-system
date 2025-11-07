@@ -38,7 +38,7 @@ class AppointmentsSeeder extends Seeder
         $appointments = [
             // Completed appointments
             [
-                'user_id' => $userIds[0] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Root Canal Treatment',
                 'procedure' => 'Root Canal',
                 'duration' => 60,
@@ -48,7 +48,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'completed',
             ],
             [
-                'user_id' => $userIds[0] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Crown Installation',
                 'procedure' => 'Crown Installation',
                 'duration' => 45,
@@ -58,7 +58,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'completed',
             ],
             [
-                'user_id' => $userIds[1] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Dental Cleaning',
                 'procedure' => 'Dental Cleaning',
                 'duration' => 30,
@@ -68,7 +68,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'completed',
             ],
             [
-                'user_id' => $userIds[2] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Wisdom Tooth Extraction',
                 'procedure' => 'Tooth Extraction',
                 'duration' => 60,
@@ -78,7 +78,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'completed',
             ],
             [
-                'user_id' => $userIds[3] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Professional Whitening',
                 'procedure' => 'Teeth Whitening',
                 'duration' => 60,
@@ -88,7 +88,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'completed',
             ],
             [
-                'user_id' => $userIds[4] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Composite Filling',
                 'procedure' => 'Cavity Filling',
                 'duration' => 45,
@@ -100,7 +100,7 @@ class AppointmentsSeeder extends Seeder
 
             // Confirmed appointments (upcoming)
             [
-                'user_id' => $userIds[5] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Regular Check-up',
                 'procedure' => 'Dental Check-up',
                 'duration' => 30,
@@ -110,7 +110,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'confirmed',
             ],
             [
-                'user_id' => $userIds[6] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Prophylaxis',
                 'procedure' => 'Dental Cleaning',
                 'duration' => 30,
@@ -120,7 +120,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'confirmed',
             ],
             [
-                'user_id' => $userIds[7] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Filling Replacement',
                 'procedure' => 'Cavity Filling',
                 'duration' => 45,
@@ -130,7 +130,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'confirmed',
             ],
             [
-                'user_id' => $userIds[8] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Braces Consultation',
                 'procedure' => 'Orthodontic Consultation',
                 'duration' => 30,
@@ -140,7 +140,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'confirmed',
             ],
             [
-                'user_id' => $userIds[9] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Root Canal Therapy',
                 'procedure' => 'Root Canal',
                 'duration' => 90,
@@ -194,7 +194,7 @@ class AppointmentsSeeder extends Seeder
 
             // Cancelled appointments
             [
-                'user_id' => $userIds[2] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Teeth Cleaning',
                 'procedure' => 'Dental Cleaning',
                 'duration' => 30,
@@ -204,7 +204,7 @@ class AppointmentsSeeder extends Seeder
                 'status' => 'cancelled',
             ],
             [
-                'user_id' => $userIds[4] ?? null,
+                'user_id' => $userIds[16] ?? null,
                 'title' => 'Whitening Session',
                 'procedure' => 'Teeth Whitening',
                 'duration' => 60,
