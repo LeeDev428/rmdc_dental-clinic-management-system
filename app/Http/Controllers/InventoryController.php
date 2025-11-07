@@ -32,7 +32,7 @@ class InventoryController extends Controller
             'quantity' => 'required|integer|min:0',
             'low_stock_threshold' => 'required|integer|min:1',
             'unit' => 'required|string|max:50',
-            'items_per_unit' => 'required|integer|min:1',
+            'items_per_unit' => 'nullable|integer|min:1',
             'supplier' => 'nullable|string|max:255',
             'expiration_type' => 'required|string|in:expirable,inexpirable',
             'category' => 'required|string|max:255',
@@ -41,6 +41,11 @@ class InventoryController extends Controller
         // Check expiration type and adjust expiration_date accordingly
         if ($request->input('expiration_type') === 'inexpirable') {
             $validated['expiration_date'] = null;
+        }
+    
+        // For pieces unit type, set items_per_unit to 1
+        if ($request->input('unit') === 'pieces') {
+            $validated['items_per_unit'] = 1;
         }
     
         // Create and save the new inventory item
@@ -67,11 +72,16 @@ class InventoryController extends Controller
         'quantity' => 'required|integer',
         'low_stock_threshold' => 'required|integer|min:1',
         'unit' => 'required|string|max:50',
-        'items_per_unit' => 'required|integer|min:1',
+        'items_per_unit' => 'nullable|integer|min:1',
         'expiration_date' => 'nullable|date',
         'supplier' => 'nullable|string|max:255',
         'category' => 'required|string|max:255',
     ]);
+
+    // For pieces unit type, set items_per_unit to 1
+    if ($request->input('unit') === 'pieces') {
+        $validated['items_per_unit'] = 1;
+    }
 
     // Update the item
     $item->name = $validated['name'];
