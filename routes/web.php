@@ -48,8 +48,10 @@
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
     Route::get('/get-services', [WelcomeController::class, 'getServices'])->name('get.services');
     
-    // Public AI Chatbot (No authentication required)
-    Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])->name('ask.gemini.public');
+    // Public AI Chatbot (No authentication required) - Rate limited to 10 requests per minute per IP
+    Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])
+        ->middleware('throttle:10,1')
+        ->name('ask.gemini.public');
 
     Route::middleware(['auth'])->group(function () {
         Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments');
