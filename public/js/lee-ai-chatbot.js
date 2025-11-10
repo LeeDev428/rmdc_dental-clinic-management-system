@@ -138,6 +138,11 @@ function initLeeAIChatbot(type, apiEndpoint) {
             
             if (response.ok && data.success) {
                 addMessage(data.response, false);
+            } else if (response.status === 429) {
+                // Handle rate limit error
+                addMessage('⏳ **Too many requests!** Please wait a moment (about 60 seconds) before asking another question. This helps us provide the best service to everyone.', false);
+            } else if (data.error) {
+                addMessage(`⚠️ ${data.error}`, false);
             } else {
                 addMessage('Sorry, I encountered an error. Please try again!', false);
             }
