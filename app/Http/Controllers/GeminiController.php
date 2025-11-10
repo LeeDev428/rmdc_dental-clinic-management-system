@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class GeminiController extends Controller
 {
@@ -39,9 +40,21 @@ class GeminiController extends Controller
             ], 500);
         }
 
+        // Check cache for frequently asked questions (cache for 1 hour)
+        $cacheKey = 'gemini_response_' . md5(strtolower(trim($question)));
+        $cachedResponse = Cache::get($cacheKey);
+        
+        if ($cachedResponse) {
+            return response()->json([
+                'success' => true,
+                'response' => $cachedResponse,
+                'cached' => true
+            ]);
+        }
+
         try {
             // Gemini API endpoint - Using Gemini 2.0 Flash (full version)
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={$apiKey}";
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}";
 
             // Prepare the request payload with comprehensive dental-focused instructions
             $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
@@ -119,11 +132,23 @@ Now, answer this dental question professionally and empathetically: {$question}"
                 // Format the response for better display
                 $formattedResponse = $this->formatAIResponse($aiResponse);
                 
+                // Cache the response for 1 hour to reduce API calls
+                Cache::put($cacheKey, $formattedResponse, 3600);
+                
                 return response()->json([
                     'success' => true,
-                    'response' => $formattedResponse
+                    'response' => $formattedResponse,
+                    'cached' => false
                 ]);
             } else {
+                // Check for rate limit error (429)
+                if ($response->status() === 429) {
+                    return response()->json([
+                        'error' => 'Too many requests. Please wait a moment before asking another question.',
+                        'rate_limit' => true
+                    ], 429);
+                }
+                
                 // Log the error for debugging
                 Log::error('Gemini API Error', [
                     'status' => $response->status(),
