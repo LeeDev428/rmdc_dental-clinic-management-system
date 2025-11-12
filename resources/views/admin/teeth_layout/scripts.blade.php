@@ -65,21 +65,39 @@ function renderTeethChart() {
 
 function calculateToothPositions() {
     const positions = [];
-    const radiusX = 250, radiusY = 200, centerX = 400, centerY = 300;
+    const centerX = 300, upperCenterY = 200, lowerCenterY = 600;
+    const radiusX = 180, radiusY = 100;
     
+    // Upper Arch (teeth 1-16) - arranged in oval from right to left
     for (let i = 0; i < 16; i++) {
-        const angle = Math.PI * (1 - i / 15);
+        const angle = Math.PI * (1 - i / 15); // Right to left
+        const x = centerX + radiusX * Math.cos(angle);
+        const y = upperCenterY - radiusY * Math.sin(angle);
+        
         positions.push({
             number: i + 1,
-            x: centerX + radiusX * Math.cos(angle),
-            y: centerY - Math.abs(radiusY * Math.sin(angle)) - 80,
+            x: x,
+            y: y,
             type: getToothType(i + 1),
-            quadrant: i < 8 ? 'upper_right' : 'upper_left'
+            quadrant: i < 8 ? 'upper_right' : 'upper_left',
+            rotation: (angle * 180 / Math.PI) - 90
         });
     }
+    
+    // Lower Arch (teeth 17-32) - arranged in oval from left to right
     for (let i = 0; i < 16; i++) {
-        const angle = Math.PI * (i / 15);
-        positions.push({ number: i + 17, x: centerX + radiusX * Math.cos(angle), y: centerY + Math.abs(radiusY * Math.sin(angle)) + 80, type: getToothType(i + 17), quadrant: i < 8 ? 'lower_left' : 'lower_right' });
+        const angle = Math.PI * (i / 15); // Left to right
+        const x = centerX + radiusX * Math.cos(angle);
+        const y = lowerCenterY + radiusY * Math.sin(angle);
+        
+        positions.push({
+            number: i + 17,
+            x: x,
+            y: y,
+            type: getToothType(i + 17),
+            quadrant: i < 8 ? 'lower_left' : 'lower_right',
+            rotation: (angle * 180 / Math.PI) + 90
+        });
     }
     return positions;
 }
@@ -94,10 +112,10 @@ function getToothType(number) {
 
 function getToothPath(type) {
     const shapes = {
-        'incisor': 'M -10,-15 Q 0,-20 10,-15 L 8,20 Q 0,25 -8,20 Z',
-        'canine': 'M -8,-18 Q 0,-25 8,-18 L 6,22 Q 0,28 -6,22 Z',
-        'premolar': 'M -12,-12 Q -15,-18 -8,-20 Q 0,-22 8,-20 Q 15,-18 12,-12 L 10,15 Q 0,20 -10,15 Z',
-        'molar': 'M -18,-15 Q -20,-20 -10,-22 Q 0,-24 10,-22 Q 20,-20 18,-15 L 15,18 Q 0,25 -15,18 Z'
+        'incisor': 'M -8,-20 Q -10,-25 -6,-28 Q 0,-30 6,-28 Q 10,-25 8,-20 L 6,18 Q 4,22 0,24 Q -4,22 -6,18 Z',
+        'canine': 'M -6,-22 Q -8,-28 -4,-32 Q 0,-35 4,-32 Q 8,-28 6,-22 L 5,20 Q 3,25 0,28 Q -3,25 -5,20 Z',
+        'premolar': 'M -12,-18 Q -14,-22 -10,-25 Q -5,-27 0,-27 Q 5,-27 10,-25 Q 14,-22 12,-18 L 10,15 Q 8,20 4,22 Q 0,23 -4,22 Q -8,20 -10,15 Z',
+        'molar': 'M -15,-16 Q -18,-20 -14,-24 Q -8,-27 0,-28 Q 8,-27 14,-24 Q 18,-20 15,-16 L 13,18 Q 10,23 5,26 Q 0,28 -5,26 Q -10,23 -13,18 Z'
     };
     return shapes[type] || shapes['incisor'];
 }
@@ -110,21 +128,26 @@ function drawTooth(chart, position) {
     
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('class', 'tooth-group');
-    group.setAttribute('transform', `translate(${position.x},${position.y})`);
+    group.setAttribute('transform', `translate(${position.x},${position.y}) rotate(${position.rotation})`);
     group.style.cursor = 'pointer';
     
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('d', getToothPath(position.type));
     path.setAttribute('class', 'tooth-shape');
     path.setAttribute('fill', conditionColors[condition]);
-    path.setAttribute('stroke', '#1f2937');
-    path.setAttribute('stroke-width', '1.5');
+    path.setAttribute('stroke', '#ffffff');
+    path.setAttribute('stroke-width', '2');
     group.appendChild(path);
     
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', 0); text.setAttribute('y', 5); text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('font-size', '11'); text.setAttribute('font-weight', 'bold'); text.setAttribute('fill', '#fff');
-    text.setAttribute('class', 'tooth-label'); text.textContent = position.number;
+    text.setAttribute('x', 0);
+    text.setAttribute('y', 5);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '10');
+    text.setAttribute('font-weight', 'bold');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('class', 'tooth-label');
+    text.textContent = position.number;
     group.appendChild(text);
     
     group.addEventListener('click', () => showToothDetails(position.number, record));
@@ -141,22 +164,41 @@ function updateStatistics() {
 }
 
 function initializeDefaultLayout() {
-    if (!selectedUserId) return alert('Please select a patient first.');
+    if (!selectedUserId) {
+        alert('Please select a patient first.');
+        return;
+    }
     if (!confirm('Initialize default 32-tooth layout for this patient?')) return;
-    fetch(`/admin/tooth-records/initialize/${selectedUserId}`, { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
-        .then(response => response.json())
-        .then(data => { alert(data.message); loadTeethLayout(selectedUserId); })
-        .catch(error => { alert('Error initializing layout'); console.error(error); });
+    
+    fetch(`/admin/tooth-records/initialize/${selectedUserId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        loadTeethLayout(selectedUserId);
+    })
+    .catch(error => {
+        alert('Error initializing layout');
+        console.error(error);
+    });
 }
 
 function showToothDetails(toothNumber, record) {
-    currentToothId = record?.id; currentToothNumber = toothNumber;
+    currentToothId = record?.id;
+    currentToothNumber = toothNumber;
+    
     document.getElementById('modal-tooth-title').textContent = `Tooth #${toothNumber}`;
     document.getElementById('detail-number').textContent = toothNumber;
     document.getElementById('detail-quadrant').textContent = getQuadrantName(toothNumber);
     document.getElementById('detail-type').textContent = capitalizeFirst(getToothType(toothNumber));
     document.getElementById('detail-condition').textContent = capitalizeFirst(record?.condition?.replace('_', ' ') || 'healthy');
     document.getElementById('condition-select').value = record?.condition || 'healthy';
+    
     loadToothNotes(record?.id);
     document.getElementById('tooth-detail-modal').classList.add('show');
 }
@@ -175,11 +217,17 @@ function getQuadrantValue(number) {
     return 'lower_right';
 }
 
-function capitalizeFirst(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 function loadToothNotes(toothRecordId) {
     const container = document.getElementById('notes-container');
-    if (!toothRecordId) return container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>';
+    if (!toothRecordId) {
+        container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>';
+        return;
+    }
+    
     fetch(`/admin/tooth-records/${toothRecordId}/notes`)
         .then(response => response.json())
         .then(data => {
@@ -193,9 +241,13 @@ function loadToothNotes(toothRecordId) {
                         <div class="note-content">${note.content}</div>
                     </div>
                 `).join('');
-            } else container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>';
+            } else {
+                container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>';
+            }
         })
-        .catch(() => container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>');
+        .catch(() => {
+            container.innerHTML = '<p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>';
+        });
 }
 
 function closeToothModal() {
@@ -208,39 +260,84 @@ function saveToothChanges() {
     const condition = document.getElementById('condition-select').value;
     const noteContent = document.getElementById('note-content').value.trim();
     const noteType = document.getElementById('note-type-select').value;
-    if (!selectedUserId || !currentToothNumber) return alert('Please select a patient and tooth first');
+    
+    if (!selectedUserId || !currentToothNumber) {
+        alert('Please select a patient and tooth first');
+        return;
+    }
     
     const data = {
-        user_id: selectedUserId, tooth_number: currentToothNumber, condition: condition,
-        quadrant: getQuadrantValue(currentToothNumber), tooth_type: getToothType(currentToothNumber),
-        color_code: conditionColors[condition], is_missing: condition === 'missing',
-        note_content: noteContent, note_type: noteType
+        user_id: selectedUserId,
+        tooth_number: currentToothNumber,
+        condition: condition,
+        quadrant: getQuadrantValue(currentToothNumber),
+        tooth_type: getToothType(currentToothNumber),
+        color_code: conditionColors[condition],
+        is_missing: condition === 'missing',
+        note_content: noteContent,
+        note_type: noteType
     };
     
     fetch('/admin/tooth-records/update', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
         body: JSON.stringify(data)
     })
-    .then(response => { if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); return response.json(); })
-    .then(result => { alert(result.message || 'Changes saved successfully!'); closeToothModal(); loadTeethLayout(selectedUserId); })
-    .catch(error => { alert('Error saving changes: ' + error.message); console.error(error); });
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+    })
+    .then(result => {
+        alert(result.message || 'Changes saved successfully!');
+        closeToothModal();
+        loadTeethLayout(selectedUserId);
+    })
+    .catch(error => {
+        alert('Error saving changes: ' + error.message);
+        console.error(error);
+    });
 }
 
 function markToothAsMissing() {
-    if (!currentToothId) { document.getElementById('condition-select').value = 'missing'; return saveToothChanges(); }
+    if (!currentToothId) {
+        document.getElementById('condition-select').value = 'missing';
+        saveToothChanges();
+        return;
+    }
+    
     if (!confirm('Are you sure you want to mark this tooth as missing?')) return;
+    
     fetch(`/admin/tooth-records/${currentToothId}/mark-missing`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
     })
-    .then(response => { if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); return response.json(); })
-    .then(result => { alert(result.message || 'Tooth marked as missing!'); closeToothModal(); loadTeethLayout(selectedUserId); })
-    .catch(error => { alert('Error marking tooth as missing: ' + error.message); console.error(error); });
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
+    })
+    .then(result => {
+        alert(result.message || 'Tooth marked as missing!');
+        closeToothModal();
+        loadTeethLayout(selectedUserId);
+    })
+    .catch(error => {
+        alert('Error marking tooth as missing: ' + error.message);
+        console.error(error);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('tooth-detail-modal');
-    if (modal) modal.addEventListener('click', function(e) { if (e.target === modal) closeToothModal(); });
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeToothModal();
+        });
+    }
 });
 </script>
