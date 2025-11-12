@@ -144,6 +144,20 @@
     Route::middleware(['auth', AdminMiddleware::class])->group(function () {
         Route::get('/admin/pending-appointments', [AdminController::class, 'upcomingAppointments'])->name('admin.upcoming_appointments');
         Route::get('/admin/upcoming-appointments', [AdminController::class, 'acceptedAppointments'])->name('admin.appointments');
+        
+        // Database Backup Routes
+        Route::get('/admin/database-backup', [\App\Http\Controllers\DatabaseBackupController::class, 'index'])->name('admin.database.backup');
+        Route::post('/admin/database-backup/create', [\App\Http\Controllers\DatabaseBackupController::class, 'create'])->name('admin.database.backup.create');
+        Route::get('/admin/database-backup/download/{filename}', [\App\Http\Controllers\DatabaseBackupController::class, 'download'])->name('admin.database.backup.download');
+        Route::delete('/admin/database-backup/delete/{filename}', [\App\Http\Controllers\DatabaseBackupController::class, 'delete'])->name('admin.database.backup.delete');
+        
+        // Activity Logs Routes
+        Route::get('/admin/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('admin.activity.logs');
+        Route::post('/admin/activity-logs/clear', [\App\Http\Controllers\ActivityLogController::class, 'clearOldLogs'])->name('admin.activity.logs.clear');
+        Route::get('/admin/activity-logs/export', [\App\Http\Controllers\ActivityLogController::class, 'export'])->name('admin.activity.logs.export');
+        
+        // Security Settings Route
+        Route::get('/admin/security-settings', [AdminController::class, 'securitySettings'])->name('admin.security.settings');
 
     //decline and accept in appoitnments
         Route::post('/appointments/{id}/accept', [AppointmentController::class, 'accept'])->name('appointments.accept');
