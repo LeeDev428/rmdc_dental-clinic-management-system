@@ -18,7 +18,6 @@
     use App\Http\Controllers\Admin\ReviewController;
     use App\Http\Controllers\DashboardController;
     use App\Http\Controllers\WelcomeController;
-    use App\Http\Controllers\Admin\TeethLayoutController;
     use App\Http\Controllers\Admin\ToothRecordController;
     use App\Http\Controllers\Auth\CaptchaController;
     use App\Http\Controllers\DentalRecordController;
@@ -330,17 +329,8 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
 
 
  Route::prefix('admin')->group(function () {
-    // Old Teeth Layout Routes (legacy)
-    Route::get('/teeth-layout', [TeethLayoutController::class, 'index'])->name('admin.teeth_layout');
-    Route::get('/teeth-layout/{userId}', [TeethLayoutController::class, 'getTeethLayout']);
-    Route::post('/teeth-layout/add', [TeethLayoutController::class, 'addTooth']);
-    Route::delete('/teeth-layout/remove/{toothId}', [TeethLayoutController::class, 'removeTooth']);
-    Route::post('/teeth-layout/initialize/{userId}', [TeethLayoutController::class, 'initializeTeethLayout']);
-    Route::post('/teeth-layout/save/{userId}', [TeethLayoutController::class, 'saveTeethLayout']);
-    Route::post('/teeth-layout/update-position/{toothId}', [TeethLayoutController::class, 'updateToothPosition']);
-    
-    // New Professional Teeth Layout Routes (ToothRecord system)
-    Route::get('/teeth-layout-v2', [ToothRecordController::class, 'index'])->name('admin.teeth_layout_v2');
+    // Teeth Layout Management Routes
+    Route::get('/teeth-layout', [ToothRecordController::class, 'index'])->name('admin.teeth_layout');
     Route::get('/teeth-layout/records/{userId}', [ToothRecordController::class, 'getRecords']);
     Route::post('/tooth-records/initialize/{userId}', [ToothRecordController::class, 'initializeLayout']);
     Route::post('/tooth-records/update', [ToothRecordController::class, 'updateRecord']);
@@ -352,8 +342,6 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::post('/tooth-records/{toothRecordId}/upload-image', [ToothRecordController::class, 'uploadImage']);
     Route::get('/tooth-records/{toothRecordId}/images', [ToothRecordController::class, 'getImages']);
 });
-
-Route::get('/user/teeth-layout', [TeethLayoutController::class, 'getUserTeethLayout']);
 
 // Old PayMongo Controller routes commented out - now using session-based PaymentController
 // use App\Http\Controllers\PayMongoController;
