@@ -60,22 +60,13 @@
     <div class="content-card">
         <div class="chart-title">Interactive Dental Chart</div>
         <div class="dental-chart">
-            <svg id="teeth-chart" viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 500px; height: auto;">
-                <!-- Upper Arch - U-shaped gum -->
-                <path d="M 80,180 Q 80,80 250,80 Q 420,80 420,180 L 420,220 Q 420,240 400,240 L 100,240 Q 80,240 80,220 Z" 
-                      fill="#f48fb1" stroke="none"/>
-                <path d="M 100,200 Q 100,100 250,100 Q 400,100 400,200" 
-                      fill="#f8a5c2" stroke="none"/>
-                
-                <!-- Lower Arch - U-shaped gum -->
-                <path d="M 80,520 Q 80,620 250,620 Q 420,620 420,520 L 420,480 Q 420,460 400,460 L 100,460 Q 80,460 80,480 Z" 
-                      fill="#f48fb1" stroke="none"/>
-                <path d="M 100,500 Q 100,600 250,600 Q 400,600 400,500" 
-                      fill="#f8a5c2" stroke="none"/>
-                
-                <!-- Labels -->
-                <text x="430" y="150" fill="#9ca3af" font-size="14" font-weight="600">Upper Arch</text>
-                <text x="430" y="550" fill="#9ca3af" font-size="14" font-weight="600">Lower Arch</text>
+            <svg id="teeth-chart" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 600px;">
+                <line x1="400" y1="50" x2="400" y2="550" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
+                <line x1="100" y1="300" x2="700" y2="300" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
+                <text x="250" y="80" class="quadrant-label">Upper Right (1-8)</text>
+                <text x="480" y="80" class="quadrant-label">Upper Left (9-16)</text>
+                <text x="480" y="540" class="quadrant-label">Lower Left (17-24)</text>
+                <text x="230" y="540" class="quadrant-label">Lower Right (25-32)</text>
             </svg>
         </div>
         <div class="action-buttons">
