@@ -19,6 +19,7 @@
     use App\Http\Controllers\DashboardController;
     use App\Http\Controllers\WelcomeController;
     use App\Http\Controllers\Admin\TeethLayoutController;
+    use App\Http\Controllers\Admin\ToothRecordController;
     use App\Http\Controllers\Auth\CaptchaController;
     use App\Http\Controllers\DentalRecordController;
     use App\Http\Controllers\PatientDentalRecordController;
@@ -329,12 +330,27 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
 
 
  Route::prefix('admin')->group(function () {
+    // Old Teeth Layout Routes (legacy)
     Route::get('/teeth-layout', [TeethLayoutController::class, 'index'])->name('admin.teeth_layout');
     Route::get('/teeth-layout/{userId}', [TeethLayoutController::class, 'getTeethLayout']);
     Route::post('/teeth-layout/add', [TeethLayoutController::class, 'addTooth']);
     Route::delete('/teeth-layout/remove/{toothId}', [TeethLayoutController::class, 'removeTooth']);
     Route::post('/teeth-layout/initialize/{userId}', [TeethLayoutController::class, 'initializeTeethLayout']);
     Route::post('/teeth-layout/save/{userId}', [TeethLayoutController::class, 'saveTeethLayout']);
+    Route::post('/teeth-layout/update-position/{toothId}', [TeethLayoutController::class, 'updateToothPosition']);
+    
+    // New Professional Teeth Layout Routes (ToothRecord system)
+    Route::get('/teeth-layout-v2', [ToothRecordController::class, 'index'])->name('admin.teeth_layout_v2');
+    Route::get('/teeth-layout/records/{userId}', [ToothRecordController::class, 'getRecords']);
+    Route::post('/tooth-records/initialize/{userId}', [ToothRecordController::class, 'initializeLayout']);
+    Route::post('/tooth-records/update', [ToothRecordController::class, 'updateRecord']);
+    Route::get('/tooth-records/{toothRecordId}/notes', [ToothRecordController::class, 'getNotes']);
+    Route::post('/tooth-records/{toothRecordId}/notes', [ToothRecordController::class, 'addNote']);
+    Route::get('/tooth-records/statistics/{userId}', [ToothRecordController::class, 'getStatistics']);
+    Route::post('/tooth-records/update-positions', [ToothRecordController::class, 'updatePositions']);
+    Route::put('/tooth-records/{toothRecordId}/mark-missing', [ToothRecordController::class, 'markAsMissing']);
+    Route::post('/tooth-records/{toothRecordId}/upload-image', [ToothRecordController::class, 'uploadImage']);
+    Route::get('/tooth-records/{toothRecordId}/images', [ToothRecordController::class, 'getImages']);
 });
 
 Route::get('/user/teeth-layout', [TeethLayoutController::class, 'getUserTeethLayout']);
