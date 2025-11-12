@@ -24,7 +24,6 @@
                 </div>
             </div>
 
-            <!-- Edit Condition Form -->
             <div class="form-group">
                 <label class="form-label">Change Condition:</label>
                 <select id="condition-select" class="form-select">
@@ -39,14 +38,12 @@
                 </select>
             </div>
 
-            <!-- Notes Section -->
             <div class="notes-section">
                 <div class="section-title">Clinical Notes</div>
                 <div id="notes-container">
                     <p style="color: #6b7280; text-align: center; font-size: 13px;">No notes available</p>
                 </div>
                 
-                <!-- Add Note Form -->
                 <div class="form-group" style="margin-top: 12px;">
                     <label class="form-label">Add New Note:</label>
                     <select id="note-type-select" class="form-select" style="margin-bottom: 8px;">
