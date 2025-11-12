@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('type', 50)->index(); // login, logout, create, update, delete, etc.
+            $table->text('description');
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->json('data')->nullable(); // Additional data
             $table->timestamps();
+            
+            // Index for faster queries
+            $table->index('created_at');
         });
     }
 
