@@ -60,18 +60,18 @@
     <div class="content-card">
         <div class="chart-title">Interactive Dental Chart</div>
         <div class="dental-chart">
-            <svg id="teeth-chart" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 600px; height: auto;">
+            <svg id="teeth-chart" viewBox="0 0 700 900" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 700px; height: auto;">
                 <!-- Upper Arch Background -->
-                <ellipse cx="300" cy="200" rx="200" ry="120" fill="#e91e63" opacity="0.3"/>
-                <ellipse cx="300" cy="200" rx="160" ry="90" fill="#f48fb1" opacity="0.5"/>
+                <ellipse cx="350" cy="230" rx="280" ry="140" fill="#f8bbd0" opacity="0.6"/>
+                <ellipse cx="350" cy="230" rx="240" ry="110" fill="#f48fb1" opacity="0.4"/>
                 
                 <!-- Lower Arch Background -->
-                <ellipse cx="300" cy="600" rx="200" ry="120" fill="#e91e63" opacity="0.3"/>
-                <ellipse cx="300" cy="600" rx="160" ry="90" fill="#f48fb1" opacity="0.5"/>
+                <ellipse cx="350" cy="670" rx="280" ry="140" fill="#f8bbd0" opacity="0.6"/>
+                <ellipse cx="350" cy="670" rx="240" ry="110" fill="#f48fb1" opacity="0.4"/>
                 
-                <!-- Arch Labels -->
-                <text x="500" y="200" class="quadrant-label" font-size="20" font-weight="bold">Upper Arch</text>
-                <text x="500" y="600" class="quadrant-label" font-size="20" font-weight="bold">Lower Arch</text>
+                <!-- Labels -->
+                <text x="600" y="230" fill="#9ca3af" font-size="16" font-weight="600">Upper Arch</text>
+                <text x="600" y="670" fill="#9ca3af" font-size="16" font-weight="600">Lower Arch</text>
             </svg>
         </div>
         <div class="action-buttons">
