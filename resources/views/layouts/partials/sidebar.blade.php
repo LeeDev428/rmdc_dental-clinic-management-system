@@ -108,9 +108,9 @@ function updateSidebarPendingCount() {
             let count = response.pendingCount;
             let badge = $("#sidebarPendingApptBadge");
             if (count > 0) {
-                badge.text(count).removeClass("bg-secondary").addClass("bg-danger");
+                badge.text(count).removeClass("bg-secondary").addClass("bg-success");
             } else {
-                badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
+                badge.text("0").removeClass("bg-success").addClass("bg-secondary");
             }
         }
     });
