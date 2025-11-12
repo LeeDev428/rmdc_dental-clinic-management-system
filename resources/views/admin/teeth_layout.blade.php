@@ -731,22 +731,13 @@ function getToothType(number) {
 }
 
 function getToothPath(type) {
-    switch (type) {
-        case 'incisor':
-            // Rectangular front tooth
-            return 'M -8,-20 L 8,-20 L 6,20 L -6,20 Z';
-        case 'canine':
-            // Pointed tooth
-            return 'M 0,-22 L 8,-18 L 6,20 L -6,20 L -8,-18 Z';
-        case 'premolar':
-            // Medium rounded tooth
-            return 'M -10,-18 Q -12,-22 -6,-24 L 6,-24 Q 12,-22 10,-18 L 8,18 Q 0,22 -8,18 Z';
-        case 'molar':
-            // Large square tooth
-            return 'M -14,-20 L -10,-24 L 10,-24 L 14,-20 L 12,20 L 8,24 L -8,24 L -12,20 Z';
-        default:
-            return 'M -8,-20 L 8,-20 L 6,20 L -6,20 Z';
-    }
+    const toothShapes = {
+        'incisor': 'M -10,-15 Q 0,-20 10,-15 L 8,20 Q 0,25 -8,20 Z',
+        'canine': 'M -8,-18 Q 0,-25 8,-18 L 6,22 Q 0,28 -6,22 Z',
+        'premolar': 'M -12,-12 Q -15,-18 -8,-20 Q 0,-22 8,-20 Q 15,-18 12,-12 L 10,15 Q 0,20 -10,15 Z',
+        'molar': 'M -18,-15 Q -20,-20 -10,-22 Q 0,-24 10,-22 Q 20,-20 18,-15 L 15,18 Q 0,25 -15,18 Z'
+    };
+    return toothShapes[type] || toothShapes['incisor'];
 }
 
 function drawTooth(chart, position) {
@@ -847,8 +838,10 @@ function loadToothNotes(toothRecordId) {
 }
 
 function closeToothModal() {
+    console.log('Closing modal');
     document.getElementById('tooth-detail-modal').classList.remove('show');
     document.getElementById('note-content').value = '';
+    document.getElementById('note-type-select').value = 'treatment';
 }
 
 function saveToothChanges() {
@@ -856,7 +849,16 @@ function saveToothChanges() {
     const noteContent = document.getElementById('note-content').value.trim();
     const noteType = document.getElementById('note-type-select').value;
     
-    if (!selectedUserId || !currentToothNumber) return;
+    console.log('Save button clicked');
+    console.log('Selected User ID:', selectedUserId);
+    console.log('Current Tooth Number:', currentToothNumber);
+    console.log('Condition:', condition);
+    console.log('Note Content:', noteContent);
+    
+    if (!selectedUserId || !currentToothNumber) {
+        alert('Please select a patient and tooth first');
+        return;
+    }
     
     const data = {
         user_id: selectedUserId,
@@ -870,6 +872,8 @@ function saveToothChanges() {
         note_type: noteType
     };
     
+    console.log('Sending data:', data);
+    
     fetch('/admin/tooth-records/update', {
         method: 'POST',
         headers: {
@@ -878,21 +882,32 @@ function saveToothChanges() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(result => {
+        console.log('Success result:', result);
         alert(result.message || 'Changes saved successfully!');
         closeToothModal();
         loadTeethLayout(selectedUserId);
     })
     .catch(error => {
-        alert('Error saving changes');
-        console.error(error);
+        console.error('Save error:', error);
+        alert('Error saving changes: ' + error.message);
     });
 }
 
 function markToothAsMissing() {
+    console.log('Mark as Missing clicked');
+    console.log('Current Tooth ID:', currentToothId);
+    
     if (!currentToothId) {
         // If no record exists yet, change condition to missing and save
+        console.log('No tooth record exists, setting condition to missing');
         document.getElementById('condition-select').value = 'missing';
         saveToothChanges();
         return;
@@ -907,15 +922,22 @@ function markToothAsMissing() {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Mark missing response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(result => {
+        console.log('Mark missing success:', result);
         alert(result.message || 'Tooth marked as missing!');
         closeToothModal();
         loadTeethLayout(selectedUserId);
     })
     .catch(error => {
-        alert('Error marking tooth as missing');
-        console.error(error);
+        console.error('Mark missing error:', error);
+        alert('Error marking tooth as missing: ' + error.message);
     });
 }
 
@@ -960,5 +982,15 @@ function updateStatistics() {
     document.getElementById('stat-healthy').textContent = healthy;
     document.getElementById('stat-treatment').textContent = treatment;
 }
+
+// Close modal when clicking outside of it
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('tooth-detail-modal');
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeToothModal();
+        }
+    });
+});
 </script>
 @endsection
