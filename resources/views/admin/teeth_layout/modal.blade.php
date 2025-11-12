@@ -1,8 +1,8 @@
-<div id="tooth-detail-modal" class="modal">
-    <div class="modal-dialog">
+<div id="tooth-detail-modal" class="modal" onclick="if(event.target === this) closeToothModal();">
+    <div class="modal-dialog" onclick="event.stopPropagation();">
         <div class="modal-header">
             <h5 class="modal-title" id="modal-tooth-title">Tooth Details</h5>
-            <button type="button" class="close" onclick="closeToothModal()">&times;</button>
+            <button type="button" class="close" onclick="event.preventDefault(); closeToothModal();">&times;</button>
         </div>
         <div class="modal-body">
             <div class="detail-grid">
@@ -26,7 +26,7 @@
 
             <div class="form-group">
                 <label class="form-label">Change Condition:</label>
-                <select id="condition-select" class="form-select">
+                <select id="condition-select" class="form-select" onchange="console.log('Condition changed to:', this.value)">
                     <option value="healthy">Healthy</option>
                     <option value="watch">Watch/Monitor</option>
                     <option value="cavity">Cavity</option>
@@ -57,9 +57,9 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-danger" onclick="markToothAsMissing()">Mark as Missing</button>
-            <button type="button" class="btn btn-secondary" onclick="closeToothModal()">Cancel</button>
-            <button type="button" class="btn btn-primary" onclick="saveToothChanges()">Save Changes</button>
+            <button type="button" class="btn btn-danger" onclick="event.preventDefault(); markToothAsMissing();">Mark as Missing</button>
+            <button type="button" class="btn btn-secondary" onclick="event.preventDefault(); closeToothModal();">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="event.preventDefault(); saveToothChanges();">Save Changes</button>
         </div>
     </div>
 </div>
