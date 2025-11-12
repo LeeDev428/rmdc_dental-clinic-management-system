@@ -20,6 +20,7 @@
             <a class="nav-link" href="{{ route('admin.appointments') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-calendar"></i></div>
                 Upcoming Appointments
+                <span id="sidebarAcceptedApptBadge" class="badge bg-secondary ms-2">0</span>
             </a>
             <a class="nav-link" href="{{ route('admin.upcoming_appointments') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-clock"></i></div>
@@ -45,6 +46,20 @@
             <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                 Service Feedbacks
+            </a>
+
+            <div class="sb-sidenav-menu-heading">Security & Backup</div>
+            <a class="nav-link" href="{{ route('admin.database.backup') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
+                Database Backup
+            </a>
+            <a class="nav-link" href="{{ route('admin.activity.logs') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-history"></i></div>
+                Activity Logs
+            </a>
+            <a class="nav-link" href="{{ route('admin.security.settings') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
+                Security Settings
             </a>
 
             <div class="sb-sidenav-menu-heading">Interface</div>
@@ -101,15 +116,34 @@ function updateSidebarPendingCount() {
     });
 }
 
+// Update accepted appointments badge in sidebar
+function updateSidebarAcceptedCount() {
+    $.ajax({
+        url: "{{ route('notifications.accepted-count') }}",
+        method: "GET",
+        success: function(response) {
+            let count = response.acceptedCount;
+            let badge = $("#sidebarAcceptedApptBadge");
+            if (count > 0) {
+                badge.text(count).removeClass("bg-secondary").addClass("bg-success");
+            } else {
+                badge.text("0").removeClass("bg-success").addClass("bg-secondary");
+            }
+        }
+    });
+}
+
 $(document).ready(function() {
     // Initialize badges
     updateSidebarUnreadMessagesCount();
     updateSidebarPendingCount();
+    updateSidebarAcceptedCount();
 
     // Refresh counts every 30 seconds
     setInterval(function() {
         updateSidebarUnreadMessagesCount();
         updateSidebarPendingCount();
+        updateSidebarAcceptedCount();
     }, 30000);
 });
 </script>
