@@ -21,7 +21,7 @@ class ToothRecordController extends Controller
     public function index()
     {
         $users = User::where('usertype', 'user')->orderBy('name')->get();
-        return view('admin.teeth_layout_v2', compact('users'));
+        return view('admin.teeth_layout', compact('users'));
     }
 
     /**
