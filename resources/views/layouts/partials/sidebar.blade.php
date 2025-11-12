@@ -40,12 +40,8 @@
                 Dental Prices
             </a>
             <a class="nav-link" href="{{ route('admin.teeth_layout') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-teeth"></i></div>
-                Teeth Layout (Legacy)
-            </a>
-            <a class="nav-link" href="{{ route('admin.teeth_layout_v2') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-tooth"></i></div>
-                Professional Teeth Chart
+                Teeth Layout Management
             </a>
             <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
