@@ -60,13 +60,18 @@
     <div class="content-card">
         <div class="chart-title">Interactive Dental Chart</div>
         <div class="dental-chart">
-            <svg id="teeth-chart" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 600px;">
-                <line x1="400" y1="50" x2="400" y2="550" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
-                <line x1="100" y1="300" x2="700" y2="300" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
-                <text x="250" y="80" class="quadrant-label">Upper Right (1-8)</text>
-                <text x="480" y="80" class="quadrant-label">Upper Left (9-16)</text>
-                <text x="480" y="540" class="quadrant-label">Lower Left (17-24)</text>
-                <text x="230" y="540" class="quadrant-label">Lower Right (25-32)</text>
+            <svg id="teeth-chart" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 600px; height: auto;">
+                <!-- Upper Arch Background -->
+                <ellipse cx="300" cy="200" rx="200" ry="120" fill="#e91e63" opacity="0.3"/>
+                <ellipse cx="300" cy="200" rx="160" ry="90" fill="#f48fb1" opacity="0.5"/>
+                
+                <!-- Lower Arch Background -->
+                <ellipse cx="300" cy="600" rx="200" ry="120" fill="#e91e63" opacity="0.3"/>
+                <ellipse cx="300" cy="600" rx="160" ry="90" fill="#f48fb1" opacity="0.5"/>
+                
+                <!-- Arch Labels -->
+                <text x="500" y="200" class="quadrant-label" font-size="20" font-weight="bold">Upper Arch</text>
+                <text x="500" y="600" class="quadrant-label" font-size="20" font-weight="bold">Lower Arch</text>
             </svg>
         </div>
         <div class="action-buttons">
