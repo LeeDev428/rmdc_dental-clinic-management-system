@@ -3,7 +3,24 @@
 @section('title', 'Teeth Layout Management')
 
 @section('content')
-<style>
+@include('admin.teeth_layout.styles')
+
+<div class="page-header">
+    <h2 class="page-title">Teeth Layout Management</h2>
+</div>
+
+@include('admin.teeth_layout.search', ['users' => $users])
+
+<div id="teeth-layout-container" class="d-none">
+    @include('admin.teeth_layout.chart')
+</div>
+
+@include('admin.teeth_layout.modal')
+
+@include('admin.teeth_layout.scripts')
+@include('admin.teeth_layout.modal-functions')
+
+@endsection
     .page-header {
         background-color: #fff;
         padding: 24px;
