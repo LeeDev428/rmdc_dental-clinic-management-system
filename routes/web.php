@@ -133,6 +133,7 @@
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/pending-count', [AdminController::class, 'getPendingCount'])->name('notifications.pending-count');
+    Route::get('/notifications/accepted-count', [AdminController::class, 'getAcceptedCount'])->name('notifications.accepted-count');
     //realtime notifications in users
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
     Route::get('/notifications/fetch', [AdminAppointment::class, 'fetchNotifications'])->name('notifications.fetch');
