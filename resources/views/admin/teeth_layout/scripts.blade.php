@@ -39,52 +39,25 @@ function loadTeethLayout(userId) {
 
 function renderTeethChart() {
     const chart = document.getElementById('teeth-chart');
-    if (!chart) {
-        console.error('Teeth chart SVG element not found!');
-        return;
-    }
-    
-    // Remove existing teeth
     chart.querySelectorAll('.tooth-group').forEach(e => e.remove());
-    
-    // Calculate and draw all teeth
-    const positions = calculateToothPositions();
-    console.log(`Drawing ${positions.length} teeth...`);
-    
-    positions.forEach((pos, index) => {
-        try {
-            drawTooth(chart, pos);
-        } catch (error) {
-            console.error(`Error drawing tooth ${pos.number}:`, error);
-        }
-    });
-    
-    console.log(`Successfully rendered ${chart.querySelectorAll('.tooth-group').length} teeth`);
+    calculateToothPositions().forEach(pos => drawTooth(chart, pos));
 }
 
 function calculateToothPositions() {
     const positions = [];
-    // Adjusted for 800x600 viewBox
-    const radiusX = 280, radiusY = 160;
+    const radiusX = 280, radiusY = 150;
     const centerX = 400, centerY = 300;
-    const upperY = 160, lowerY = 440;
-    
-    // Spacing adjustments for different tooth types
-    const spacing = [0, 0.8, 1.6, 2.5, 3.5, 4.6, 5.9, 7.3]; // Custom spacing for natural arch
+    const upperY = 150, lowerY = 450;
     
     // Upper Right (1-8) - right side arc
     for (let i = 0; i < 8; i++) {
-        const progress = spacing[i] / 7.3;
-        const angle = Math.PI * (0.5 - (progress * 0.45)); // 0.45 for better arc
+        const angle = Math.PI * (0.5 - (i / 14)); // Angle from right to center
         const x = centerX + radiusX * Math.cos(angle);
         const y = upperY - radiusY * Math.sin(angle);
-        const rotation = -angle * (180 / Math.PI) + 90; // Perpendicular to arc
-        
         positions.push({
             number: i + 1,
             x: x,
             y: y,
-            rotation: rotation,
             type: getToothType(i + 1),
             quadrant: 'upper_right'
         });
@@ -92,17 +65,13 @@ function calculateToothPositions() {
     
     // Upper Left (9-16) - left side arc
     for (let i = 0; i < 8; i++) {
-        const progress = spacing[i] / 7.3;
-        const angle = Math.PI * (0.5 + (progress * 0.45));
+        const angle = Math.PI * (0.5 + (i / 14)); // Angle from center to left
         const x = centerX + radiusX * Math.cos(angle);
         const y = upperY - radiusY * Math.sin(angle);
-        const rotation = -angle * (180 / Math.PI) + 90;
-        
         positions.push({
             number: i + 9,
             x: x,
             y: y,
-            rotation: rotation,
             type: getToothType(i + 9),
             quadrant: 'upper_left'
         });
@@ -110,17 +79,13 @@ function calculateToothPositions() {
     
     // Lower Left (17-24) - left side arc
     for (let i = 0; i < 8; i++) {
-        const progress = spacing[i] / 7.3;
-        const angle = Math.PI * (0.5 + (progress * 0.45));
+        const angle = Math.PI * (0.5 + (i / 14));
         const x = centerX + radiusX * Math.cos(angle);
         const y = lowerY + radiusY * Math.sin(angle);
-        const rotation = -angle * (180 / Math.PI) - 90;
-        
         positions.push({
             number: i + 17,
             x: x,
             y: y,
-            rotation: rotation,
             type: getToothType(i + 17),
             quadrant: 'lower_left'
         });
@@ -128,23 +93,18 @@ function calculateToothPositions() {
     
     // Lower Right (25-32) - right side arc
     for (let i = 0; i < 8; i++) {
-        const progress = spacing[i] / 7.3;
-        const angle = Math.PI * (0.5 - (progress * 0.45));
+        const angle = Math.PI * (0.5 - (i / 14));
         const x = centerX + radiusX * Math.cos(angle);
         const y = lowerY + radiusY * Math.sin(angle);
-        const rotation = -angle * (180 / Math.PI) - 90;
-        
         positions.push({
             number: i + 25,
             x: x,
             y: y,
-            rotation: rotation,
             type: getToothType(i + 25),
             quadrant: 'lower_right'
         });
     }
     
-    console.log(`Calculated ${positions.length} tooth positions`);
     return positions;
 }
 
@@ -184,13 +144,9 @@ function drawTooth(chart, position) {
     
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.setAttribute('class', 'tooth-group');
-    
-    // Apply translation and rotation
-    const rotation = position.rotation || 0;
-    group.setAttribute('transform', `translate(${position.x},${position.y}) rotate(${rotation})`);
+    group.setAttribute('transform', `translate(${position.x},${position.y})`);
     group.setAttribute('data-tooth-number', position.number);
     group.style.cursor = 'pointer';
-    group.style.transformOrigin = 'center';
     
     // Create gradient for 3D effect
     const gradientId = `gradient-${position.number}`;
@@ -225,25 +181,15 @@ function drawTooth(chart, position) {
     path.setAttribute('filter', 'drop-shadow(2px 2px 3px rgba(0,0,0,0.3))');
     group.appendChild(path);
     
-    // Add tooth number label - adjust font size based on tooth type
-    const fontSize = position.type === 'molar' ? '11' : position.type === 'incisor' ? '10' : '10.5';
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', 0);
-    text.setAttribute('y', 3);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('font-size', fontSize);
-    text.setAttribute('font-weight', 'bold');
-    text.setAttribute('fill', '#fff');
-    text.setAttribute('class', 'tooth-label');
-    text.setAttribute('style', 'text-shadow: 1px 1px 2px rgba(0,0,0,0.6);');
+    text.setAttribute('x', 0); text.setAttribute('y', 5); text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '12'); text.setAttribute('font-weight', 'bold'); text.setAttribute('fill', '#fff');
+    text.setAttribute('class', 'tooth-label'); 
+    text.setAttribute('style', 'text-shadow: 1px 1px 2px rgba(0,0,0,0.5);');
     text.textContent = position.number;
     group.appendChild(text);
     
-    group.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showToothDetails(position.number, record);
-    });
-    
+    group.addEventListener('click', () => showToothDetails(position.number, record));
     chart.appendChild(group);
 }
 
@@ -426,73 +372,14 @@ function markToothAsMissing() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Teeth layout page loaded');
     
-    // Modal event handlers
-    const modal = document.getElementById('tooth-detail-modal');
-    const backdrop = modal.querySelector('.modal-backdrop');
-    const closeBtn = document.getElementById('modal-close-btn');
-    const cancelBtn = document.getElementById('btn-cancel');
-    const saveBtn = document.getElementById('btn-save');
-    const markMissingBtn = document.getElementById('btn-mark-missing');
-    
-    // Close modal when clicking backdrop only
-    if (backdrop) {
-        backdrop.addEventListener('click', function(e) {
-            e.stopPropagation();
-            closeToothModal();
-        });
-    }
-    
-    // Close button
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeToothModal();
-        });
-    }
-    
-    // Cancel button
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            closeToothModal();
-        });
-    }
-    
-    // Save button
-    if (saveBtn) {
-        saveBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            saveToothChanges();
-        });
-    }
-    
-    // Mark missing button
-    if (markMissingBtn) {
-        markMissingBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            markToothAsMissing();
-        });
-    }
-    
-    // ESC key to close modal
+    // Add keyboard shortcut to close modal (ESC key)
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
+            const modal = document.getElementById('tooth-detail-modal');
             if (modal && modal.classList.contains('show')) {
                 closeToothModal();
             }
         }
     });
-    
-    // Prevent modal dialog clicks from closing
-    const modalDialog = modal.querySelector('.modal-dialog');
-    if (modalDialog) {
-        modalDialog.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    }
 });
 </script>
