@@ -19,9 +19,10 @@
 .stat-label { font-size: 12px; color: #6b7280; margin-top: 4px; font-weight: 500; }
 .chart-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e0e0e0; }
 .dental-chart { width: 100%; max-width: 800px; margin: 0 auto; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; }
-.tooth-group { cursor: pointer; }
-.tooth-group:hover .tooth-shape { opacity: 0.8; }
-.tooth-shape { transition: opacity 0.2s; }
+.tooth-group { cursor: pointer; transition: transform 0.2s ease; }
+.tooth-group:hover { transform: scale(1.15) !important; }
+.tooth-group:hover .tooth-shape { filter: brightness(1.1) drop-shadow(3px 3px 5px rgba(0,0,0,0.4)); }
+.tooth-shape { transition: all 0.2s ease; }
 .tooth-label { font-weight: 600; pointer-events: none; user-select: none; }
 .quadrant-label { font-size: 14px; font-weight: 600; fill: #9ca3af; }
 .legend-section { background: #f8f9fa; padding: 16px; border-radius: 6px; margin-bottom: 24px; }
