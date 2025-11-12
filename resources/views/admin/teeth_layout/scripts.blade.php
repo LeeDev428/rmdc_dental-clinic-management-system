@@ -65,14 +65,22 @@ function renderTeethChart() {
 
 function calculateToothPositions() {
     const positions = [];
-    const centerX = 300, upperCenterY = 200, lowerCenterY = 600;
-    const radiusX = 180, radiusY = 100;
+    const centerX = 350;
+    const upperArchY = 230;
+    const lowerArchY = 670;
+    const radiusX = 240;
+    const radiusY = 110;
     
-    // Upper Arch (teeth 1-16) - arranged in oval from right to left
+    // Upper Arch - Teeth 1-16 (right to left, only upper semicircle)
     for (let i = 0; i < 16; i++) {
-        const angle = Math.PI * (1 - i / 15); // Right to left
+        const t = i / 15; // 0 to 1
+        const angle = Math.PI - (t * Math.PI); // π to 0 (right to left)
+        
         const x = centerX + radiusX * Math.cos(angle);
-        const y = upperCenterY - radiusY * Math.sin(angle);
+        const y = upperArchY - Math.abs(radiusY * Math.sin(angle));
+        
+        // Calculate rotation to face outward from arch
+        const rotation = -((angle * 180 / Math.PI) - 90);
         
         positions.push({
             number: i + 1,
@@ -80,15 +88,20 @@ function calculateToothPositions() {
             y: y,
             type: getToothType(i + 1),
             quadrant: i < 8 ? 'upper_right' : 'upper_left',
-            rotation: (angle * 180 / Math.PI) - 90
+            rotation: rotation
         });
     }
     
-    // Lower Arch (teeth 17-32) - arranged in oval from left to right
+    // Lower Arch - Teeth 17-32 (left to right, only lower semicircle)
     for (let i = 0; i < 16; i++) {
-        const angle = Math.PI * (i / 15); // Left to right
+        const t = i / 15; // 0 to 1
+        const angle = t * Math.PI; // 0 to π (left to right)
+        
         const x = centerX + radiusX * Math.cos(angle);
-        const y = lowerCenterY + radiusY * Math.sin(angle);
+        const y = lowerArchY + Math.abs(radiusY * Math.sin(angle));
+        
+        // Calculate rotation to face outward from arch
+        const rotation = (angle * 180 / Math.PI) - 90;
         
         positions.push({
             number: i + 17,
@@ -96,9 +109,10 @@ function calculateToothPositions() {
             y: y,
             type: getToothType(i + 17),
             quadrant: i < 8 ? 'lower_left' : 'lower_right',
-            rotation: (angle * 180 / Math.PI) + 90
+            rotation: rotation
         });
     }
+    
     return positions;
 }
 
