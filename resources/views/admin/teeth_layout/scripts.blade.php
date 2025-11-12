@@ -109,11 +109,14 @@ function calculateToothPositions() {
 }
 
 function getToothType(number) {
-    const mod = (number - 1) % 8;
-    if (mod === 0 || mod === 1) return 'incisor';
-    if (mod === 2) return 'canine';
-    if (mod === 3 || mod === 4) return 'premolar';
-    return 'molar';
+    // Universal Numbering System (1-32)
+    // Each quadrant has 8 teeth: 2 incisors, 1 canine, 2 premolars, 3 molars
+    const position = ((number - 1) % 8) + 1;
+    
+    if (position === 1 || position === 2) return 'incisor';    // Central & Lateral Incisors
+    if (position === 3) return 'canine';                        // Canine
+    if (position === 4 || position === 5) return 'premolar';    // First & Second Premolars
+    return 'molar';                                              // First, Second & Third Molars (6,7,8)
 }
 
 function getToothPath(type) {
