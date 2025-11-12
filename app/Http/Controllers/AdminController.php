@@ -189,6 +189,11 @@ class   AdminController extends Controller
         return response()->json(['acceptedCount' => $acceptedCount]);
     }
 
+    public function securitySettings()
+    {
+        return view('admin.security-settings');
+    }
+
     public function patientmanagement()
     {
         // Count the number of pending appointments
