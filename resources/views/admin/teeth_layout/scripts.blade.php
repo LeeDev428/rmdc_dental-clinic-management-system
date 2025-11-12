@@ -6,15 +6,24 @@ let currentToothNumber = null;
 let teethRecords = [];
 
 const conditionColors = {
-    'healthy': '#10b981', 'watch': '#fbbf24', 'cavity': '#f59e0b', 'treatment_needed': '#ef4444',
-    'crown': '#8b5cf6', 'implant': '#3b82f6', 'root_canal': '#ec4899', 'missing': '#6b7280'
+    'healthy': '#10b981',
+    'watch': '#fbbf24',
+    'cavity': '#f59e0b',
+    'treatment_needed': '#ef4444',
+    'crown': '#8b5cf6',
+    'implant': '#3b82f6',
+    'root_canal': '#ec4899',
+    'missing': '#6b7280'
 };
 
 function filterUsers() {
     const searchValue = document.getElementById('user-search').value.toLowerCase();
     const userList = document.getElementById('user-list');
     const users = userList.getElementsByTagName('li');
-    for (let user of users) user.style.display = user.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
+    for (let user of users) {
+        const text = user.textContent.toLowerCase();
+        user.style.display = text.includes(searchValue) ? '' : 'none';
+    }
     userList.style.display = searchValue ? 'block' : 'none';
 }
 
@@ -29,12 +38,23 @@ function selectUser(userId, userName) {
 }
 
 function loadTeethLayout(userId) {
-    if (!userId) return document.getElementById('teeth-layout-container').classList.add('d-none');
+    if (!userId) {
+        document.getElementById('teeth-layout-container').classList.add('d-none');
+        return;
+    }
     document.getElementById('teeth-layout-container').classList.remove('d-none');
     fetch(`/admin/teeth-layout/records/${userId}`)
         .then(response => response.json())
-        .then(data => { teethRecords = data.records || []; renderTeethChart(); updateStatistics(); })
-        .catch(error => { console.error('Error:', error); teethRecords = []; renderTeethChart(); });
+        .then(data => {
+            teethRecords = data.records || [];
+            renderTeethChart();
+            updateStatistics();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            teethRecords = [];
+            renderTeethChart();
+        });
 }
 
 function renderTeethChart() {
@@ -44,10 +64,18 @@ function renderTeethChart() {
 }
 
 function calculateToothPositions() {
-    const positions = [], radiusX = 250, radiusY = 200, centerX = 400, centerY = 300;
+    const positions = [];
+    const radiusX = 250, radiusY = 200, centerX = 400, centerY = 300;
+    
     for (let i = 0; i < 16; i++) {
         const angle = Math.PI * (1 - i / 15);
-        positions.push({ number: i + 1, x: centerX + radiusX * Math.cos(angle), y: centerY - Math.abs(radiusY * Math.sin(angle)) - 80, type: getToothType(i + 1), quadrant: i < 8 ? 'upper_right' : 'upper_left' });
+        positions.push({
+            number: i + 1,
+            x: centerX + radiusX * Math.cos(angle),
+            y: centerY - Math.abs(radiusY * Math.sin(angle)) - 80,
+            type: getToothType(i + 1),
+            quadrant: i < 8 ? 'upper_right' : 'upper_left'
+        });
     }
     for (let i = 0; i < 16; i++) {
         const angle = Math.PI * (i / 15);
