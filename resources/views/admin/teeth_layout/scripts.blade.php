@@ -45,19 +45,26 @@ function renderTeethChart() {
 
 function calculateToothPositions() {
     const positions = [];
-    const radiusX = 280, radiusY = 150;
+    const radiusX = 260, radiusY = 140;
     const centerX = 400, centerY = 300;
-    const upperY = 150, lowerY = 450;
+    const upperY = 140, lowerY = 460;
+    
+    // Spacing adjustments for different tooth types
+    const spacing = [0, 0.8, 1.6, 2.5, 3.5, 4.6, 5.9, 7.3]; // Custom spacing for natural arch
     
     // Upper Right (1-8) - right side arc
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * (0.5 - (i / 14)); // Angle from right to center
+        const progress = spacing[i] / 7.3;
+        const angle = Math.PI * (0.5 - (progress * 0.45)); // 0.45 for better arc
         const x = centerX + radiusX * Math.cos(angle);
         const y = upperY - radiusY * Math.sin(angle);
+        const rotation = -angle * (180 / Math.PI) + 90; // Perpendicular to arc
+        
         positions.push({
             number: i + 1,
             x: x,
             y: y,
+            rotation: rotation,
             type: getToothType(i + 1),
             quadrant: 'upper_right'
         });
@@ -65,13 +72,17 @@ function calculateToothPositions() {
     
     // Upper Left (9-16) - left side arc
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * (0.5 + (i / 14)); // Angle from center to left
+        const progress = spacing[i] / 7.3;
+        const angle = Math.PI * (0.5 + (progress * 0.45));
         const x = centerX + radiusX * Math.cos(angle);
         const y = upperY - radiusY * Math.sin(angle);
+        const rotation = -angle * (180 / Math.PI) + 90;
+        
         positions.push({
             number: i + 9,
             x: x,
             y: y,
+            rotation: rotation,
             type: getToothType(i + 9),
             quadrant: 'upper_left'
         });
@@ -79,13 +90,17 @@ function calculateToothPositions() {
     
     // Lower Left (17-24) - left side arc
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * (0.5 + (i / 14));
+        const progress = spacing[i] / 7.3;
+        const angle = Math.PI * (0.5 + (progress * 0.45));
         const x = centerX + radiusX * Math.cos(angle);
         const y = lowerY + radiusY * Math.sin(angle);
+        const rotation = -angle * (180 / Math.PI) - 90;
+        
         positions.push({
             number: i + 17,
             x: x,
             y: y,
+            rotation: rotation,
             type: getToothType(i + 17),
             quadrant: 'lower_left'
         });
@@ -93,13 +108,17 @@ function calculateToothPositions() {
     
     // Lower Right (25-32) - right side arc
     for (let i = 0; i < 8; i++) {
-        const angle = Math.PI * (0.5 - (i / 14));
+        const progress = spacing[i] / 7.3;
+        const angle = Math.PI * (0.5 - (progress * 0.45));
         const x = centerX + radiusX * Math.cos(angle);
         const y = lowerY + radiusY * Math.sin(angle);
+        const rotation = -angle * (180 / Math.PI) - 90;
+        
         positions.push({
             number: i + 25,
             x: x,
             y: y,
+            rotation: rotation,
             type: getToothType(i + 25),
             quadrant: 'lower_right'
         });
