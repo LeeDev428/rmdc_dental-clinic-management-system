@@ -183,6 +183,12 @@ class   AdminController extends Controller
         return response()->json(['pendingCount' => $pendingCount]);
     }
 
+    public function getAcceptedCount(Request $request)
+    {
+        $acceptedCount = Appointment::where('status', 'accepted')->count();
+        return response()->json(['acceptedCount' => $acceptedCount]);
+    }
+
     public function patientmanagement()
     {
         // Count the number of pending appointments
