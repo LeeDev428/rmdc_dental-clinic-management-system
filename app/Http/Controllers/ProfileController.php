@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use App\Traits\LogsActivity;
 
 class ProfileController extends Controller
 {
+    use LogsActivity;
     /**
      * Display the user's profile form.
      */
@@ -53,11 +55,34 @@ public function update(Request $request)
         $user->avatar = $avatarPath;
     }
     
+    // Track what changed for activity log
+    $changes = [];
+    if ($user->name !== $validated['name']) {
+        $changes['name'] = ['from' => $user->name, 'to' => $validated['name']];
+    }
+    if ($user->email !== $validated['email']) {
+        $changes['email'] = ['from' => $user->email, 'to' => $validated['email']];
+    }
+    if ($user->bio !== ($validated['bio'] ?? null)) {
+        $changes['bio'] = ['from' => $user->bio, 'to' => $validated['bio'] ?? null];
+    }
+    if ($request->hasFile('avatar')) {
+        $changes['avatar'] = 'updated';
+    }
+
     // Update the user's profile (exclude avatar from validated data)
     $user->name = $validated['name'];
     $user->email = $validated['email'];
     $user->bio = $validated['bio'] ?? null;
     $user->save();
+
+    // Log profile update activity
+    if (!empty($changes)) {
+        $this->logPatientActivity('profile_updated', $user, [
+            'changes' => $changes,
+            'description' => 'User updated their profile information',
+        ]);
+    }
     
     // Set flash message after update
     return redirect()->route('profile.edit')->with('status', 'Profile updated successfully!');
