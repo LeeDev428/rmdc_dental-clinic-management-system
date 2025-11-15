@@ -132,6 +132,14 @@
         const fetchNotifications = async () => {
             try {
                 const response = await fetch('/get-unread-count');
+                
+                // Check if response is JSON or HTML (redirect)
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    // Not JSON, probably a redirect to login - silently skip
+                    return;
+                }
+                
                 const data = await response.json();
                 const notificationCount = document.querySelector('.notification-count');
                 if (data.unreadCount > 0) {
@@ -141,7 +149,8 @@
                     notificationCount.style.display = "none";
                 }
             } catch (error) {
-                console.error("Error fetching notifications:", error);
+                // Silently fail - user might not be logged in
+                console.debug("Could not fetch notifications (user may not be authenticated)");
             }
         };
 
