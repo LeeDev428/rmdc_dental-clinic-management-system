@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use ZipArchive;
+use App\Traits\LogsActivity;
 
 class DatabaseBackupController extends Controller
 {
+    use LogsActivity;
     /**
      * Show database backup page
      */
@@ -39,23 +41,11 @@ class DatabaseBackupController extends Controller
             $dbName = config('database.connections.mysql.database');
             $dbUser = config('database.connections.mysql.username');
             $dbPass = config('database.connections.mysql.password');
+            $dbPort = config('database.connections.mysql.port', 3306);
 
-            // Create mysqldump command
-            $command = sprintf(
-                'mysqldump --user=%s --password=%s --host=%s %s > %s',
-                escapeshellarg($dbUser),
-                escapeshellarg($dbPass),
-                escapeshellarg($dbHost),
-                escapeshellarg($dbName),
-                escapeshellarg($path)
-            );
-
-            // Execute backup
-            exec($command, $output, $returnVar);
-
-            if ($returnVar !== 0) {
-                throw new \Exception('Database backup failed');
-            }
+            // Use PHP method directly to avoid mysqldump authentication plugin issues
+            // mysqldump often fails with caching_sha2_password error on MySQL 8+
+            return $this->createBackupWithPHP($path, $filename);
 
             // Create metadata file
             $metadata = [
@@ -240,5 +230,145 @@ class DatabaseBackupController extends Controller
                 }
             }
         }
+    }
+
+    /**
+     * Find mysqldump executable
+     */
+    private function findMysqldump()
+    {
+        $paths = [
+            'C:\\xampp\\mysql\\bin\\mysqldump.exe',
+            'C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin\\mysqldump.exe',
+            'C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe',
+            '/usr/bin/mysqldump',
+            '/usr/local/bin/mysqldump',
+        ];
+
+        foreach ($paths as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        // Try to find in PATH
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            exec('where mysqldump 2>nul', $output, $returnVar);
+        } else {
+            exec('which mysqldump', $output, $returnVar);
+        }
+
+        return $returnVar === 0 && !empty($output[0]) ? $output[0] : null;
+    }
+
+    /**
+     * Create backup using PHP (fallback method)
+     */
+    private function createBackupWithPHP($path, $filename)
+    {
+        try {
+            $dbName = config('database.connections.mysql.database');
+            
+            // Get all tables
+            $tables = DB::select('SHOW TABLES');
+            $tableKey = 'Tables_in_' . $dbName;
+            
+            $sql = "-- Database Backup\n";
+            $sql .= "-- Generated: " . Carbon::now()->toDateTimeString() . "\n";
+            $sql .= "-- Database: {$dbName}\n\n";
+            $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
+
+            foreach ($tables as $table) {
+                $tableName = $table->$tableKey;
+                
+                // Get table structure
+                $createTable = DB::select("SHOW CREATE TABLE `{$tableName}`");
+                $sql .= "-- Table: {$tableName}\n";
+                $sql .= "DROP TABLE IF EXISTS `{$tableName}`;\n";
+                $sql .= $createTable[0]->{'Create Table'} . ";\n\n";
+
+                // Get table data
+                $rows = DB::table($tableName)->get();
+                
+                if ($rows->count() > 0) {
+                    $sql .= "-- Data for table {$tableName}\n";
+                    
+                    foreach ($rows as $row) {
+                        $values = [];
+                        foreach ((array)$row as $value) {
+                            if ($value === null) {
+                                $values[] = 'NULL';
+                            } else {
+                                $values[] = "'" . addslashes($value) . "'";
+                            }
+                        }
+                        
+                        $columns = implode('`, `', array_keys((array)$row));
+                        $valuesStr = implode(', ', $values);
+                        $sql .= "INSERT INTO `{$tableName}` (`{$columns}`) VALUES ({$valuesStr});\n";
+                    }
+                    
+                    $sql .= "\n";
+                }
+            }
+
+            $sql .= "SET FOREIGN_KEY_CHECKS=1;\n";
+
+            // Write to file
+            file_put_contents($path, $sql);
+
+            if (!file_exists($path) || filesize($path) === 0) {
+                throw new \Exception('Failed to create backup file');
+            }
+
+            // Create metadata file
+            $metadata = [
+                'filename' => $filename,
+                'created_at' => Carbon::now()->toDateTimeString(),
+                'size' => filesize($path),
+                'tables' => count($tables),
+                'created_by' => auth()->user()->name,
+                'method' => 'PHP',
+            ];
+
+            file_put_contents(
+                storage_path('app/backups/' . str_replace('.sql', '.json', $filename)),
+                json_encode($metadata, JSON_PRETTY_PRINT)
+            );
+
+            // Log activity
+            \App\Models\ActivityLog::create([
+                'user_id' => auth()->id(),
+                'type' => 'database_backup',
+                'description' => 'Created database backup: ' . $filename,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'data' => json_encode(['filename' => $filename, 'size' => filesize($path)]),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Database backup created successfully',
+                'filename' => $filename,
+                'size' => $this->formatBytes(filesize($path)),
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('PHP backup failed', ['error' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Format bytes to human readable
+     */
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= (1 << (10 * $pow));
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
