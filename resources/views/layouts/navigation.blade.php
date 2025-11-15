@@ -424,6 +424,10 @@ function formatDate(dateString) {
     const fetchNotifications = async () => {
         try {
             const response = await fetch('/get-unread-count');
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return;
+            }
             const data = await response.json();
             const notificationCount = document.querySelector('.notification-count');
             if (data.unreadCount > 0) {
@@ -433,7 +437,7 @@ function formatDate(dateString) {
                 notificationCount.style.display = "none";
             }
         } catch (error) {
-            console.error("Error fetching notifications:", error);
+            console.debug("Error fetching notifications:", error);
         }
     };
 
