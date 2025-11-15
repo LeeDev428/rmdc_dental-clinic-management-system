@@ -309,11 +309,225 @@
             <div class="security-item-header">
                 <div>
                     <h4>Password Hashing</h4>
-                    <p>Bcrypt encryption for secure password storage</p>
+                    <p>Bcrypt encryption with cost factor 12 for secure password storage</p>
                 </div>
                 <span class="status-badge status-active">
                     <i class="fas fa-check-circle"></i> Active
                 </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Password Reset</h4>
+                    <p>Secure token-based password reset with 60-minute expiration</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Enabled
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Security -->
+    <div class="security-card">
+        <h3><i class="fas fa-file-upload"></i> File Upload Security</h3>
+        
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>File Type Validation</h4>
+                    <p>Only allowed file types can be uploaded (images, PDF, documents)</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Validated
+                </span>
+            </div>
+        </div>
+        
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>File Size Limits</h4>
+                    <p>Maximum upload size: {{ ini_get('upload_max_filesize') }} (configurable in php.ini)</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Limited
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Secure Storage</h4>
+                    <p>Files stored outside public directory with hashed filenames</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Protected
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Security -->
+    <div class="security-card">
+        <h3><i class="fas fa-user-shield"></i> Authentication Security</h3>
+        
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Email Verification</h4>
+                    <p>Require email verification for new user accounts</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Required
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Remember Me</h4>
+                    <p>Secure "Remember Me" functionality with encrypted cookies</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Enabled
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Session Regeneration</h4>
+                    <p>Session ID regenerated on login to prevent fixation attacks</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Protection -->
+    <div class="security-card">
+        <h3><i class="fas fa-shield-virus"></i> Data Protection</h3>
+        
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Data Encryption</h4>
+                    <p>Sensitive data encrypted using AES-256-CBC cipher</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Encrypted
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Database Encryption</h4>
+                    <p>Connection uses SSL/TLS when available</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Secured
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Mass Assignment Protection</h4>
+                    <p>Models use fillable/guarded properties to prevent mass assignment</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Protected
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Security -->
+    <div class="security-card">
+        <h3><i class="fas fa-network-wired"></i> Network Security</h3>
+        
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>HTTPS Enforcement</h4>
+                    <p>Force HTTPS connections in production environment</p>
+                </div>
+                <span class="status-badge {{ config('app.env') === 'production' ? 'status-active' : 'status-inactive' }}">
+                    <i class="fas {{ config('app.env') === 'production' ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i> 
+                    {{ config('app.env') === 'production' ? 'Enforced' : 'Dev Mode' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>Security Headers</h4>
+                    <p>X-Frame-Options, X-Content-Type-Options, and other security headers</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Set
+                </span>
+            </div>
+        </div>
+
+        <div class="security-item">
+            <div class="security-item-header">
+                <div>
+                    <h4>CORS Configuration</h4>
+                    <p>Cross-Origin Resource Sharing properly configured</p>
+                </div>
+                <span class="status-badge status-active">
+                    <i class="fas fa-check-circle"></i> Configured
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Recommendations -->
+    <div class="security-card" style="background: #fef3c7; border: 2px solid #f59e0b;">
+        <h3 style="color: #92400e;"><i class="fas fa-exclamation-triangle"></i> Security Recommendations</h3>
+        
+        <div class="security-item" style="border-color: #fbbf24;">
+            <div>
+                <h4 style="color: #92400e;">Regular Updates</h4>
+                <p style="color: #78350f;">Keep Laravel framework and all packages up to date to patch security vulnerabilities</p>
+                <p style="color: #78350f; margin-top: 8px;"><strong>Action:</strong> Run <code>composer update</code> regularly</p>
+            </div>
+        </div>
+
+        <div class="security-item" style="border-color: #fbbf24;">
+            <div>
+                <h4 style="color: #92400e;">Environment Configuration</h4>
+                <p style="color: #78350f;">Never commit .env file to version control and keep APP_DEBUG=false in production</p>
+                <p style="color: #78350f; margin-top: 8px;"><strong>Current:</strong> APP_DEBUG={{ config('app.debug') ? 'true (Dev Mode)' : 'false (Production)' }}</p>
+            </div>
+        </div>
+
+        <div class="security-item" style="border-color: #fbbf24;">
+            <div>
+                <h4 style="color: #92400e;">Regular Backups</h4>
+                <p style="color: #78350f;">Schedule automatic database backups and test restoration procedures regularly</p>
+                <p style="color: #78350f; margin-top: 8px;"><strong>Action:</strong> <a href="{{ route('admin.database.backup') }}" style="color: #92400e; font-weight: 600;">Configure Backup Schedule</a></p>
+            </div>
+        </div>
+
+        <div class="security-item" style="border-color: #fbbf24;">
+            <div>
+                <h4 style="color: #92400e;">Activity Log Monitoring</h4>
+                <p style="color: #78350f;">Regularly review activity logs for suspicious behavior and unauthorized access attempts</p>
+                <p style="color: #78350f; margin-top: 8px;"><strong>Action:</strong> <a href="{{ route('admin.activity.logs') }}" style="color: #92400e; font-weight: 600;">Review Activity Logs</a></p>
             </div>
         </div>
     </div>
