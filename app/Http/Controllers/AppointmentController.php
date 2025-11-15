@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ProcedurePrice;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Traits\LogsActivity;
 
 class AppointmentController extends Controller
-
 {
+    use LogsActivity;
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -173,30 +175,28 @@ public function store(Request $request)
     }
 
     $startTime = Carbon::parse($validated['start']);
-    $today = Carbon::today();
-$now = Carbon::now();
-$startOfWeek = $today->copy()->startOfWeek(); // Monday
-$endOfWeek = $today->copy()->endOfWeek(); // Sunday
+    $now = Carbon::now();
 
-if ($today->isSunday()) {
-    // If today is Sunday, allow only Monday
-    $allowedStart = $today->copy()->addDay(); // Monday
-    $allowedEnd = $allowedStart; // Only Monday
-} else {
-    // If today is Monday-Saturday, allow booking from tomorrow to Sunday
-    $allowedStart = $today->copy()->addDay(); // Tomorrow
-    $allowedEnd = $endOfWeek; // Sunday
-}
-
-// Ensure the selected start time is within the allowed range
-if ($startTime < $allowedStart || $startTime > $allowedEnd) {
-    return response()->json(['error' => 'Invalid booking date. Please follow the allowed schedule.'], 422);
-}
-
-// ✅ New Rule: Ensure booking is at least 4 hours ahead of the present time
+// ✅ Same-Day + 7-Day Rolling Window
+// User can book from 4 hours from now up to 7 days ahead
+// Includes TODAY if booking is 4+ hours from now
+// Example: If now is Sunday 10:00 AM, can book Sunday 2:00 PM onwards until next Sunday
 $minimumBookingTime = $now->copy()->addHours(4);
+$maximumBookingTime = $now->copy()->addDays(7)->endOfDay();
+
+// Ensure booking is at least 4 hours in advance
 if ($startTime < $minimumBookingTime) {
-    return response()->json(['error' => 'Appointments must be scheduled at least 4 hours in advance.'], 422);
+    $hoursNeeded = $now->diffInHours($minimumBookingTime, false);
+    return response()->json([
+        'error' => 'Appointments must be scheduled at least 4 hours in advance. Please select a time after ' . $minimumBookingTime->format('g:i A') . '.'
+    ], 422);
+}
+
+// Ensure booking is within 7 days from now
+if ($startTime > $maximumBookingTime) {
+    return response()->json([
+        'error' => 'Appointments can only be booked up to 7 days in advance. Last available date: ' . $maximumBookingTime->format('M d, Y') . '.'
+    ], 422);
 }
 
  // ✅ Fetch procedure duration from `procedure_prices` table
@@ -257,6 +257,16 @@ $endTime = $startTime->copy()->addMinutes($duration);
         'data' => $appointmentData
     ]);
 
+    // Log appointment initiation
+    $this->logAppointmentActivity('initiated', null, [
+        'procedure' => $validated['procedure'],
+        'date' => $startTime->format('Y-m-d'),
+        'time' => $validated['time'],
+        'payment_method' => $validated['payment_method'],
+        'total_price' => $validated['total_price'],
+        'description' => 'Appointment booking initiated, pending payment',
+    ]);
+
     // Generate PayMongo payment URL with session key
     $paymentUrl = route('payment.create') . '?session_key=' . $sessionKey;
 
@@ -299,6 +309,12 @@ $endTime = $startTime->copy()->addMinutes($duration);
         // Update the appointment
         $appointment->update($validatedData);
 
+        // Log appointment update
+        $this->logAppointmentActivity('updated', $appointment, [
+            'updated_fields' => array_keys($validatedData),
+            'description' => 'Appointment details updated',
+        ]);
+
         // Return the updated appointment details to the front-end for calendar update
         return response()->json([
             'id' => $appointment->id,
@@ -319,6 +335,11 @@ $endTime = $startTime->copy()->addMinutes($duration);
         if ($appointment->user_id != Auth::id()) {
             return response()->json(['message' => 'You can only delete your own appointments'], 403);
         }
+
+        // Log appointment deletion before deleting
+        $this->logAppointmentActivity('deleted', $appointment, [
+            'description' => 'Appointment cancelled by user',
+        ]);
 
         // Delete image if exists
         if ($appointment->image_path) {
