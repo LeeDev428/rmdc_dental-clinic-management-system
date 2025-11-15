@@ -175,27 +175,33 @@ public function store(Request $request)
     }
 
     $startTime = Carbon::parse($validated['start']);
+    $today = Carbon::today();
     $now = Carbon::now();
 
-// ✅ Same-Day + 7-Day Rolling Window
-// User can book from 4 hours from now up to 7 days ahead
-// Includes TODAY if booking is 4+ hours from now
-// Example: If now is Sunday 10:00 AM, can book Sunday 2:00 PM onwards until next Sunday
-$minimumBookingTime = $now->copy()->addHours(4);
-$maximumBookingTime = $now->copy()->addDays(7)->endOfDay();
+// ✅ Next-Day Booking System (T+1 to T+7)
+// CANNOT book today - can ONLY book from tomorrow onwards up to 7 days
+// Example: Today is Sunday Nov 16 → Can book Monday Nov 17 to Sunday Nov 23
+$tomorrow = $today->copy()->addDay()->startOfDay();
+$lastBookingDay = $today->copy()->addDays(7)->endOfDay();
 
-// Ensure booking is at least 4 hours in advance
-if ($startTime < $minimumBookingTime) {
-    $hoursNeeded = $now->diffInHours($minimumBookingTime, false);
+// Ensure booking is NOT today (must be tomorrow or later)
+if ($startTime->isSameDay($today)) {
     return response()->json([
-        'error' => 'Appointments must be scheduled at least 4 hours in advance. Please select a time after ' . $minimumBookingTime->format('g:i A') . '.'
+        'error' => 'Cannot book appointments for today. Please select tomorrow (' . $tomorrow->format('M d, Y') . ') or later.'
     ], 422);
 }
 
-// Ensure booking is within 7 days from now
-if ($startTime > $maximumBookingTime) {
+// Ensure booking starts from tomorrow onwards
+if ($startTime < $tomorrow) {
     return response()->json([
-        'error' => 'Appointments can only be booked up to 7 days in advance. Last available date: ' . $maximumBookingTime->format('M d, Y') . '.'
+        'error' => 'Appointments can only be booked from tomorrow onwards. Please select ' . $tomorrow->format('M d, Y') . ' or later.'
+    ], 422);
+}
+
+// Ensure booking is within 7 days from today
+if ($startTime > $lastBookingDay) {
+    return response()->json([
+        'error' => 'Appointments can only be booked up to 7 days in advance. Last available date: ' . $lastBookingDay->format('M d, Y') . '.'
     ], 422);
 }
 
