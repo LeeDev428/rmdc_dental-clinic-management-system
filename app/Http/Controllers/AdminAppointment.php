@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Events\AppointmentStatusChanged;
+use App\Traits\LogsActivity;
 
 class AdminAppointment extends Controller
 {
+    use LogsActivity;
 
 
     public function handleAction(Request $request, $id, $action)
@@ -53,6 +55,13 @@ $appointment->start = '2003-04-28 23:59';
 $appointment->end = '2003-04-28 23:59';
 $appointment->save();
 
+// Log appointment decline
+$this->logAppointmentActivity('declined', $appointment, [
+    'declined_by' => Auth::user()->name ?? 'Admin',
+    'reason' => $reason,
+    'description' => 'Appointment declined by admin',
+]);
+
 // Optional notification
 Notification::create([
     'user_id' => $appointment->user_id,
@@ -75,6 +84,12 @@ return redirect()->back()->with('success', 'Appointment declined successfully an
 
     // Save the updated appointment status (if needed)
     $appointment->save();
+
+    // Log appointment acceptance
+    $this->logAppointmentActivity('accepted', $appointment, [
+        'accepted_by' => Auth::user()->name ?? 'Admin',
+        'description' => 'Appointment accepted by admin',
+    ]);
 
     // Create a notification for the user
     Notification::create([
@@ -253,6 +268,13 @@ Message::create([
         $appointment->end = '2003-04-28 23:59';
         $appointment->save(); // Save changes
 
+        // Log appointment decline
+        $this->logAppointmentActivity('declined', $appointment, [
+            'declined_by' => Auth::user()->name ?? 'Admin',
+            'reason' => $request->message,
+            'description' => 'Appointment declined by admin with message',
+        ]);
+
         // Create a notification for the user (optional)
         Notification::create([
             'user_id' => $appointment->user_id,
@@ -269,6 +291,12 @@ Message::create([
     if ($action === 'accept') {
         $appointment->status = 'accepted';
         $appointment->save();
+
+        // Log appointment acceptance
+        $this->logAppointmentActivity('accepted', $appointment, [
+            'accepted_by' => Auth::user()->name ?? 'Admin',
+            'description' => 'Appointment accepted by admin',
+        ]);
 
         // Create a notification for the user
         Notification::create([
