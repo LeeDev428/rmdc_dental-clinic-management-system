@@ -7,9 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Traits\LogsActivity;
 
 class PaymentController extends Controller
 {
+    use LogsActivity;
     /**
      * Create PayMongo Checkout Session and redirect to hosted checkout page
      */
@@ -190,6 +192,24 @@ class PaymentController extends Controller
                         'payment_status' => 'paid',
                         'payment_reference' => $paymentId,
                         'status' => 'pending', // Ready for admin approval
+                    ]);
+                    
+                    // Log appointment creation after successful payment
+                    $this->logAppointmentActivity('created', $appointment, [
+                        'payment_reference' => $paymentId,
+                        'payment_method' => $appointmentData['payment_method'],
+                        'amount_paid' => $appointmentData['down_payment'],
+                        'description' => 'Appointment created after successful payment',
+                    ]);
+
+                    // Log payment activity
+                    $this->logPaymentActivity('completed', null, [
+                        'appointment_id' => $appointment->id,
+                        'reference' => $paymentId,
+                        'method' => $appointmentData['payment_method'],
+                        'amount' => $appointmentData['down_payment'],
+                        'total_price' => $appointmentData['total_price'],
+                        'description' => 'Down payment received for appointment',
                     ]);
                     
                     // Clear session data and save to database
