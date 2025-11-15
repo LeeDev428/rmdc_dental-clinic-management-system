@@ -1192,42 +1192,36 @@ window.onclick = function(event) {
         },
 
         dateClick: function(info) {
-    const selectedDate = new Date(info.dateStr);
+    const selectedDate = new Date(info.dateStr + 'T00:00:00');
     const now = new Date();
-
-    const isSunday = now.getDay() === 0; // Sunday = 0
-    const isMonday = now.getDay() === 1; // Monday = 1
-
-    let allowedStart, allowedEnd;
-
-    if (isSunday) {
-        // If today is Sunday, allow only Monday
-        allowedStart = new Date(now);
-        allowedStart.setDate(now.getDate() + 1); // Monday
-        allowedStart.setHours(0, 0, 0, 0);
-        allowedEnd = new Date(allowedStart); // Only Monday
-    } else {
-        // If today is Monday-Saturday, allow booking from tomorrow to Sunday
-        allowedStart = new Date(now);
-        allowedStart.setDate(now.getDate() + 1); // Tomorrow
-        allowedStart.setHours(0, 0, 0, 0);
-
-        allowedEnd = new Date(now);
-        allowedEnd.setDate(now.getDate() - now.getDay() + 7); // Sunday
-        allowedEnd.setHours(23, 59, 59, 999);
-    }
-
-    // ✅ New Rule: Ensure booking is at least 4 hours ahead
-    const minAllowedTime = new Date(now);
-    minAllowedTime.setHours(now.getHours() + 4); // 4 hours from now
-
-    if (selectedDate < allowedStart || selectedDate > allowedEnd) {
-        showErrorMessage("Invalid booking date. Please follow the allowed schedule.");
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    // T+1 to T+7 system: Can only book tomorrow through 7 days from today
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    const lastBookingDay = new Date(today);
+    lastBookingDay.setDate(today.getDate() + 7);
+    
+    // Format dates for error message
+    const tomorrowStr = tomorrow.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    const lastDayStr = lastBookingDay.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    
+    // Check if selected date is today (not allowed)
+    if (selectedDate.getTime() === today.getTime()) {
+        showErrorMessage(`Cannot book for today. Please select ${tomorrowStr} or later.`);
         return;
     }
-
-    if (selectedDate.getTime() < minAllowedTime.getTime()) {
-        showErrorMessage("Appointments must be scheduled at least 4 hours in advance.");
+    
+    // Check if selected date is before tomorrow
+    if (selectedDate < tomorrow) {
+        showErrorMessage(`Please select ${tomorrowStr} or later.`);
+        return;
+    }
+    
+    // Check if selected date is beyond 7 days
+    if (selectedDate > lastBookingDay) {
+        showErrorMessage(`Booking limit is ${lastDayStr}. Please select an earlier date.`);
         return;
     }
 
