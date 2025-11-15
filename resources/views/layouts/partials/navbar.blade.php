@@ -121,10 +121,13 @@
 
     @vite('resources/js/app.js')
     <script>
-        Echo.channel('appointments')
-            .listen('AppointmentStatusChanged', (e) => {
-                fetchNotifications();
-            });
+        // Check if Echo is available before using it
+        if (typeof Echo !== 'undefined') {
+            Echo.channel('appointments')
+                .listen('AppointmentStatusChanged', (e) => {
+                    fetchNotifications();
+                });
+        }
 
         const fetchNotifications = async () => {
             try {
