@@ -330,4 +330,125 @@ Message::create([
         }
     }
 
+    /**
+     * Mark appointment as completed and automatically deduct inventory
+     */
+    public function completeAppointment($id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $appointment = Appointment::findOrFail($id);
+            
+            // Check if already completed
+            if ($appointment->status === 'completed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This appointment is already marked as completed.'
+                ]);
+            }
+            
+            // Find the procedure
+            $procedure = \App\Models\ProcedurePrice::where('procedure_name', $appointment->procedure)->first();
+            
+            if (!$procedure) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Procedure not found. Cannot deduct inventory.'
+                ], 404);
+            }
+            
+            // Get linked inventory items
+            $supplies = $procedure->procedureInventories()->with('inventory')->get();
+            
+            if ($supplies->isEmpty()) {
+                // No supplies linked, just mark as completed
+                $appointment->status = 'completed';
+                $appointment->save();
+                
+                // Log activity
+                $this->logAppointmentActivity('completed', $appointment, [
+                    'completed_by' => Auth::user()->name ?? 'Admin',
+                    'description' => 'Appointment completed (no supplies linked)',
+                ]);
+                
+                DB::commit();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Appointment marked as completed. No inventory items were linked to this procedure.'
+                ]);
+            }
+            
+            $deductedItems = [];
+            $insufficientStock = [];
+            
+            // Process each supply item
+            foreach ($supplies as $supply) {
+                $inventory = $supply->inventory;
+                $quantityNeeded = $supply->quantity_used; // In pieces
+                
+                // Calculate how many units to deduct
+                if ($inventory->unit === 'Pieces') {
+                    // Direct deduction
+                    if ($inventory->quantity < $quantityNeeded) {
+                        $insufficientStock[] = "{$inventory->name} (Need: {$quantityNeeded} pieces, Available: {$inventory->quantity})";
+                        continue;
+                    }
+                    $inventory->quantity -= $quantityNeeded;
+                } else {
+                    // Convert pieces to units (Box, Bottle, etc.)
+                    $itemsPerUnit = $inventory->items_per_unit ?? 1;
+                    $unitsNeeded = $quantityNeeded / $itemsPerUnit;
+                    
+                    if ($inventory->quantity < $unitsNeeded) {
+                        $insufficientStock[] = "{$inventory->name} (Need: " . number_format($unitsNeeded, 2) . " {$inventory->unit}, Available: {$inventory->quantity})";
+                        continue;
+                    }
+                    $inventory->quantity -= $unitsNeeded;
+                }
+                
+                $inventory->save();
+                $deductedItems[] = "{$inventory->name}: {$quantityNeeded} pieces";
+            }
+            
+            // Check if there were insufficient stock items
+            if (!empty($insufficientStock)) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => "Insufficient stock for:\n" . implode("\n", $insufficientStock)
+                ]);
+            }
+            
+            // Update appointment status
+            $appointment->status = 'completed';
+            $appointment->save();
+            
+            // Log activity
+            $this->logAppointmentActivity('completed', $appointment, [
+                'completed_by' => Auth::user()->name ?? 'Admin',
+                'description' => 'Appointment completed with inventory deduction',
+                'deducted_items' => $deductedItems,
+            ]);
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Appointment completed successfully!\n\nInventory deducted:\n" . implode("\n", $deductedItems)
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error completing appointment: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while completing the appointment: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 }
