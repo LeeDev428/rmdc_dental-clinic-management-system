@@ -939,8 +939,8 @@
             <td>
                 <span class="unit-display" style="font-size: 13px;">Pieces</span>
             </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeSupplyRow(this)">
+            <td style="text-align: center;">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeSupplyRow(this)" style="padding: 4px 8px;">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -966,7 +966,7 @@
         if (tbody.children.length > 1) {
             button.closest('tr').remove();
         } else {
-            alert('At least one supply row is required.');
+            alert('At least one supply row is required. Please select an item or close the modal.');
         }
     }
 
@@ -974,6 +974,21 @@
         const form = document.getElementById('suppliesForm');
         const formData = new FormData(form);
         const procedureId = formData.get('procedure_id');
+        
+        // Validate that at least one item is selected
+        const inventoryIds = formData.getAll('inventory_id[]');
+        const validItems = inventoryIds.filter(id => id !== '');
+        
+        if (validItems.length === 0) {
+            alert('Please select at least one inventory item before saving.');
+            return;
+        }
+        
+        // Show loading state
+        const saveButton = event.target;
+        const originalText = saveButton.innerHTML;
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
         
         fetch(`/admin/procedure-supplies/${procedureId}`, {
             method: 'POST',
@@ -983,20 +998,46 @@
             },
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalText;
+            
             if (data.success) {
                 $('#suppliesModal').modal('hide');
-                alert('Supplies updated successfully!');
+                alert('✓ Supplies updated successfully!\n\nThe inventory items have been linked to this procedure.');
+                // Clear the form
+                document.getElementById('suppliesTableBody').innerHTML = '';
             } else {
                 alert('Error saving supplies: ' + (data.message || 'Unknown error'));
             }
         })
         .catch(error => {
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalText;
             console.error('Error:', error);
-            alert('Error saving supplies. Please try again.');
+            alert('Error saving supplies. Please try again.\n\nDetails: ' + error.message);
         });
     }
+    
+    // Close supplies modal function
+    function closeSuppliesModal() {
+        $('#suppliesModal').modal('hide');
+        // Clear the form
+        document.getElementById('suppliesTableBody').innerHTML = '';
+        document.getElementById('suppliesProcedureId').value = '';
+    }
+    
+    // Reset modal when closed
+    $('#suppliesModal').on('hidden.bs.modal', function () {
+        document.getElementById('suppliesTableBody').innerHTML = '';
+        document.getElementById('suppliesProcedureId').value = '';
+    });
 </script>
 
 <!-- Supplies Management Modal -->
@@ -1005,7 +1046,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="suppliesModalLabel">Manage Supplies</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" onclick="closeSuppliesModal()" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -1037,7 +1078,7 @@
                     </button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeSuppliesModal()">Close</button>
                     <button type="button" class="btn btn-success" onclick="saveSupplies()">
                         <i class="fas fa-save"></i> Save Supplies
                     </button>
