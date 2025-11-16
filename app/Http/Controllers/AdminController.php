@@ -445,5 +445,62 @@ public function patientInformation(Request $request)
     ]);
 }
 
+/**
+ * Display cancellation requests page
+ */
+public function cancellationRequests()
+{
+    // Get statistics
+    $pendingCancellations = 0; // Placeholder - implement when cancellation tracking is added
+    $approvedToday = 0;
+    $weeklyTotal = 0;
+    $lateCancellations = 0;
+
+    return view('admin.cancellation-requests', compact(
+        'pendingCancellations',
+        'approvedToday',
+        'weeklyTotal',
+        'lateCancellations'
+    ));
+}
+
+/**
+ * Get cancellation count for badge
+ */
+public function getCancellationCount()
+{
+    // Placeholder - implement when cancellation tracking is added
+    $count = 0;
+    return response()->json(['count' => $count]);
+}
+
+/**
+ * Display reschedule requests page
+ */
+public function rescheduleRequests()
+{
+    // Get statistics
+    $pendingReschedules = 0; // Placeholder - implement when reschedule tracking is added
+    $approvedToday = 0;
+    $weeklyTotal = 0;
+    $lateRequests = 0;
+
+    return view('admin.reschedule-requests', compact(
+        'pendingReschedules',
+        'approvedToday',
+        'weeklyTotal',
+        'lateRequests'
+    ));
+}
+
+/**
+ * Get reschedule count for badge
+ */
+public function getRescheduleCount()
+{
+    // Placeholder - implement when reschedule tracking is added
+    $count = 0;
+    return response()->json(['count' => $count]);
+}
 
 }
