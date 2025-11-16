@@ -681,10 +681,14 @@
     
     // Mark appointment as completed and deduct inventory
     function markAsCompleted(appointmentId, procedureName) {
+        console.log('markAsCompleted called with:', appointmentId, procedureName);
+        
         if (!confirm(`Are you sure you want to mark this appointment as COMPLETED?\n\nThis will:\n✓ Update the appointment status\n✓ Automatically deduct inventory items used for "${procedureName}"\n\nThis action cannot be undone.`)) {
+            console.log('User cancelled completion');
             return;
         }
         
+        console.log('Sending completion request...');
         fetch(`/admin/appointments/${appointmentId}/complete`, {
             method: 'POST',
             headers: {
@@ -693,8 +697,12 @@
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
                 alert(`✓ Appointment marked as completed!\n\n${data.message}`);
                 closeDetailsModal();
