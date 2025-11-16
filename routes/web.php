@@ -248,6 +248,9 @@ Route::delete('admin/appointments/delete-all-declined', [AdminAppointment::class
 
     Route::get('admin/appointments/{id}/details', [AdminAppointment::class, 'getAppointmentDetails'])
         ->name('admin.appointments.details');
+    
+    Route::post('admin/appointments/{id}/complete', [AdminAppointment::class, 'completeAppointment'])
+        ->name('admin.appointments.complete');
 
     Route::post('admin/appointment/{id}/{action}', [AdminAppointment::class, 'messageFromAdmin'])->name('appointment.messageFromAdmin');
 
