@@ -12,7 +12,8 @@ class ProcedurePriceController extends Controller
     {
         $procedures = ProcedurePrice::paginate(20);  // Paginate with 20 items per page
         $allProcedures = ProcedurePrice::all(); // For statistics
-        return view('admin.procedure_prices', compact('procedures', 'allProcedures'));
+        $inventories = \App\Models\Inventory::all(); // Get all inventory items for the modal
+        return view('admin.procedure_prices', compact('procedures', 'allProcedures', 'inventories'));
     }
 
     public function store(Request $request)
@@ -94,5 +95,64 @@ class ProcedurePriceController extends Controller
         }
 
         return response()->json(['error' => 'Procedure not found'], 404);
+    }
+
+    /**
+     * Get supplies for a specific procedure
+     */
+    public function getProcedureSupplies($procedureId)
+    {
+        $procedure = ProcedurePrice::with('procedureInventories.inventory')->findOrFail($procedureId);
+        
+        $supplies = $procedure->procedureInventories->map(function($pi) {
+            return [
+                'inventory_id' => $pi->inventory_id,
+                'quantity_used' => $pi->quantity_used,
+                'inventory_name' => $pi->inventory->name,
+                'unit' => $pi->inventory->unit,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'supplies' => $supplies
+        ]);
+    }
+
+    /**
+     * Save/Update supplies for a procedure
+     */
+    public function saveProcedureSupplies(Request $request, $procedureId)
+    {
+        $request->validate([
+            'inventory_id' => 'required|array',
+            'inventory_id.*' => 'required|exists:inventories,id',
+            'quantity_used' => 'required|array',
+            'quantity_used.*' => 'required|numeric|min:0.01',
+        ]);
+
+        $procedure = ProcedurePrice::findOrFail($procedureId);
+
+        // Delete existing supplies for this procedure
+        $procedure->procedureInventories()->delete();
+
+        // Add new supplies
+        $inventoryIds = $request->input('inventory_id');
+        $quantities = $request->input('quantity_used');
+
+        foreach ($inventoryIds as $index => $inventoryId) {
+            if (!empty($inventoryId) && !empty($quantities[$index])) {
+                \App\Models\ProcedureInventory::create([
+                    'procedure_price_id' => $procedureId,
+                    'inventory_id' => $inventoryId,
+                    'quantity_used' => $quantities[$index],
+                ]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Supplies updated successfully'
+        ]);
     }
 }
