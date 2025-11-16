@@ -144,6 +144,10 @@
     Route::middleware(['auth', AdminMiddleware::class])->group(function () {
         Route::get('/admin/pending-appointments', [AdminController::class, 'upcomingAppointments'])->name('admin.upcoming_appointments');
         Route::get('/admin/upcoming-appointments', [AdminController::class, 'acceptedAppointments'])->name('admin.appointments');
+        Route::get('/admin/cancellation-requests', [AdminController::class, 'cancellationRequests'])->name('admin.cancellation.requests');
+        Route::get('/admin/reschedule-requests', [AdminController::class, 'rescheduleRequests'])->name('admin.reschedule.requests');
+        Route::get('/admin/cancellation-count', [AdminController::class, 'getCancellationCount']);
+        Route::get('/admin/reschedule-count', [AdminController::class, 'getRescheduleCount']);
         
         // Database Backup Routes
         Route::get('/admin/database-backup', [\App\Http\Controllers\DatabaseBackupController::class, 'index'])->name('admin.database.backup');
