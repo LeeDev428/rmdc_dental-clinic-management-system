@@ -1,132 +1,211 @@
 @extends('layouts.admin')
 
-@section('content')
-<div class="container-fluid px-4">
-    <h1 class="mt-4">
-        <i class="fas fa-ban text-danger"></i> Cancellation Requests
-    </h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Cancellation Requests</li>
-    </ol>
+@section('title', 'Cancellation Requests')
 
-    <!-- Policy Reminder -->
-    <div class="alert alert-warning shadow-sm mb-4">
-        <div class="d-flex align-items-center">
-            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
-            <div>
-                <h5 class="alert-heading mb-1">Cancellation Policy Reminder</h5>
-                <p class="mb-0 small">
-                    Patients can only cancel appointments at least <strong>2 days (48 hours)</strong> before the scheduled time. 
-                    Same-day cancellations are not permitted. Down payments are non-refundable for late cancellations.
-                </p>
-            </div>
-        </div>
+@section('content')
+<style>
+    .page-container {
+        padding: 24px;
+    }
+    
+    .page-header {
+        background: white;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 24px;
+    }
+    
+    .page-header h2 {
+        margin: 0 0 8px 0;
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .page-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+    
+    .info-banner {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 16px;
+        border-radius: 6px;
+        margin-bottom: 24px;
+    }
+    
+    .info-banner p {
+        margin: 0;
+        font-size: 14px;
+        color: #92400e;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border-left: 4px solid #e5e7eb;
+    }
+    
+    .stat-card.pending { border-left-color: #ef4444; }
+    .stat-card.approved { border-left-color: #10b981; }
+    .stat-card.weekly { border-left-color: #6b7280; }
+    .stat-card.late { border-left-color: #f59e0b; }
+    
+    .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 8px;
+    }
+    
+    .stat-value {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .content-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .content-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .content-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table th {
+        background: #f9fafb;
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b7280;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .data-table td {
+        padding: 16px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 14px;
+        color: #374151;
+    }
+    
+    .data-table tr:hover {
+        background: #f9fafb;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #9ca3af;
+    }
+    
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+    
+    .empty-state p {
+        margin: 8px 0 0 0;
+        font-size: 14px;
+    }
+</style>
+
+<div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>Cancellation Requests</h2>
+        <p>Manage patient appointment cancellation requests</p>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-danger text-white mb-4 shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="small">Pending Cancellations</div>
-                            <div class="h2 mb-0">{{ $pendingCancellations ?? 0 }}</div>
-                        </div>
-                        <i class="fas fa-hourglass-half fa-2x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+    <!-- Policy Info Banner -->
+    <div class="info-banner">
+        <p><strong>Policy:</strong> Cancellations must be made at least 2 days (48 hours) before appointment. Same-day cancellations not permitted. Down payments are non-refundable for late cancellations.</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card pending">
+            <div class="stat-label">Pending Cancellations</div>
+            <div class="stat-value">{{ $pendingCancellations ?? 0 }}</div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-success text-white mb-4 shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="small">Approved Today</div>
-                            <div class="h2 mb-0">{{ $approvedToday ?? 0 }}</div>
-                        </div>
-                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card approved">
+            <div class="stat-label">Approved Today</div>
+            <div class="stat-value">{{ $approvedToday ?? 0 }}</div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-secondary text-white mb-4 shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="small">Total This Week</div>
-                            <div class="h2 mb-0">{{ $weeklyTotal ?? 0 }}</div>
-                        </div>
-                        <i class="fas fa-calendar-week fa-2x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card weekly">
+            <div class="stat-label">Total This Week</div>
+            <div class="stat-value">{{ $weeklyTotal ?? 0 }}</div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card bg-warning text-white mb-4 shadow">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="small">Late Cancellations</div>
-                            <div class="h2 mb-0">{{ $lateCancellations ?? 0 }}</div>
-                        </div>
-                        <i class="fas fa-exclamation-circle fa-2x opacity-50"></i>
-                    </div>
-                </div>
-            </div>
+        <div class="stat-card late">
+            <div class="stat-label">Late Cancellations</div>
+            <div class="stat-value">{{ $lateCancellations ?? 0 }}</div>
         </div>
     </div>
 
     <!-- Cancellation Requests Table -->
-    <div class="card mb-4 shadow">
-        <div class="card-header bg-danger text-white">
-            <i class="fas fa-list me-1"></i>
-            Cancellation Requests
+    <div class="content-card">
+        <div class="content-header">
+            <h3>Cancellation Requests</h3>
         </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover" id="cancellationTable">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Request Date</th>
-                            <th>Patient Name</th>
-                            <th>Appointment Date</th>
-                            <th>Procedure</th>
-                            <th>Days Until Appt</th>
-                            <th>Reason</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Placeholder - will be populated with actual data -->
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                <p>No cancellation requests at the moment</p>
-                                <small>Pending cancellation requests will appear here</small>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Request Date</th>
+                        <th>Patient Name</th>
+                        <th>Appointment Date</th>
+                        <th>Procedure</th>
+                        <th>Days Until Appt</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p style="margin: 8px 0 0 0; font-weight: 500;">No cancellation requests</p>
+                                <p style="font-size: 13px; color: #9ca3af;">Pending requests will appear here</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-
-<style>
-    .opacity-50 {
-        opacity: 0.5;
-    }
-    .card {
-        border: none;
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-5px);
-    }
-</style>
 @endsection
