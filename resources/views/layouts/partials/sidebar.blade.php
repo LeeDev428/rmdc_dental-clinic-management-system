@@ -28,6 +28,16 @@
                 <span id="sidebarPendingApptBadge" class="badge bg-secondary ms-2">0</span>
             </a>
             <a class="nav-link" href="#">
+                <div class="sb-nav-link-icon"><i class="fas fa-ban text-danger"></i></div>
+                Cancellation Requests
+                <span id="sidebarCancellationBadge" class="badge bg-secondary ms-2">0</span>
+            </a>
+            <a class="nav-link" href="#">
+                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt text-warning"></i></div>
+                Reschedule Requests
+                <span id="sidebarRescheduleBadge" class="badge bg-secondary ms-2">0</span>
+            </a>
+            <a class="nav-link" href="#">
                 <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>
                 Edit Availability
             </a>
@@ -43,10 +53,7 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-tooth"></i></div>
                 Teeth Layout Management
             </a>
-            <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
-                <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
-                Service Feedbacks
-            </a>
+         
 
             <div class="sb-sidenav-menu-heading">Security & Backup</div>
             <a class="nav-link" href="{{ route('admin.database.backup') }}">
@@ -72,6 +79,10 @@
             <a class="nav-link" href="{{ url('admin/reviews') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
                 Reviews
+            </a>
+               <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+                Service Feedbacks
             </a>
         </div>
     </div>
@@ -133,17 +144,61 @@ function updateSidebarAcceptedCount() {
     });
 }
 
+// Update cancellation requests badge in sidebar
+function updateSidebarCancellationCount() {
+    $.ajax({
+        url: "{{ url('/admin/cancellation-count') }}",
+        method: "GET",
+        success: function(response) {
+            let count = response.count || 0;
+            let badge = $("#sidebarCancellationBadge");
+            if (count > 0) {
+                badge.text(count).removeClass("bg-secondary").addClass("bg-danger");
+            } else {
+                badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
+            }
+        },
+        error: function() {
+            // Silently fail if route not implemented yet
+        }
+    });
+}
+
+// Update reschedule requests badge in sidebar
+function updateSidebarRescheduleCount() {
+    $.ajax({
+        url: "{{ url('/admin/reschedule-count') }}",
+        method: "GET",
+        success: function(response) {
+            let count = response.count || 0;
+            let badge = $("#sidebarRescheduleBadge");
+            if (count > 0) {
+                badge.text(count).removeClass("bg-secondary").addClass("bg-warning");
+            } else {
+                badge.text("0").removeClass("bg-warning").addClass("bg-secondary");
+            }
+        },
+        error: function() {
+            // Silently fail if route not implemented yet
+        }
+    });
+}
+
 $(document).ready(function() {
     // Initialize badges
     updateSidebarUnreadMessagesCount();
     updateSidebarPendingCount();
     updateSidebarAcceptedCount();
+    updateSidebarCancellationCount();
+    updateSidebarRescheduleCount();
 
     // Refresh counts every 30 seconds
     setInterval(function() {
         updateSidebarUnreadMessagesCount();
         updateSidebarPendingCount();
         updateSidebarAcceptedCount();
+        updateSidebarCancellationCount();
+        updateSidebarRescheduleCount();
     }, 30000);
 });
 </script>
