@@ -135,7 +135,7 @@
             </a>
 
             <!-- View Messages -->
-            <a href="{{ route('messages') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-purple-50 dark:hover:bg-gray-700">
+            <a href="{{ route('messages.index') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-purple-50 dark:hover:bg-gray-700">
                 <div class="flex flex-col items-center">
                     <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-4 mb-4">
                         <i class="fas fa-comments text-3xl text-purple-600 dark:text-purple-400"></i>
