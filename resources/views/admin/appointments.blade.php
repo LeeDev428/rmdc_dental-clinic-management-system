@@ -617,6 +617,19 @@
         }
         
         html += '</div>';
+        
+        // Add action buttons at the bottom
+        html += `
+            <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; display: flex; gap: 12px;">
+                <button class="btn-complete-appointment" onclick="markAsCompleted(${appointment.id}, '${appointment.procedure}')">
+                    <i class="fas fa-check-circle"></i> Mark as Completed
+                </button>
+                <button class="btn-secondary" onclick="closeDetailsModal()">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        `;
+        
         return html;
     }
     
