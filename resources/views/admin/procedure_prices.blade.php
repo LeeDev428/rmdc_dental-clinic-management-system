@@ -607,6 +607,11 @@
                         <td>
                             <!-- Action Buttons Container -->
                             <div class="action-buttons">
+                                <!-- Manage Supplies Button -->
+                                <button class="btn btn-success btn-sm" onclick="openSuppliesModal({{ $procedure->id }}, '{{ $procedure->procedure_name }}')">
+                                    <i class="fas fa-boxes"></i> Supplies
+                                </button>
+
                                 <!-- Update Button -->
                                 <button class="btn btn-primary btn-sm" onclick="confirmUpdate({{ $procedure->id }})">
                                     <i class="fas fa-save"></i> Update
