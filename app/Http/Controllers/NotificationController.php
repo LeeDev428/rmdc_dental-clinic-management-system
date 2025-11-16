@@ -55,5 +55,19 @@ class NotificationController extends Controller
     //     return response()->json(['success' => true]);
     // }
 
-    
+    /**
+     * Get unread notification count for authenticated user
+     */
+    public function getUnreadCount()
+    {
+        if (!Auth::check()) {
+            return response()->json(['unreadCount' => 0]);
+        }
+
+        $unreadCount = Notification::where('user_id', Auth::id())
+            ->where('status', 'unread')
+            ->count();
+
+        return response()->json(['unreadCount' => $unreadCount]);
+    }
 }
