@@ -26,17 +26,25 @@ trait LogsActivity
      */
     protected function logAppointmentActivity($action, $appointment, $additionalData = [])
     {
-        $data = array_merge([
-            'appointment_id' => $appointment->id,
-            'patient_name' => $appointment->user->name ?? 'Unknown',
-            'appointment_date' => $appointment->appointment_date,
-            'appointment_time' => $appointment->appointment_time,
-            'status' => $appointment->status,
-        ], $additionalData);
+        // If appointment is null (e.g., during initiation), use only additionalData
+        if ($appointment === null) {
+            $data = $additionalData;
+            $description = ucfirst($action) . ' appointment for ' . (auth()->user()->name ?? 'Unknown');
+        } else {
+            $data = array_merge([
+                'appointment_id' => $appointment->id,
+                'patient_name' => $appointment->user->name ?? 'Unknown',
+                'appointment_date' => $appointment->appointment_date,
+                'appointment_time' => $appointment->appointment_time,
+                'status' => $appointment->status,
+            ], $additionalData);
+            
+            $description = ucfirst($action) . ' appointment for ' . ($appointment->user->name ?? 'Unknown');
+        }
 
         $this->logActivity(
             'appointment_' . $action,
-            ucfirst($action) . ' appointment for ' . ($appointment->user->name ?? 'Unknown'),
+            $description,
             $data
         );
     }
