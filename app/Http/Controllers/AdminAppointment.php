@@ -433,6 +433,7 @@ Message::create([
             // Check if there were insufficient stock items
             if (!empty($insufficientStock)) {
                 DB::rollBack();
+                Log::warning("Transaction rolled back due to insufficient stock");
                 return response()->json([
                     'success' => false,
                     'message' => "Insufficient stock for:\n" . implode("\n", $insufficientStock)
@@ -442,6 +443,7 @@ Message::create([
             // Update appointment status
             $appointment->status = 'completed';
             $appointment->save();
+            Log::info("Appointment status updated to completed");
             
             // Log activity
             $this->logAppointmentActivity('completed', $appointment, [
@@ -451,6 +453,7 @@ Message::create([
             ]);
             
             DB::commit();
+            Log::info("Transaction committed successfully. Deducted items: " . implode(", ", $deductedItems));
             
             return response()->json([
                 'success' => true,
