@@ -144,6 +144,7 @@
     Route::middleware(['auth', AdminMiddleware::class])->group(function () {
         Route::get('/admin/pending-appointments', [AdminController::class, 'upcomingAppointments'])->name('admin.upcoming_appointments');
         Route::get('/admin/upcoming-appointments', [AdminController::class, 'acceptedAppointments'])->name('admin.appointments');
+        Route::get('/admin/completed-appointments', [AdminController::class, 'completedAppointments'])->name('admin.completed_appointments');
         Route::get('/admin/cancellation-requests', [AdminController::class, 'cancellationRequests'])->name('admin.cancellation.requests');
         Route::get('/admin/reschedule-requests', [AdminController::class, 'rescheduleRequests'])->name('admin.reschedule.requests');
         Route::get('/admin/cancellation-count', [AdminController::class, 'getCancellationCount']);
