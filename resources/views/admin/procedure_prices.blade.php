@@ -1012,7 +1012,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th width="40%">Inventory Item</th>
+                                <th width="25%">Inventory Item</th>
                                 <th width="25%">Quantity Used</th>
                                 <th width="20%">Unit</th>
                                 <th width="15%">Action</th>
