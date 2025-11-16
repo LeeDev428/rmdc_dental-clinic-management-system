@@ -14,6 +14,20 @@
                 <div class="flex flex-col h-[calc(100vh-200px)]"> <!-- Ensuring full height with input form at the bottom -->
                     <!-- Chat Messages Container -->
                     <div id="message-container" class="flex-1 overflow-y-auto p-6 space-y-3 bg-gray-100 dark:bg-gray-800 rounded-t-lg border border-gray-300 dark:border-gray-700">
+@if($messages->isEmpty())
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center h-full text-center py-12">
+        <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-6 mb-4">
+            <i class="fas fa-comments text-5xl text-blue-600 dark:text-blue-400"></i>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No Messages Yet</h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">Start a conversation with your dentist below!</p>
+        <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+            <i class="fas fa-info-circle"></i>
+            <span>Type your message in the box below to begin</span>
+        </div>
+    </div>
+@else
 @foreach ($messages as $message)
     <div class="flex mb-3">
         <!-- If message is from the patient (right side) -->
@@ -21,10 +35,10 @@
             <div class="ml-auto p-3 bg-blue-600 text-white rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Patient's Profile Image -->
-                    <img src="{{ $message->user->avatar ? Storage::url($message->user->avatar) : asset('img/defaultprofile.png') }}"
-                         alt="Patient Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                    <img src="{{ $message->user->avatar_url ?? asset('img/default-dp.jpg') }}"
+                         alt="Patient Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
-                    <div class="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">
+                    <div class="text-xs text-gray-200 hover:text-gray-100 cursor-pointer">
                         • {{ $message->created_at->diffForHumans() }}
                     </div>
                 </div>
@@ -35,12 +49,10 @@
             <div class="mr-auto p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Admin's Profile Image -->
-                    <img src="{{ $message->user->avatar && Storage::exists('avatars/' . $message->user->avatar)
-                     ? Storage::url('avatars/' . $message->user->avatar)
-                     : asset('img/defaultprofile.png') }}"
-                         alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%;">
+                    <img src="{{ $message->user->avatar_url ?? asset('img/default-dp.jpg') }}"
+                         alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
-                    <div class="text-xs text-gray-400 hover:text-gray-600 cursor-pointer">
+                    <div class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-600 cursor-pointer">
                         • {{ $message->created_at->diffForHumans() }}
                     </div>
                 </div>
@@ -49,6 +61,7 @@
         @endif
     </div>
 @endforeach
+@endif
 
                     </div>
 
