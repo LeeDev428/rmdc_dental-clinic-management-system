@@ -27,6 +27,10 @@
                 Pending Appointments
                 <span id="sidebarPendingApptBadge" class="badge bg-secondary ms-2">0</span>
             </a>
+            <a class="nav-link" href="{{ route('admin.completed_appointments') }}">
+                <div class="sb-nav-link-icon"><i class="fas fa-check-circle"></i></div>
+                Completed Appointments
+            </a>
             <a class="nav-link" href="{{ route('admin.cancellation.requests') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-ban"></i></div>
                 Cancellation Requests
