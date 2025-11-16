@@ -922,7 +922,7 @@
         
         row.innerHTML = `
             <td>
-                <select class="form-control form-control-sm supply-select" name="inventory_id[]" required style="width: 100%; min-width: 200px; font-size: 13px;">
+                <select class="form-control form-control-sm supply-select" name="inventory_id[]" required style="width: 100%; min-width: 200px; font-size: 13px; height: 33px;">
                     ${optionsHtml}
                 </select>
             </td>
