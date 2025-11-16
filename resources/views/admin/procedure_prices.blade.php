@@ -1012,10 +1012,10 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th width="25%">Inventory Item</th>
-                                <th width="25%">Quantity Used</th>
-                                <th width="20%">Unit</th>
-                                <th width="15%">Action</th>
+                                <th width="25%" style="font-size: 13px;">Inventory Item</th>
+                                <th width="25%" style="font-size: 13px;">Quantity Used</th>
+                                <th width="20%" style="font-size: 13px;">Unit</th>
+                                <th width="15%" style="font-size: 13px;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="suppliesTableBody">
