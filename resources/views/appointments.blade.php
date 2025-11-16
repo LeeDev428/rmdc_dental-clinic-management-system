@@ -677,8 +677,12 @@ window.onclick = function(event) {
                                                         <p class="text-sm font-bold text-gray-800 mb-2">Terms and Conditions</p>
                                                         <ul class="list-disc pl-5 text-xs text-gray-700 space-y-1">
                                                             <li>Rescheduling and editing the appointment is not allowed once created.</li>
-                                                            <li>Deleting your appointment counts as a violation (max 3 violations).</li>
+                                                            <li><strong class="text-red-600">Cancellation Policy:</strong> Cancellations must be made at least <strong>2 days (48 hours) before</strong> your scheduled appointment.</li>
+                                                            <li><strong class="text-red-600">Same-Day Cancellations:</strong> Cancellations on the same day of the appointment are <strong>NOT allowed</strong>.</li>
+                                                            <li><strong class="text-red-600">Down Payment:</strong> Down payments are <strong>non-refundable</strong> for late cancellations or no-shows.</li>
+                                                            <li>Deleting your appointment counts as a violation (max 3 violations per week).</li>
                                                             <li>Only one appointment is allowed per day.</li>
+                                                            <li>If your appointment is not yet in the current appointment period, you may cancel or reschedule through the Cancellation page.</li>
                                                         </ul>
                                                     </div>
                                                 </div>
