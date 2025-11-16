@@ -218,8 +218,8 @@ class   AdminController extends Controller
 
     public function upcomingAppointments(Request $request)
     {
-        // Fetch all appointments ordered by created_at ascending (or descending if you prefer)
-        $appointments = Appointment::orderBy('created_at', 'asc')->get();
+        // Fetch pending appointments only
+        $appointments = Appointment::where('status', 'pending')->orderBy('created_at', 'asc')->get();
 
         // Get the count of appointments with 'pending' status
         $pendingCount = Appointment::where('status', 'pending')->count();
@@ -243,7 +243,8 @@ class   AdminController extends Controller
             ->select(
                 'appointments.*',
                 'users.name as username' // Fetch username from users table
-            );
+            )
+            ->where('appointments.status', 'pending'); // Only pending appointments
 
         // Apply search filter if provided
         if ($request->has('search') && $request->search != '') {
@@ -441,6 +442,70 @@ public function patientInformation(Request $request)
     return view('admin.appointments', [
         'acceptedAppointments' => $acceptedAppointments,
         'upcomingCount' => $upcomingCount,
+        'pendingCount' => $pendingCount,
+    ]);
+}
+
+/**
+ * Display completed appointments (history)
+ */
+public function completedAppointments(Request $request)
+{
+    // Start query for completed appointments with user join
+    $query = Appointment::join('users', 'appointments.user_id', '=', 'users.id')
+                        ->select('appointments.*', 'users.name as username')
+                        ->where('appointments.status', 'completed');
+    
+    // Apply search filter if provided
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('appointments.title', 'like', "%$search%")
+              ->orWhere('appointments.procedure', 'like', "%$search%")
+              ->orWhere('users.name', 'like', "%$search%");
+        });
+    }
+    
+    // Apply time-based filter (today, this week, this month)
+    if ($request->has('filter')) {
+        switch ($request->filter) {
+            case 'today':
+                $query->whereDate('appointments.updated_at', today());
+                break;
+            case 'week':
+                $query->whereBetween('appointments.updated_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+                break;
+            case 'month':
+                $query->whereMonth('appointments.updated_at', now()->month)
+                      ->whereYear('appointments.updated_at', now()->year);
+                break;
+        }
+    }
+    
+    // Apply specific date filter if provided
+    if ($request->has('date') && $request->date != '') {
+        $query->whereDate('appointments.updated_at', $request->date);
+    }
+    
+    // Sort by most recently completed first
+    $query->orderBy('appointments.updated_at', 'desc');
+    
+    // Paginate the results
+    $completedAppointments = $query->paginate(20);
+
+    // Count the number of pending appointments
+    $pendingCount = Appointment::where('status', 'pending')->count();
+
+    // Count of completed appointments
+    $completedCount = Appointment::where('status', 'completed')->count();
+
+    // Pass completed appointments and counts to the view
+    return view('admin.completed_appointments', [
+        'completedAppointments' => $completedAppointments,
+        'completedCount' => $completedCount,
         'pendingCount' => $pendingCount,
     ]);
 }
