@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ProcedurePrice;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcedurePriceController extends Controller
 {
@@ -124,35 +126,60 @@ class ProcedurePriceController extends Controller
      */
     public function saveProcedureSupplies(Request $request, $procedureId)
     {
-        $request->validate([
-            'inventory_id' => 'required|array',
-            'inventory_id.*' => 'required|exists:inventories,id',
-            'quantity_used' => 'required|array',
-            'quantity_used.*' => 'required|numeric|min:0.01',
-        ]);
+        try {
+            $request->validate([
+                'inventory_id' => 'required|array',
+                'inventory_id.*' => 'required|exists:inventories,id',
+                'quantity_used' => 'required|array',
+                'quantity_used.*' => 'required|numeric|min:0.01',
+            ]);
 
-        $procedure = ProcedurePrice::findOrFail($procedureId);
+            $procedure = ProcedurePrice::findOrFail($procedureId);
 
-        // Delete existing supplies for this procedure
-        $procedure->procedureInventories()->delete();
+            // Use transaction to ensure atomicity
+            DB::beginTransaction();
 
-        // Add new supplies
-        $inventoryIds = $request->input('inventory_id');
-        $quantities = $request->input('quantity_used');
+            // Delete existing supplies for this procedure
+            \App\Models\ProcedureInventory::where('procedure_price_id', $procedureId)->delete();
 
-        foreach ($inventoryIds as $index => $inventoryId) {
-            if (!empty($inventoryId) && !empty($quantities[$index])) {
-                \App\Models\ProcedureInventory::create([
-                    'procedure_price_id' => $procedureId,
-                    'inventory_id' => $inventoryId,
-                    'quantity_used' => $quantities[$index],
-                ]);
+            // Add new supplies
+            $inventoryIds = $request->input('inventory_id');
+            $quantities = $request->input('quantity_used');
+
+            foreach ($inventoryIds as $index => $inventoryId) {
+                if (!empty($inventoryId) && !empty($quantities[$index])) {
+                    \App\Models\ProcedureInventory::create([
+                        'procedure_price_id' => $procedureId,
+                        'inventory_id' => $inventoryId,
+                        'quantity_used' => $quantities[$index],
+                    ]);
+                }
             }
-        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Supplies updated successfully'
-        ]);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Supplies updated successfully'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saving procedure supplies: ' . $e->getMessage(), [
+                'procedure_id' => $procedureId,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error saving supplies: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
