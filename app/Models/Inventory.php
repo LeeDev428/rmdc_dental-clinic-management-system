@@ -25,4 +25,22 @@ class Inventory extends Model
             $this->attributes['expiration_date'] = $value;
         }
     }
+
+    /**
+     * Get the procedures that use this inventory item
+     */
+    public function procedureInventories()
+    {
+        return $this->hasMany(ProcedureInventory::class);
+    }
+
+    /**
+     * Get the procedures that use this inventory item (many-to-many)
+     */
+    public function procedures()
+    {
+        return $this->belongsToMany(ProcedurePrice::class, 'procedure_inventory')
+                    ->withPivot('quantity_used')
+                    ->withTimestamps();
+    }
 }
