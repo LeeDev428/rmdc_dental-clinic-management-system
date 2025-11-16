@@ -222,6 +222,10 @@
         Route::get('/admin/procedure-prices', [ProcedurePriceController::class, 'index'])->name('admin.procedure_prices');
         Route::put('/admin/procedure-prices/{id}', [ProcedurePriceController::class, 'update'])->name('admin.procedure_prices.update');
         
+        // Procedure supplies management routes
+        Route::get('/admin/procedure-supplies/{procedureId}', [ProcedurePriceController::class, 'getProcedureSupplies'])->name('admin.procedure_supplies.get');
+        Route::post('/admin/procedure-supplies/{procedureId}', [ProcedurePriceController::class, 'saveProcedureSupplies'])->name('admin.procedure_supplies.save');
+        
         // Dental Records Routes
         Route::get('/admin/patients/{userId}/dental-records', [DentalRecordController::class, 'index'])->name('admin.dental_records.index');
         Route::get('/admin/patients/{userId}/dental-records/create', [DentalRecordController::class, 'create'])->name('admin.dental_records.create');
