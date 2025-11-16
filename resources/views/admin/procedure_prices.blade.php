@@ -3,6 +3,7 @@
 @section('title', 'Procedure Prices')
 
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <style>
     .content-wrapper {
         padding: 24px;
@@ -900,22 +901,29 @@
             });
     }
 
+    // Store inventory items globally
+    const inventoryItems = @json($inventories ?? []);
+
     function addSupplyRow(supply = null) {
         const tbody = document.getElementById('suppliesTableBody');
         const row = document.createElement('tr');
         
+        // Build options HTML
+        let optionsHtml = '<option value="">Select Item</option>';
+        inventoryItems.forEach(inventory => {
+            const selected = supply && supply.inventory_id == inventory.id ? 'selected' : '';
+            optionsHtml += `<option value="${inventory.id}" 
+                                data-unit="${inventory.unit}" 
+                                data-items-per-unit="${inventory.items_per_unit}"
+                                ${selected}>
+                            ${inventory.name} (${inventory.unit})
+                        </option>`;
+        });
+        
         row.innerHTML = `
             <td>
-                <select class="form-control form-control-sm supply-select" name="inventory_id[]" required>
-                    <option value="">Select Item</option>
-                    @foreach($inventories ?? [] as $inventory)
-                        <option value="{{ $inventory->id }}" 
-                                data-unit="{{ $inventory->unit }}" 
-                                data-items-per-unit="{{ $inventory->items_per_unit }}"
-                                ${supply && supply.inventory_id == {{ $inventory->id }} ? 'selected' : ''}>
-                            {{ $inventory->name }} ({{ $inventory->unit }})
-                        </option>
-                    @endforeach
+                <select class="form-control form-control-sm supply-select" name="inventory_id[]" required style="width: 100%; min-width: 200px; font-size: 13px;">
+                    ${optionsHtml}
                 </select>
             </td>
             <td>
@@ -925,10 +933,11 @@
                        step="0.01" 
                        min="0.01" 
                        value="${supply ? supply.quantity_used : ''}" 
-                       required>
+                       required
+                       style="font-size: 13px;">
             </td>
             <td>
-                <span class="unit-display">Pieces</span>
+                <span class="unit-display" style="font-size: 13px;">Pieces</span>
             </td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm" onclick="removeSupplyRow(this)">
@@ -1009,12 +1018,12 @@
                         <strong>Note:</strong> Enter quantities in pieces. If an item uses boxes/bottles, the system will calculate based on items per unit.
                     </div>
                     
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" style="table-layout: fixed; width: 100%;">
                         <thead>
                             <tr>
-                                <th width="25%" style="font-size: 13px;">Inventory Item</th>
+                                <th width="45%" style="font-size: 13px;">Inventory Item</th>
                                 <th width="25%" style="font-size: 13px;">Quantity Used</th>
-                                <th width="20%" style="font-size: 13px;">Unit</th>
+                                <th width="15%" style="font-size: 13px;">Unit</th>
                                 <th width="15%" style="font-size: 13px;">Action</th>
                             </tr>
                         </thead>
