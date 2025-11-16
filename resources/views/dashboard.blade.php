@@ -7,6 +7,19 @@
         </h2>
     </x-slot>
 
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .quick-action-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-blue-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -44,6 +57,104 @@
                     <button type="button" class="btn btn-secondary" onclick="closeTeethLayoutModal()">Close</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Quick Statistics Cards -->
+    <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Appointments Card -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Total Appointments</p>
+                        <h3 class="text-3xl font-bold mt-2">{{ \App\Models\Appointment::where('user_id', auth()->id())->count() }}</h3>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-calendar-check text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Appointments Card -->
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-yellow-100 text-sm font-medium">Pending</p>
+                        <h3 class="text-3xl font-bold mt-2">{{ \App\Models\Appointment::where('user_id', auth()->id())->where('status', 'pending')->count() }}</h3>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-clock text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accepted Appointments Card -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Accepted</p>
+                        <h3 class="text-3xl font-bold mt-2">{{ \App\Models\Appointment::where('user_id', auth()->id())->where('status', 'accepted')->count() }}</h3>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Card -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Messages</p>
+                        <h3 class="text-3xl font-bold mt-2">{{ \App\Models\Message::where('user_id', auth()->id())->count() }}</h3>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-envelope text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="text-center font-semibold text-2xl text-gray-800 dark:text-white mb-6">
+            Quick Actions
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Book Appointment -->
+            <a href="{{ route('appointments') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-blue-50 dark:hover:bg-gray-700">
+                <div class="flex flex-col items-center">
+                    <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-4 mb-4">
+                        <i class="fas fa-calendar-plus text-3xl text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Book Appointment</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Schedule your next dental visit</p>
+                </div>
+            </a>
+
+            <!-- View Messages -->
+            <a href="{{ route('messages') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-purple-50 dark:hover:bg-gray-700">
+                <div class="flex flex-col items-center">
+                    <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-4 mb-4">
+                        <i class="fas fa-comments text-3xl text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">View Messages</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Check messages from dentist</p>
+                </div>
+            </a>
+
+            <!-- View History -->
+            <a href="{{ route('usersettings') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-green-50 dark:hover:bg-gray-700">
+                <div class="flex flex-col items-center">
+                    <div class="bg-green-100 dark:bg-green-900 rounded-full p-4 mb-4">
+                        <i class="fas fa-history text-3xl text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">View History</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Access appointment history</p>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -185,7 +296,7 @@
     </div>
 
 
-    <section>
+    <section id="our-services">
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 bg-white dark:bg-blue-800 shadow-sm rounded-lg relative">
             <div class="text-center font-semibold text-3xl text-gray-800 dark:text-white mt-6 mb-8">
