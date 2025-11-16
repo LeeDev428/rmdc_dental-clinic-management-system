@@ -834,12 +834,13 @@ window.onclick = function(event) {
                                     </button>
                                     
                                     <button type="submit" 
+                                            id="submit-booking-btn"
                                             class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                             {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'disabled' : '' }}>
                                         <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                         </svg>
-                                        {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Book Appointment & Pay' }}
+                                        <span id="submit-btn-text">{{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Book Appointment & Pay' }}</span>
                                     </button>
                                 </div>
                             </form>
@@ -983,12 +984,56 @@ window.onclick = function(event) {
             });
         });
 
+        // Prevent double submission
+        let isSubmitting = false;
+
         // Show rating modal after successful booking
         document.getElementById('booking-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent default form submission
 
+            // Prevent double submission
+            if (isSubmitting) {
+                console.log('Form already submitting, please wait...');
+                return;
+            }
+
             const form = event.target;
             const formData = new FormData(form);
+            const submitBtn = document.getElementById('submit-booking-btn');
+            const submitBtnText = document.getElementById('submit-btn-text');
+            
+            // Validate all required fields before submission
+            const requiredFields = {
+                'title': 'Patient Name',
+                'procedure': 'Procedure',
+                'time': 'Appointment Time',
+                'image_path': 'Valid ID',
+                'payment_method': 'Payment Method'
+            };
+
+            let missingFields = [];
+            for (const [field, label] of Object.entries(requiredFields)) {
+                if (field === 'payment_method') {
+                    if (!document.querySelector('input[name="payment_method"]:checked')) {
+                        missingFields.push(label);
+                    }
+                } else if (field === 'image_path') {
+                    const fileInput = document.getElementById('valid-id');
+                    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                        missingFields.push(label);
+                    }
+                } else {
+                    const input = document.querySelector(`[name="${field}"]`);
+                    if (!input || !input.value) {
+                        missingFields.push(label);
+                    }
+                }
+            }
+
+            if (missingFields.length > 0) {
+                showPopup('error', 'Please fill in all required fields:\n' + missingFields.join(', '));
+                return;
+            }
             
             // Ensure payment method is selected and explicitly added
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
@@ -1004,11 +1049,11 @@ window.onclick = function(event) {
             const totalPrice = document.getElementById('total-price-hidden');
             const downPayment = document.getElementById('down-payment-hidden');
             
-            if (!totalPrice || !totalPrice.value) {
+            if (!totalPrice || !totalPrice.value || totalPrice.value === '0') {
                 showPopup('error', 'Total price is missing. Please select a procedure.');
                 return;
             }
-            if (!downPayment || !downPayment.value) {
+            if (!downPayment || !downPayment.value || downPayment.value === '0') {
                 showPopup('error', 'Down payment is missing. Please select a procedure.');
                 return;
             }
@@ -1021,6 +1066,13 @@ window.onclick = function(event) {
             console.log('Payment Method:', paymentMethod.value);
             console.log('Total Price:', totalPrice.value);
             console.log('Down Payment:', downPayment.value);
+
+            // Disable button and show loading state
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            submitBtnText.innerHTML = '<svg class="animate-spin h-5 w-5 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
 
             fetch(form.action, {
                 method: form.method,
@@ -1043,6 +1095,8 @@ window.onclick = function(event) {
                 
                 if (data.error) {
                     showPopup('error', data.error);
+                    // Re-enable button on error
+                    resetSubmitButton();
                 } else if (data.success && data.payment_url) {
                     // Redirect to payment gateway
                     showPopup('success', data.message || 'Redirecting to payment gateway...');
@@ -1066,6 +1120,9 @@ window.onclick = function(event) {
             .catch(error => {
                 console.error('Error submitting form:', error);
                 
+                // Re-enable button on error
+                resetSubmitButton();
+                
                 // Display validation errors more clearly
                 let errorMessage = 'An error occurred while booking your appointment';
                 
@@ -1074,7 +1131,8 @@ window.onclick = function(event) {
                 } else if (error.errors) {
                     // Show all validation errors
                     const errorList = Object.values(error.errors).flat();
-                    errorMessage = errorList.join('\n');
+                    errorMessage = 'Validation errors:\n' + errorList.join('\n');
+                    console.log('Validation errors:', error.errors);
                 } else if (error.message) {
                     errorMessage = error.message;
                 }
@@ -1082,6 +1140,17 @@ window.onclick = function(event) {
                 showPopup('error', errorMessage);
             });
         });
+
+        // Function to reset submit button
+        function resetSubmitButton() {
+            isSubmitting = false;
+            const submitBtn = document.getElementById('submit-booking-btn');
+            const submitBtnText = document.getElementById('submit-btn-text');
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            submitBtnText.innerHTML = '<svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Book Appointment & Pay';
+        }
 
         // Close rating modal
         closeRatingModal.addEventListener('click', function () {
