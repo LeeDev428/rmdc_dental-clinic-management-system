@@ -338,7 +338,10 @@ Message::create([
         try {
             DB::beginTransaction();
             
+            Log::info("=== Starting completeAppointment for ID: {$id} ===");
+            
             $appointment = Appointment::findOrFail($id);
+            Log::info("Appointment found - Procedure: {$appointment->procedure}, Status: {$appointment->status}");
             
             // Check if already completed
             if ($appointment->status === 'completed') {
@@ -350,17 +353,22 @@ Message::create([
             
             // Find the procedure
             $procedure = \App\Models\ProcedurePrice::where('procedure_name', $appointment->procedure)->first();
+            Log::info("Searching for procedure with name: " . $appointment->procedure);
             
             if (!$procedure) {
                 DB::rollBack();
+                Log::error("Procedure not found in database");
                 return response()->json([
                     'success' => false,
                     'message' => 'Procedure not found. Cannot deduct inventory.'
                 ], 404);
             }
             
+            Log::info("Procedure found - ID: {$procedure->id}, Name: {$procedure->procedure_name}");
+            
             // Get linked inventory items
             $supplies = $procedure->procedureInventories()->with('inventory')->get();
+            Log::info("Found {$supplies->count()} supply items linked to procedure");
             
             if ($supplies->isEmpty()) {
                 // No supplies linked, just mark as completed
@@ -389,27 +397,36 @@ Message::create([
                 $inventory = $supply->inventory;
                 $quantityNeeded = $supply->quantity_used; // In pieces
                 
+                Log::info("Processing: {$inventory->name}, Unit: {$inventory->unit}, Current Qty: {$inventory->quantity}, Needed: {$quantityNeeded}");
+                
                 // Calculate how many units to deduct
                 if ($inventory->unit === 'Pieces') {
                     // Direct deduction
                     if ($inventory->quantity < $quantityNeeded) {
                         $insufficientStock[] = "{$inventory->name} (Need: {$quantityNeeded} pieces, Available: {$inventory->quantity})";
+                        Log::warning("Insufficient stock for {$inventory->name}");
                         continue;
                     }
                     $inventory->quantity -= $quantityNeeded;
+                    Log::info("Deducted {$quantityNeeded} pieces. New quantity: {$inventory->quantity}");
                 } else {
                     // Convert pieces to units (Box, Bottle, etc.)
                     $itemsPerUnit = $inventory->items_per_unit ?? 1;
                     $unitsNeeded = $quantityNeeded / $itemsPerUnit;
                     
+                    Log::info("Converting: {$quantityNeeded} pieces / {$itemsPerUnit} items_per_unit = {$unitsNeeded} {$inventory->unit}");
+                    
                     if ($inventory->quantity < $unitsNeeded) {
                         $insufficientStock[] = "{$inventory->name} (Need: " . number_format($unitsNeeded, 2) . " {$inventory->unit}, Available: {$inventory->quantity})";
+                        Log::warning("Insufficient stock for {$inventory->name}");
                         continue;
                     }
                     $inventory->quantity -= $unitsNeeded;
+                    Log::info("Deducted {$unitsNeeded} {$inventory->unit}. New quantity: {$inventory->quantity}");
                 }
                 
                 $inventory->save();
+                Log::info("Saved inventory ID: {$inventory->id}");
                 $deductedItems[] = "{$inventory->name}: {$quantityNeeded} pieces";
             }
             
