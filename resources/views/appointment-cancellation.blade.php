@@ -8,6 +8,34 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
+            <!-- Cancellation Policy Notice -->
+            <div class="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 shadow-lg sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="ml-4 flex-1">
+                            <h3 class="text-lg font-bold text-red-900 mb-2">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Important Cancellation & Reschedule Policy
+                            </h3>
+                            <div class="text-sm text-red-800 space-y-2">
+                                <p class="font-semibold">Before you proceed, please read carefully:</p>
+                                <ul class="list-disc ml-5 space-y-1">
+                                    <li><strong>Minimum Notice:</strong> Cancellations or reschedules must be made at least <strong class="text-red-900">2 days (48 hours)</strong> before your appointment.</li>
+                                    <li><strong>Same-Day Policy:</strong> Same-day cancellations or reschedules are <strong class="text-red-900">NOT permitted</strong>.</li>
+                                    <li><strong>Down Payment:</strong> Your down payment is <strong class="text-red-900">non-refundable</strong> for late cancellations or no-shows.</li>
+                                    <li><strong>Eligible Actions:</strong> You may only cancel or reschedule appointments that are <strong>NOT in the current appointment period</strong>.</li>
+                                    <li><strong>Weekly Limit:</strong> Maximum 3 cancellations allowed per week.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Cancellation Limit Info -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6">
