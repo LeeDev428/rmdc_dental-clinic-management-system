@@ -867,6 +867,175 @@
             }
         }
     }
+
+    // Manage Supplies Modal Functions
+    function openSuppliesModal(procedureId, procedureName) {
+        $('#suppliesProcedureId').val(procedureId);
+        $('#suppliesModalLabel').text('Manage Supplies for: ' + procedureName);
+        
+        // Load existing supplies for this procedure
+        loadProcedureSupplies(procedureId);
+        
+        $('#suppliesModal').modal('show');
+    }
+
+    function loadProcedureSupplies(procedureId) {
+        fetch(`/admin/procedure-supplies/${procedureId}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('suppliesTableBody');
+                tbody.innerHTML = '';
+                
+                if (data.supplies && data.supplies.length > 0) {
+                    data.supplies.forEach(supply => {
+                        addSupplyRow(supply);
+                    });
+                } else {
+                    addSupplyRow();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading supplies:', error);
+                addSupplyRow();
+            });
+    }
+
+    function addSupplyRow(supply = null) {
+        const tbody = document.getElementById('suppliesTableBody');
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>
+                <select class="form-control form-control-sm supply-select" name="inventory_id[]" required>
+                    <option value="">Select Item</option>
+                    @foreach($inventories ?? [] as $inventory)
+                        <option value="{{ $inventory->id }}" 
+                                data-unit="{{ $inventory->unit }}" 
+                                data-items-per-unit="{{ $inventory->items_per_unit }}"
+                                ${supply && supply.inventory_id == {{ $inventory->id }} ? 'selected' : ''}>
+                            {{ $inventory->name }} ({{ $inventory->unit }})
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm" 
+                       name="quantity_used[]" 
+                       placeholder="Pieces" 
+                       step="0.01" 
+                       min="0.01" 
+                       value="${supply ? supply.quantity_used : ''}" 
+                       required>
+            </td>
+            <td>
+                <span class="unit-display">Pieces</span>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeSupplyRow(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+        
+        // Add event listener to update unit display
+        const select = row.querySelector('.supply-select');
+        select.addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            const unitDisplay = row.querySelector('.unit-display');
+            if (option.value) {
+                unitDisplay.textContent = 'Pieces';
+            } else {
+                unitDisplay.textContent = 'Pieces';
+            }
+        });
+    }
+
+    function removeSupplyRow(button) {
+        const tbody = document.getElementById('suppliesTableBody');
+        if (tbody.children.length > 1) {
+            button.closest('tr').remove();
+        } else {
+            alert('At least one supply row is required.');
+        }
+    }
+
+    function saveSupplies() {
+        const form = document.getElementById('suppliesForm');
+        const formData = new FormData(form);
+        const procedureId = formData.get('procedure_id');
+        
+        fetch(`/admin/procedure-supplies/${procedureId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#suppliesModal').modal('hide');
+                alert('Supplies updated successfully!');
+            } else {
+                alert('Error saving supplies: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error saving supplies. Please try again.');
+        });
+    }
 </script>
+
+<!-- Supplies Management Modal -->
+<div class="modal fade" id="suppliesModal" tabindex="-1" role="dialog" aria-labelledby="suppliesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="suppliesModalLabel">Manage Supplies</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="suppliesForm">
+                <div class="modal-body">
+                    <input type="hidden" id="suppliesProcedureId" name="procedure_id">
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Note:</strong> Enter quantities in pieces. If an item uses boxes/bottles, the system will calculate based on items per unit.
+                    </div>
+                    
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="40%">Inventory Item</th>
+                                <th width="25%">Quantity Used</th>
+                                <th width="20%">Unit</th>
+                                <th width="15%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliesTableBody">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                    
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="addSupplyRow()">
+                        <i class="fas fa-plus"></i> Add Another Item
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" onclick="saveSupplies()">
+                        <i class="fas fa-save"></i> Save Supplies
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @endsection
