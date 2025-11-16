@@ -458,6 +458,26 @@
         color: #991b1b;
     }
     
+    .btn-complete-appointment {
+        background: #10b981;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-complete-appointment:hover {
+        background: #059669;
+        transform: translateY(-1px);
+    }
+    
     .appointment-image {
         max-width: 100%;
         border-radius: 8px;
@@ -658,5 +678,35 @@
             closeDetailsModal();
         }
     });
+    
+    // Mark appointment as completed and deduct inventory
+    function markAsCompleted(appointmentId, procedureName) {
+        if (!confirm(`Are you sure you want to mark this appointment as COMPLETED?\n\nThis will:\n✓ Update the appointment status\n✓ Automatically deduct inventory items used for "${procedureName}"\n\nThis action cannot be undone.`)) {
+            return;
+        }
+        
+        fetch(`/admin/appointments/${appointmentId}/complete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`✓ Appointment marked as completed!\n\n${data.message}`);
+                closeDetailsModal();
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to complete appointment'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while completing the appointment.');
+        });
+    }
 </script>
 @endsection
