@@ -301,21 +301,42 @@
             closeActionModal();
             
             if (action === 'cancel') {
-                // Open cancel modal
-                openCancelModal(currentAppointmentId, currentAppointmentTitle);
+                // Open cancel modal for cancellation
+                openCancelModal(currentAppointmentId, currentAppointmentTitle, 'cancel');
             } else if (action === 'reschedule') {
-                // Redirect to appointments page to book new time
-                window.location.href = '/appointments';
+                // Open cancel modal but for rescheduling
+                openCancelModal(currentAppointmentId, currentAppointmentTitle, 'reschedule');
             }
         }
 
-        function openCancelModal(appointmentId, appointmentTitle) {
+        function openCancelModal(appointmentId, appointmentTitle, actionType = 'cancel') {
             document.getElementById('appointmentId').value = appointmentId;
             document.getElementById('appointmentTitle').textContent = appointmentTitle;
             document.getElementById('cancelModal').classList.remove('hidden');
             document.getElementById('cancelModal').classList.add('flex');
             document.getElementById('reason').value = '';
             document.getElementById('errorMessage').classList.add('hidden');
+            
+            // Store action type for submission
+            document.getElementById('cancelForm').dataset.actionType = actionType;
+            
+            // Update modal text based on action
+            const modalTitle = document.querySelector('#cancelModal h3');
+            const modalDescription = document.querySelector('#cancelModal .text-sm.text-gray-600');
+            const reasonLabel = document.querySelector('label[for="reason"]');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (actionType === 'reschedule') {
+                modalTitle.textContent = 'Reschedule Appointment';
+                modalDescription.innerHTML = `Are you sure you want to reschedule <span class="font-semibold">${appointmentTitle}</span>? Your current time slot will be freed for others.`;
+                reasonLabel.innerHTML = 'Reason for Rescheduling <span class="text-red-500">*</span>';
+                submitBtn.textContent = 'Confirm Reschedule';
+            } else {
+                modalTitle.textContent = 'Cancel Appointment';
+                modalDescription.innerHTML = `Are you sure you want to cancel <span class="font-semibold">${appointmentTitle}</span>?`;
+                reasonLabel.innerHTML = 'Reason for Cancellation <span class="text-red-500">*</span>';
+                submitBtn.textContent = 'Confirm Cancellation';
+            }
         }
 
         function closeCancelModal() {
@@ -330,13 +351,19 @@
             const reason = document.getElementById('reason').value;
             const submitBtn = document.getElementById('submitBtn');
             const errorDiv = document.getElementById('errorMessage');
+            const actionType = document.getElementById('cancelForm').dataset.actionType || 'cancel';
             
             // Disable button
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Cancelling...';
+            submitBtn.textContent = actionType === 'reschedule' ? 'Rescheduling...' : 'Cancelling...';
             
             try {
-                const response = await fetch(`/appointments/${appointmentId}/cancel`, {
+                // Use the appropriate endpoint based on action type
+                const endpoint = actionType === 'reschedule' 
+                    ? `/appointments/${appointmentId}/reschedule`
+                    : `/appointments/${appointmentId}/cancel`;
+                
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -349,7 +376,13 @@
                 
                 if (response.ok) {
                     alert(data.success);
-                    window.location.reload();
+                    
+                    // If reschedule, redirect to appointments page
+                    if (actionType === 'reschedule' && data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.reload();
+                    }
                 } else {
                     errorDiv.textContent = data.error || 'An error occurred';
                     errorDiv.classList.remove('hidden');
@@ -359,7 +392,7 @@
                 errorDiv.classList.remove('hidden');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Confirm Cancellation';
+                submitBtn.textContent = actionType === 'reschedule' ? 'Confirm Reschedule' : 'Confirm Cancellation';
             }
         }
 
