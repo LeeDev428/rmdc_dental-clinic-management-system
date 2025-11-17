@@ -11,11 +11,12 @@ class AppointmentCancellation extends Model
         'user_id',
         'appointment_id',
         'reason',
-        'cancelled_at'
+        'type', // 'cancel' or 'reschedule'
+        'processed_at' // renamed from cancelled_at
     ];
 
     protected $casts = [
-        'cancelled_at' => 'datetime',
+        'processed_at' => 'datetime',
     ];
 
     // Relationship to User
@@ -30,27 +31,39 @@ class AppointmentCancellation extends Model
         return $this->belongsTo(Appointment::class);
     }
 
-    // Check if user has reached cancellation limit (3 per week)
-    public static function canUserCancel($userId)
+    // Check if user has reached limit (2 total per week: any combination of cancel/reschedule)
+    public static function canUserPerformAction($userId)
     {
         $oneWeekAgo = Carbon::now()->subWeek();
         
-        $cancellationsThisWeek = self::where('user_id', $userId)
-            ->where('cancelled_at', '>=', $oneWeekAgo)
+        $actionsThisWeek = self::where('user_id', $userId)
+            ->where('processed_at', '>=', $oneWeekAgo)
             ->count();
         
-        return $cancellationsThisWeek < 3;
+        return $actionsThisWeek < 2; // Changed from 3 to 2
     }
 
-    // Get remaining cancellations for this week
-    public static function getRemainingCancellations($userId)
+    // Get remaining actions for this week (out of 2)
+    public static function getRemainingActions($userId)
     {
         $oneWeekAgo = Carbon::now()->subWeek();
         
-        $cancellationsThisWeek = self::where('user_id', $userId)
-            ->where('cancelled_at', '>=', $oneWeekAgo)
+        $actionsThisWeek = self::where('user_id', $userId)
+            ->where('processed_at', '>=', $oneWeekAgo)
             ->count();
         
-        return max(0, 3 - $cancellationsThisWeek);
+        return max(0, 2 - $actionsThisWeek); // Changed from 3 to 2
+    }
+
+    // Legacy method for backwards compatibility
+    public static function canUserCancel($userId)
+    {
+        return self::canUserPerformAction($userId);
+    }
+
+    // Legacy method for backwards compatibility
+    public static function getRemainingCancellations($userId)
+    {
+        return self::getRemainingActions($userId);
     }
 }
