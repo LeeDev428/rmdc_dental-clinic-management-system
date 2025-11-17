@@ -704,17 +704,67 @@
         .then(data => {
             console.log('Response data:', data);
             if (data.success) {
-                alert(`✓ Appointment marked as completed!\n\n${data.message}`);
+                // Show modern toast notification instead of alert
+                showToast('success', data.message || 'Appointment marked as completed successfully!');
                 closeDetailsModal();
-                window.location.reload();
+                // Reload page after 2 seconds to show the toast
+                setTimeout(() => window.location.reload(), 2000);
             } else {
-                alert('Error: ' + (data.message || 'Failed to complete appointment'));
+                showToast('error', data.message || 'Failed to complete appointment');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while completing the appointment.');
+            showToast('error', 'An error occurred while completing the appointment.');
         });
     }
+    
+    // Toast notification function
+    function showToast(type, message) {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-5 right-5 z-50 px-6 py-4 rounded-lg shadow-lg text-white max-w-md ${
+            type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+        }`;
+        toast.style.animation = 'slideInRight 0.3s ease-out';
+        toast.innerHTML = `
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">${type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠'}</span>
+                <div>
+                    <div class="font-semibold mb-1">${type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Warning'}</div>
+                    <div class="text-sm">${message}</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 </script>
+
+<style>
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+</style>
 @endsection
