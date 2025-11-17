@@ -395,39 +395,34 @@ Message::create([
             // Process each supply item
             foreach ($supplies as $supply) {
                 $inventory = $supply->inventory;
-                $quantityNeeded = $supply->quantity_used; // In pieces
+                $piecesNeeded = floatval($supply->quantity_used); // Always in pieces
                 
-                Log::info("Processing: {$inventory->name}, Unit: {$inventory->unit}, Current Qty: {$inventory->quantity}, Needed: {$quantityNeeded}");
+                Log::info("Processing: {$inventory->name}, Unit: {$inventory->unit}, Current Qty: {$inventory->quantity}, Needed: {$piecesNeeded} pieces");
                 
-                // Calculate how many units to deduct
-                if ($inventory->unit === 'Pieces') {
-                    // Direct deduction
-                    if ($inventory->quantity < $quantityNeeded) {
-                        $insufficientStock[] = "{$inventory->name} (Need: {$quantityNeeded} pieces, Available: {$inventory->quantity})";
-                        Log::warning("Insufficient stock for {$inventory->name}");
-                        continue;
-                    }
-                    $inventory->quantity -= $quantityNeeded;
-                    Log::info("Deducted {$quantityNeeded} pieces. New quantity: {$inventory->quantity}");
-                } else {
-                    // Convert pieces to units (Box, Bottle, etc.)
-                    $itemsPerUnit = $inventory->items_per_unit ?? 1;
-                    $unitsNeeded = $quantityNeeded / $itemsPerUnit;
-                    
-                    Log::info("Converting: {$quantityNeeded} pieces / {$itemsPerUnit} items_per_unit = {$unitsNeeded} {$inventory->unit}");
-                    
-                    if ($inventory->quantity < $unitsNeeded) {
-                        $insufficientStock[] = "{$inventory->name} (Need: " . number_format($unitsNeeded, 2) . " {$inventory->unit}, Available: {$inventory->quantity})";
-                        Log::warning("Insufficient stock for {$inventory->name}");
-                        continue;
-                    }
-                    $inventory->quantity -= $unitsNeeded;
-                    Log::info("Deducted {$unitsNeeded} {$inventory->unit}. New quantity: {$inventory->quantity}");
+                // LOGIC: 
+                // - quantity_used (from procedure_inventory) = PIECES needed
+                // - inventory.quantity = UNITS in stock (boxes/bottles/packs)
+                // - items_per_unit = how many PIECES in one UNIT
+                // FORMULA: units_to_deduct = pieces_needed / items_per_unit
+                $itemsPerUnit = floatval($inventory->items_per_unit ?? 1);
+                $unitsToDeduct = $piecesNeeded / $itemsPerUnit;
+                
+                Log::info("Calculation: {$piecesNeeded} pieces ÷ {$itemsPerUnit} items/unit = {$unitsToDeduct} {$inventory->unit} to deduct");
+                
+                // Check stock availability
+                if ($inventory->quantity < $unitsToDeduct) {
+                    $insufficientStock[] = "{$inventory->name} (Need: " . number_format($unitsToDeduct, 2) . " {$inventory->unit}, Available: {$inventory->quantity})";
+                    Log::warning("Insufficient stock for {$inventory->name}");
+                    continue;
                 }
+                
+                // Deduct from inventory
+                $inventory->quantity -= $unitsToDeduct;
+                Log::info("Deducted {$unitsToDeduct} {$inventory->unit}. New quantity: {$inventory->quantity}");
                 
                 $inventory->save();
                 Log::info("Saved inventory ID: {$inventory->id}");
-                $deductedItems[] = "{$inventory->name}: {$quantityNeeded} pieces";
+                $deductedItems[] = "{$inventory->name}: {$piecesNeeded} pieces ({$unitsToDeduct} {$inventory->unit})";
             }
             
             // Check if there were insufficient stock items
