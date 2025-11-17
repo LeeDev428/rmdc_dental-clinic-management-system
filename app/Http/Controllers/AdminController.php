@@ -515,13 +515,33 @@ public function completedAppointments(Request $request)
  */
 public function cancellationRequests()
 {
+    // Get cancelled appointments from appointment_cancellations table
+    $cancellations = \App\Models\AppointmentCancellation::with(['user', 'appointment'])
+        ->orderBy('processed_at', 'desc')
+        ->get();
+    
     // Get statistics
-    $pendingCancellations = 0; // Placeholder - implement when cancellation tracking is added
-    $approvedToday = 0;
-    $weeklyTotal = 0;
-    $lateCancellations = 0;
+    $pendingCancellations = $cancellations->filter(function($c) {
+        return $c->appointment->status === 'cancelled';
+    })->count();
+    
+    $approvedToday = $cancellations->filter(function($c) {
+        return $c->processed_at->isToday();
+    })->count();
+    
+    $weeklyTotal = $cancellations->filter(function($c) {
+        return $c->processed_at->isCurrentWeek();
+    })->count();
+    
+    // Late cancellations (less than 48 hours notice)
+    $lateCancellations = $cancellations->filter(function($c) {
+        $appointmentTime = \Carbon\Carbon::parse($c->appointment->start);
+        $hoursNotice = $c->processed_at->diffInHours($appointmentTime, false);
+        return $hoursNotice < 48 && $hoursNotice > 0;
+    })->count();
 
     return view('admin.cancellation-requests', compact(
+        'cancellations',
         'pendingCancellations',
         'approvedToday',
         'weeklyTotal',
@@ -534,8 +554,11 @@ public function cancellationRequests()
  */
 public function getCancellationCount()
 {
-    // Placeholder - implement when cancellation tracking is added
-    $count = 0;
+    // Count pending cancellations from appointment_cancellations table
+    $count = \App\Models\AppointmentCancellation::whereHas('appointment', function($query) {
+        $query->where('status', 'cancelled');
+    })->count();
+    
     return response()->json(['count' => $count]);
 }
 
