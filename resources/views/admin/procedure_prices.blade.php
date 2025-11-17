@@ -908,17 +908,30 @@
         const tbody = document.getElementById('suppliesTableBody');
         const row = document.createElement('tr');
         
-        // Build options HTML
+        // Get already selected inventory IDs from existing rows
+        const selectedInventoryIds = Array.from(tbody.querySelectorAll('.supply-select'))
+            .map(select => select.value)
+            .filter(id => id !== '');
+        
+        // Build options HTML - exclude already selected items
         let optionsHtml = '<option value="">Select Item</option>';
         inventoryItems.forEach(inventory => {
             const selected = supply && supply.inventory_id == inventory.id ? 'selected' : '';
-            optionsHtml += `<option value="${inventory.id}" 
-                                data-unit="${inventory.unit}" 
-                                data-items-per-unit="${inventory.items_per_unit}"
-                                data-quantity="${inventory.quantity}"
-                                ${selected}>
-                            ${inventory.name} (${inventory.unit}) - Available: ${inventory.quantity}
-                        </option>`;
+            // Hide items that are already selected in other rows (unless this is the current row's item)
+            const isAlreadyTaken = selectedInventoryIds.includes(inventory.id.toString()) && 
+                                   (!supply || supply.inventory_id != inventory.id);
+            
+            if (!isAlreadyTaken) {
+                optionsHtml += `<option value="${inventory.id}" 
+                                    data-unit="${inventory.unit}" 
+                                    data-items-per-unit="${inventory.items_per_unit}"
+                                    data-original-per-unit="${inventory.original_items_per_unit || inventory.items_per_unit}"
+                                    data-current-box-pieces="${inventory.current_box_pieces || inventory.items_per_unit}"
+                                    data-quantity="${inventory.quantity}"
+                                    ${selected}>
+                                ${inventory.name} (${inventory.unit}) - Available: ${inventory.quantity} + ${inventory.current_box_pieces || inventory.items_per_unit} pieces
+                            </option>`;
+            }
         });
         
         row.innerHTML = `
@@ -960,16 +973,18 @@
             const option = select.options[select.selectedIndex];
             if (!option.value) return true;
             
-            const itemsPerUnit = parseFloat(option.dataset.itemsPerUnit) || 1;
-            const availableQty = parseFloat(option.dataset.quantity) || 0;
+            // NEW VALIDATION LOGIC WITH current_box_pieces
+            const fullBoxes = parseFloat(option.dataset.quantity) || 0;
+            const openBoxPieces = parseFloat(option.dataset.currentBoxPieces) || 0;
+            const piecesPerBox = parseFloat(option.dataset.originalPerUnit) || 1;
             const requestedPieces = parseFloat(quantityInput.value) || 0;
             const unit = option.dataset.unit;
             
-            // Calculate max pieces available: availableQty (boxes) * itemsPerUnit (pieces per box)
-            const maxPiecesAvailable = availableQty * itemsPerUnit;
+            // Calculate total available: (full boxes × pieces per box) + pieces in open box
+            const totalAvailable = (fullBoxes * piecesPerBox) + openBoxPieces;
             
-            if (requestedPieces > maxPiecesAvailable) {
-                errorSpan.textContent = `Insufficient stock! Need ${requestedPieces} pieces, only ${maxPiecesAvailable} pieces available (${availableQty} ${unit} × ${itemsPerUnit} pieces)`;
+            if (requestedPieces > totalAvailable) {
+                errorSpan.textContent = `Insufficient stock! Need ${requestedPieces} pieces, only ${totalAvailable} pieces available (${fullBoxes} ${unit} + ${openBoxPieces} pieces in open box)`;
                 errorSpan.style.display = 'block';
                 quantityInput.style.borderColor = 'red';
                 return false;
@@ -1025,15 +1040,16 @@
             const option = select.options[select.selectedIndex];
             
             if (option.value) {
-                const itemsPerUnit = parseFloat(option.dataset.itemsPerUnit) || 1;
-                const availableQty = parseFloat(option.dataset.quantity) || 0;
+                const fullBoxes = parseFloat(option.dataset.quantity) || 0;
+                const openBoxPieces = parseFloat(option.dataset.currentBoxPieces) || 0;
+                const piecesPerBox = parseFloat(option.dataset.originalPerUnit) || 1;
                 const requestedPieces = parseFloat(input.value) || 0;
-                const maxPiecesAvailable = availableQty * itemsPerUnit;
+                const totalAvailable = (fullBoxes * piecesPerBox) + openBoxPieces;
                 
-                if (requestedPieces > maxPiecesAvailable) {
+                if (requestedPieces > totalAvailable) {
                     hasErrors = true;
                     const itemName = option.textContent.split('(')[0].trim();
-                    errorMessages.push(`${itemName}: Need ${requestedPieces} pieces, only ${maxPiecesAvailable} available`);
+                    errorMessages.push(`${itemName}: Need ${requestedPieces} pieces, only ${totalAvailable} available`);
                 }
             }
         });
