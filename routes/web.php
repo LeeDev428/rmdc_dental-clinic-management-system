@@ -89,6 +89,7 @@
     // Appointment Cancellation
     Route::get('/cancel-appointment', [AppointmentCancellationController::class, 'index'])->name('appointment.cancel');
     Route::post('/appointments/{id}/cancel', [AppointmentCancellationController::class, 'cancel'])->name('appointments.cancel');
+    Route::post('/appointments/{id}/reschedule', [AppointmentCancellationController::class, 'reschedule'])->name('appointments.reschedule');
     
     // Service Feedback
     Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
