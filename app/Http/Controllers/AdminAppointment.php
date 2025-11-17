@@ -397,32 +397,69 @@ Message::create([
                 $inventory = $supply->inventory;
                 $piecesNeeded = floatval($supply->quantity_used); // Always in pieces
                 
-                Log::info("Processing: {$inventory->name}, Unit: {$inventory->unit}, Current Qty: {$inventory->quantity}, Needed: {$piecesNeeded} pieces");
+                Log::info("Processing: {$inventory->name}, Unit: {$inventory->unit}, Needed: {$piecesNeeded} pieces");
                 
-                // LOGIC: 
-                // - quantity_used (from procedure_inventory) = PIECES needed
-                // - inventory.quantity = UNITS in stock (boxes/bottles/packs)
-                // - items_per_unit = how many PIECES in one UNIT
-                // FORMULA: units_to_deduct = pieces_needed / items_per_unit
-                $itemsPerUnit = floatval($inventory->items_per_unit ?? 1);
-                $unitsToDeduct = $piecesNeeded / $itemsPerUnit;
+                // NEW INVENTORY TRACKING SYSTEM:
+                // - quantity = number of FULL/UNOPENED boxes
+                // - current_box_pieces = pieces remaining in the CURRENTLY OPEN box
+                // - original_items_per_unit = pieces in a FRESH box (constant, never changes)
                 
-                Log::info("Calculation: {$piecesNeeded} pieces ÷ {$itemsPerUnit} items/unit = {$unitsToDeduct} {$inventory->unit} to deduct");
+                $fullBoxes = floatval($inventory->quantity);
+                $openBoxPieces = floatval($inventory->current_box_pieces);
+                $piecesPerFreshBox = floatval($inventory->original_items_per_unit ?? 1);
                 
-                // Check stock availability
-                if ($inventory->quantity < $unitsToDeduct) {
-                    $insufficientStock[] = "{$inventory->name} (Need: " . number_format($unitsToDeduct, 2) . " {$inventory->unit}, Available: {$inventory->quantity})";
+                // Calculate total available pieces
+                $totalAvailable = ($fullBoxes * $piecesPerFreshBox) + $openBoxPieces;
+                
+                Log::info("Available: {$fullBoxes} full boxes + {$openBoxPieces} pieces in open box = {$totalAvailable} total pieces");
+                
+                // Check if we have enough
+                if ($piecesNeeded > $totalAvailable) {
+                    $insufficientStock[] = "{$inventory->name} (Need: {$piecesNeeded} pieces, Available: {$totalAvailable} pieces)";
                     Log::warning("Insufficient stock for {$inventory->name}");
                     continue;
                 }
                 
-                // Deduct from inventory
-                $inventory->quantity -= $unitsToDeduct;
-                Log::info("Deducted {$unitsToDeduct} {$inventory->unit}. New quantity: {$inventory->quantity}");
+                // DEDUCTION LOGIC
+                $remaining = $piecesNeeded;
+                
+                // Step 1: Try to fulfill from current open box first
+                if ($openBoxPieces >= $remaining) {
+                    // Simple case: deduct from open box only
+                    $inventory->current_box_pieces = $openBoxPieces - $remaining;
+                    Log::info("Deducted {$remaining} pieces from open box. Remaining in open box: {$inventory->current_box_pieces}");
+                } else {
+                    // Need more than what's in open box
+                    Log::info("Using all {$openBoxPieces} pieces from open box");
+                    $remaining -= $openBoxPieces;
+                    $inventory->current_box_pieces = 0;
+                    
+                    // Step 2: Calculate how many full boxes we need
+                    $fullBoxesNeeded = floor($remaining / $piecesPerFreshBox);
+                    $piecesFromLastBox = $remaining % $piecesPerFreshBox;
+                    
+                    Log::info("Need {$fullBoxesNeeded} full boxes + {$piecesFromLastBox} pieces from another box");
+                    
+                    // Deduct full boxes
+                    $inventory->quantity -= $fullBoxesNeeded;
+                    
+                    // Handle the last partial box
+                    if ($piecesFromLastBox > 0) {
+                        // Open one more box and take some pieces
+                        $inventory->quantity -= 1;
+                        $inventory->current_box_pieces = $piecesPerFreshBox - $piecesFromLastBox;
+                        Log::info("Opened 1 more box, used {$piecesFromLastBox} pieces, {$inventory->current_box_pieces} pieces left in this box");
+                    } else {
+                        // Used exact boxes, reset open box to full
+                        $inventory->current_box_pieces = $piecesPerFreshBox;
+                        Log::info("Used exact boxes, new open box has {$inventory->current_box_pieces} pieces");
+                    }
+                }
+                
+                Log::info("Final: {$inventory->quantity} full boxes + {$inventory->current_box_pieces} pieces in open box");
                 
                 $inventory->save();
-                Log::info("Saved inventory ID: {$inventory->id}");
-                $deductedItems[] = "{$inventory->name}: {$piecesNeeded} pieces ({$unitsToDeduct} {$inventory->unit})";
+                $deductedItems[] = "{$inventory->name}: {$piecesNeeded} pieces (Now: {$inventory->quantity} {$inventory->unit} + {$inventory->current_box_pieces} pieces open)";
             }
             
             // Check if there were insufficient stock items
