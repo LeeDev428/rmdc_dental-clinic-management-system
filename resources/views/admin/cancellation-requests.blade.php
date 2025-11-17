@@ -194,15 +194,57 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($cancellations ?? [] as $cancellation)
+                    <tr>
+                        <td>{{ $cancellation->processed_at->format('M d, Y g:i A') }}</td>
+                        <td>{{ $cancellation->user->name ?? 'N/A' }}</td>
+                        <td>{{ \Carbon\Carbon::parse($cancellation->appointment->start)->format('M d, Y g:i A') }}</td>
+                        <td>{{ $cancellation->appointment->procedure ?? 'N/A' }}</td>
+                        <td>
+                            @php
+                                $appointmentTime = \Carbon\Carbon::parse($cancellation->appointment->start);
+                                $daysUntil = $cancellation->processed_at->diffInDays($appointmentTime, false);
+                                $hoursNotice = $cancellation->processed_at->diffInHours($appointmentTime, false);
+                            @endphp
+                            @if($daysUntil >= 0)
+                                {{ $daysUntil }} days
+                                @if($hoursNotice < 48)
+                                    <span class="badge bg-warning">Late</span>
+                                @endif
+                            @else
+                                <span class="badge bg-danger">Past</span>
+                            @endif
+                        </td>
+                        <td>
+                            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" 
+                                 title="{{ $cancellation->reason }}">
+                                {{ $cancellation->reason }}
+                            </div>
+                        </td>
+                        <td>
+                            @if($cancellation->appointment->status === 'cancelled')
+                                <span class="badge bg-danger">Cancelled</span>
+                            @else
+                                <span class="badge bg-secondary">{{ ucfirst($cancellation->appointment->status) }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="viewDetails({{ $cancellation->id }})" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
                     <tr>
                         <td colspan="8">
                             <div class="empty-state">
                                 <i class="fas fa-inbox"></i>
                                 <p style="margin: 8px 0 0 0; font-weight: 500;">No cancellation requests</p>
-                                <p style="font-size: 13px; color: #9ca3af;">Pending requests will appear here</p>
+                                <p style="font-size: 13px; color: #9ca3af;">Cancelled appointments will appear here</p>
                             </div>
                         </td>
                     </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
