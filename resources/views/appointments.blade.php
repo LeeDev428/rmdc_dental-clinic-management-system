@@ -991,9 +991,10 @@ window.onclick = function(event) {
         document.getElementById('booking-form').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent default form submission
 
-            // Prevent double submission
+            // Prevent double submission with explicit flag
             if (isSubmitting) {
                 console.log('Form already submitting, please wait...');
+                showPopup('warning', 'Please wait, processing your booking...');
                 return;
             }
 
@@ -1255,13 +1256,18 @@ window.onclick = function(event) {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        events: @json($appointments).filter(appointment => appointment.status !== 'declined'),
-
+        events: @json($appointments).filter(appointment => appointment.status !== 'declined').map(appointment => ({
+            ...appointment,
+            start: appointment.start,
+            end: appointment.end,
+            title: appointment.title
+        })),
 
         eventTimeFormat: { // 24-hour format
             hour: '2-digit',
             minute: '2-digit',
-            hour12: false
+            hour12: false,
+            meridiem: false
         },
 
         dateClick: function(info) {
@@ -1337,18 +1343,15 @@ window.onclick = function(event) {
         eventContent: function(info) {
     const isLoggedInUserEvent = info.event.extendedProps.user_id === {{ auth()->id() }};
     const status = info.event.extendedProps.status; // Get event status
-    let timeFormatted = info.timeText;
-
-    const timeParts = timeFormatted.match(/(\d{1,2}):(\d{2})([ap]+m)/);
-    if (timeParts) {
-        let hour = parseInt(timeParts[1]);
-        let minute = timeParts[2];
-        let period = timeParts[3].toLowerCase();
-
-        if (period === 'pm' && hour < 12) hour += 12;
-        if (period === 'am' && hour === 12) hour = 0;
-
-        timeFormatted = (hour < 10 ? '0' : '') + hour + ':' + minute;
+    
+    // Extract time directly from start date
+    let startDate = info.event.start;
+    let timeFormatted = '00:00';
+    
+    if (startDate) {
+        let hours = startDate.getHours();
+        let minutes = startDate.getMinutes();
+        timeFormatted = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
     }
 
     let userName = "{{ auth()->user()->name }}".substring(0, 0);
