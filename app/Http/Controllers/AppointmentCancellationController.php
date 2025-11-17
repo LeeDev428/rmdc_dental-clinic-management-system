@@ -91,4 +91,57 @@ class AppointmentCancellationController extends Controller
             'remaining' => AppointmentCancellation::getRemainingCancellations($userId)
         ]);
     }
+    
+    // Process reschedule (marks old appointment as cancelled, user books new one)
+    public function reschedule(Request $request, $appointmentId)
+    {
+        $userId = Auth::id();
+        
+        // Check if user can perform action (2 per week limit)
+        if (!AppointmentCancellation::canUserCancel($userId)) {
+            return response()->json([
+                'error' => 'You have reached your limit (2 actions per week). Please try again later.'
+            ], 422);
+        }
+        
+        // Find the appointment
+        $appointment = Appointment::findOrFail($appointmentId);
+        
+        // Verify ownership
+        if ($appointment->user_id != $userId) {
+            return response()->json([
+                'error' => 'You can only reschedule your own appointments.'
+            ], 403);
+        }
+        
+        // Check if appointment is accepted
+        if ($appointment->status !== 'accepted') {
+            return response()->json([
+                'error' => 'You can only reschedule accepted appointments. Pending appointments must be approved first.'
+            ], 422);
+        }
+        
+        // Validate reason
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500'
+        ]);
+        
+        // Create reschedule record (type = 'reschedule')
+        AppointmentCancellation::create([
+            'user_id' => $userId,
+            'appointment_id' => $appointmentId,
+            'reason' => $request->reason,
+            'type' => 'reschedule',
+            'processed_at' => Carbon::now()
+        ]);
+        
+        // Update appointment status to cancelled (frees up the time slot)
+        $appointment->update(['status' => 'cancelled']);
+        
+        return response()->json([
+            'success' => 'Appointment marked for rescheduling. Please book a new appointment.',
+            'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
+            'redirect' => '/appointments'
+        ]);
+    }
 }
