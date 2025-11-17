@@ -51,7 +51,7 @@
             </a>
             <a class="nav-link" href="{{ route('admin.procedure_prices') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-dollar-sign"></i></div>
-                Dental Prices
+                Dental Procedures & Prices
             </a>
             <a class="nav-link" href="{{ route('admin.teeth_layout') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-tooth"></i></div>
