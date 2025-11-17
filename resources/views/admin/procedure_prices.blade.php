@@ -915,8 +915,9 @@
             optionsHtml += `<option value="${inventory.id}" 
                                 data-unit="${inventory.unit}" 
                                 data-items-per-unit="${inventory.items_per_unit}"
+                                data-quantity="${inventory.quantity}"
                                 ${selected}>
-                            ${inventory.name} (${inventory.unit})
+                            ${inventory.name} (${inventory.unit}) - Available: ${inventory.quantity}
                         </option>`;
         });
         
@@ -927,7 +928,7 @@
                 </select>
             </td>
             <td>
-                <input type="number" class="form-control form-control-sm" 
+                <input type="number" class="form-control form-control-sm quantity-input" 
                        name="quantity_used[]" 
                        placeholder="Pieces" 
                        step="0.01" 
@@ -935,6 +936,7 @@
                        value="${supply ? supply.quantity_used : ''}" 
                        required
                        style="font-size: 13px;">
+                <small class="text-danger quantity-error" style="display: none;"></small>
             </td>
             <td>
                 <span class="unit-display" style="font-size: 13px;">Pieces</span>
@@ -948,17 +950,47 @@
         
         tbody.appendChild(row);
         
-        // Add event listener to update unit display
+        // Add event listeners for validation
         const select = row.querySelector('.supply-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const errorSpan = row.querySelector('.quantity-error');
+        const unitDisplay = row.querySelector('.unit-display');
+        
+        function validateQuantity() {
+            const option = select.options[select.selectedIndex];
+            if (!option.value) return true;
+            
+            const itemsPerUnit = parseFloat(option.dataset.itemsPerUnit) || 1;
+            const availableQty = parseFloat(option.dataset.quantity) || 0;
+            const requestedPieces = parseFloat(quantityInput.value) || 0;
+            const unit = option.dataset.unit;
+            
+            // Calculate max pieces available: availableQty (boxes) * itemsPerUnit (pieces per box)
+            const maxPiecesAvailable = availableQty * itemsPerUnit;
+            
+            if (requestedPieces > maxPiecesAvailable) {
+                errorSpan.textContent = `Insufficient stock! Need ${requestedPieces} pieces, only ${maxPiecesAvailable} pieces available (${availableQty} ${unit} × ${itemsPerUnit} pieces)`;
+                errorSpan.style.display = 'block';
+                quantityInput.style.borderColor = 'red';
+                return false;
+            } else {
+                errorSpan.style.display = 'none';
+                quantityInput.style.borderColor = '';
+                return true;
+            }
+        }
+        
         select.addEventListener('change', function() {
             const option = this.options[this.selectedIndex];
-            const unitDisplay = row.querySelector('.unit-display');
             if (option.value) {
                 unitDisplay.textContent = 'Pieces';
             } else {
                 unitDisplay.textContent = 'Pieces';
             }
+            validateQuantity();
         });
+        
+        quantityInput.addEventListener('input', validateQuantity);
     }
 
     function removeSupplyRow(button) {
@@ -981,6 +1013,33 @@
         
         if (validItems.length === 0) {
             alert('Please select at least one inventory item before saving.');
+            return;
+        }
+        
+        // Validate quantities before saving
+        let hasErrors = false;
+        let errorMessages = [];
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            const row = input.closest('tr');
+            const select = row.querySelector('.supply-select');
+            const option = select.options[select.selectedIndex];
+            
+            if (option.value) {
+                const itemsPerUnit = parseFloat(option.dataset.itemsPerUnit) || 1;
+                const availableQty = parseFloat(option.dataset.quantity) || 0;
+                const requestedPieces = parseFloat(input.value) || 0;
+                const maxPiecesAvailable = availableQty * itemsPerUnit;
+                
+                if (requestedPieces > maxPiecesAvailable) {
+                    hasErrors = true;
+                    const itemName = option.textContent.split('(')[0].trim();
+                    errorMessages.push(`${itemName}: Need ${requestedPieces} pieces, only ${maxPiecesAvailable} available`);
+                }
+            }
+        });
+        
+        if (hasErrors) {
+            alert('⚠️ Cannot save! Quantity errors:\n\n' + errorMessages.join('\n'));
             return;
         }
         
