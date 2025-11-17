@@ -40,20 +40,22 @@ class AppointmentController extends Controller
             '16:00', '16:15', '16:30', '16:45',
         ];
     
-        // Remove booked times (including all slots within duration)
-        $availableTimes = array_filter($workingHours, function ($time) use ($appointments, $selectedDate) {
-            $currentTime = Carbon::parse("$selectedDate $time");
-            foreach ($appointments as $appointment) {
-                $start = Carbon::parse($appointment->start);
-                $end = Carbon::parse($appointment->end);
-                if ($currentTime >= $start && $currentTime < $end) {
-                    return false; // Remove this time slot
-                }
+    // Remove booked times (including all slots within duration) - exclude completed appointments
+    $availableTimes = array_filter($workingHours, function ($time) use ($appointments, $selectedDate) {
+        $currentTime = Carbon::parse("$selectedDate $time");
+        foreach ($appointments as $appointment) {
+            // Skip completed, declined, or cancelled appointments
+            if (in_array($appointment->status, ['completed', 'declined', 'cancelled'])) {
+                continue;
             }
-            return true; // Keep this time slot
-        });
-    
-        $availableTimes = array_values($availableTimes); // Reindex array
+            $start = Carbon::parse($appointment->start);
+            $end = Carbon::parse($appointment->end);
+            if ($currentTime >= $start && $currentTime < $end) {
+                return false; // Remove this time slot
+            }
+        }
+        return true; // Keep this time slot
+    });        $availableTimes = array_values($availableTimes); // Reindex array
     
         // Retrieve the selected procedure (if any)
         $selectedProcedure = $request->input('procedure');
@@ -174,7 +176,10 @@ public function store(Request $request)
         ], 422);
     }
 
-    $startTime = Carbon::parse($validated['start']);
+    // Combine date and time fields to create proper datetime
+    $dateStr = $validated['start'];
+    $timeStr = $validated['time'];
+    $startTime = Carbon::parse("$dateStr $timeStr");
     $today = Carbon::today();
     $now = Carbon::now();
 
@@ -213,8 +218,9 @@ $duration = $procedure ? (int) $procedure->duration : 30; // Convert to integer
 $endTime = $startTime->copy()->addMinutes($duration);
 
 
-    // 🔥 FIX: Allow booking exactly at the end time
+    // 🔥 FIX: Allow booking exactly at the end time & exclude completed appointments
     $conflictingAppointments = Appointment::whereDate('start', $startTime->toDateString())
+        ->whereNotIn('status', ['completed', 'declined', 'cancelled']) // Only check active appointments
         ->where(function ($query) use ($startTime, $endTime) {
             $query->whereBetween('start', [$startTime, $endTime->copy()->subMinute()])
                   ->orWhere(function ($query) use ($startTime, $endTime) {
