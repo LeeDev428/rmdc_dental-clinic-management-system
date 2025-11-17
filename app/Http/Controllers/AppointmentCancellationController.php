@@ -15,16 +15,16 @@ class AppointmentCancellationController extends Controller
     {
         $userId = Auth::id();
         
-        // Get user's pending appointments
+        // Get user's ACCEPTED appointments (not pending - those can't be cancelled yet)
         $pendingAppointments = Appointment::where('user_id', $userId)
-            ->where('status', 'pending')
+            ->where('status', 'accepted')
             ->orderBy('start', 'asc')
             ->get();
         
         // Get cancellation history (last 7 days)
         $cancellationHistory = AppointmentCancellation::where('user_id', $userId)
             ->with('appointment')
-            ->orderBy('cancelled_at', 'desc')
+            ->orderBy('processed_at', 'desc')
             ->limit(10)
             ->get();
         
@@ -45,10 +45,10 @@ class AppointmentCancellationController extends Controller
     {
         $userId = Auth::id();
         
-        // Check if user can cancel (3 per week limit)
+        // Check if user can perform action (2 per week limit)
         if (!AppointmentCancellation::canUserCancel($userId)) {
             return response()->json([
-                'error' => 'You have reached your cancellation limit (3 per week). Please try again later.'
+                'error' => 'You have reached your limit (2 actions per week). Please try again later.'
             ], 422);
         }
         
@@ -62,10 +62,10 @@ class AppointmentCancellationController extends Controller
             ], 403);
         }
         
-        // Check if appointment is pending
-        if ($appointment->status !== 'pending') {
+        // Check if appointment is accepted (only accepted appointments can be cancelled/rescheduled)
+        if ($appointment->status !== 'accepted') {
             return response()->json([
-                'error' => 'You can only cancel pending appointments.'
+                'error' => 'You can only cancel accepted appointments. Pending appointments must be approved first.'
             ], 422);
         }
         
@@ -79,7 +79,8 @@ class AppointmentCancellationController extends Controller
             'user_id' => $userId,
             'appointment_id' => $appointmentId,
             'reason' => $request->reason,
-            'cancelled_at' => Carbon::now()
+            'type' => 'cancel',
+            'processed_at' => Carbon::now()
         ]);
         
         // Update appointment status to cancelled
