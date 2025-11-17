@@ -1256,7 +1256,10 @@ window.onclick = function(event) {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        events: @json($appointments).filter(appointment => appointment.status !== 'declined').map(appointment => ({
+        events: @json($appointments).filter(appointment => 
+            appointment.status !== 'declined' && 
+            appointment.status !== 'cancelled'
+        ).map(appointment => ({
             ...appointment,
             start: appointment.start,
             end: appointment.end,
