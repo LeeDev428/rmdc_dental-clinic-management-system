@@ -1,0 +1,47 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ staging ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy to Staging via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            # Create staging directory if it doesn't exist
+            mkdir -p ~/domains/roblesmoncayo.com/staging
+            
+            # Clone or pull staging branch
+            if [ -d ~/domains/roblesmoncayo.com/staging/.git ]; then
+              cd ~/domains/roblesmoncayo.com/staging
+              git pull origin staging
+            else
+              git clone -b staging https://github.com/LeeDev428/rmdc_dental-clinic-management-system.git ~/domains/roblesmoncayo.com/staging
+              cd ~/domains/roblesmoncayo.com/staging
+            fi
+            
+            # Copy .env from production (or create new one)
+            if [ ! -f .env ]; then
+              cp ~/domains/roblesmoncayo.com/public_html/.env .env
+              # Update APP_ENV to staging
+              sed -i 's/APP_ENV=production/APP_ENV=staging/' .env
+              sed -i 's/APP_DEBUG=false/APP_DEBUG=true/' .env
+            fi
+            
+            # Run Laravel commands
+            php artisan migrate --force
+            php artisan config:clear
+            php artisan view:clear
+            chmod -R 775 storage bootstrap/cache
