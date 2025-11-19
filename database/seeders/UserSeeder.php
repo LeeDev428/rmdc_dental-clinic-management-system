@@ -19,9 +19,9 @@ class UserSeeder extends Seeder
         // Create Admin User
         DB::table('users')->insert([
             'name' => 'Admin User',
-            'email' => 'admin@rmdc.com',
+            'email' => 'admin@gmail.com',
             'email_verified_at' => now(),
-            'password' => Hash::make('users123'),
+            'password' => Hash::make('admin123'),
             'usertype' => 'admin',
             'bio' => 'System administrator for RMDC Dental Clinic',
             'avatar' => 'img/default-dp.jpg',
