@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             ProcedurePricesSeeder::class,
             InventorySeeder::class,
             DentalRecordsSeeder::class,
-            AppointmentsSeeder::class,
+            // AppointmentsSeeder::class,
             RatingsSeeder::class,
         ]);
     }
