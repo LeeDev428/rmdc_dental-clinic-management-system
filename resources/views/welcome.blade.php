@@ -402,8 +402,9 @@
         .services-grid-modern {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            gap: 30px 24px;
             margin-top: 30px;
+            padding: 0 20px;
         }
 
         .service-card {
@@ -1000,13 +1001,16 @@
             }
 
             .carousel-controls {
-                flex-direction: column;
+                flex-direction: row;
                 gap: 15px;
                 padding: 20px 15px;
+                flex-wrap: wrap;
             }
 
             .carousel-btn {
-                width: 100%;
+                width: auto;
+                min-width: 44px;
+                padding: 12px 16px;
             }
 
             .footer-container {
