@@ -941,8 +941,9 @@
 
             .services-grid-modern {
                 grid-template-columns: 1fr !important;
-                gap: 20px !important;
+                gap: 25px !important;
                 padding: 0 10px !important;
+                row-gap: 25px !important;
             }
 
             .services-slide {
