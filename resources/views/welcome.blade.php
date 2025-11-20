@@ -138,7 +138,7 @@
         }
 
         .btn-login {
-            background: #00c8d7;
+            
             color: white;
             padding: 10px 24px;
             border-radius: 6px;
@@ -400,11 +400,19 @@
         }
 
         .services-grid-modern {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px 24px;
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 30px 24px !important;
             margin-top: 30px;
             padding: 0 20px;
+        }
+
+        /* Force 3 columns on desktop */
+        @media (min-width: 969px) {
+            .services-grid-modern {
+                grid-template-columns: repeat(3, 1fr) !important;
+                display: grid !important;
+            }
         }
 
         .service-card {
@@ -929,9 +937,9 @@
             }
 
             .services-grid-modern {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 0 10px;
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+                padding: 0 10px !important;
             }
 
             .services-slide {
@@ -994,12 +1002,6 @@
             .value-item {
                 flex-direction: column;
                 text-align: center;
-            }
-
-            .services-grid-modern {
-                grid-template-columns: 1fr !important;
-                gap: 20px;
-                padding: 0 10px;
             }
 
             .service-card {
