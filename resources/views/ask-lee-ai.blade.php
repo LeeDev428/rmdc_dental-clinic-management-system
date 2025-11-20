@@ -64,7 +64,6 @@
             display: flex;
             flex-direction: column;
             gap: 25px;
-        }
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             overflow: hidden;
