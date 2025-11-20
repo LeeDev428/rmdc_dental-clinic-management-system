@@ -928,6 +928,12 @@
                 padding: 0 15px;
             }
 
+            .services-grid-modern {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 10px;
+            }
+
             .services-slide {
                 grid-template-columns: 1fr;
             }
