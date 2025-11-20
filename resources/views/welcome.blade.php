@@ -424,6 +424,7 @@
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             transition: all 0.3s ease-in-out;
+            margin-bottom: 0;
         }
 
         .service-card:hover {
@@ -941,9 +942,13 @@
 
             .services-grid-modern {
                 grid-template-columns: 1fr !important;
-                gap: 25px !important;
+                gap: 30px !important;
                 padding: 0 10px !important;
-                row-gap: 25px !important;
+                row-gap: 30px !important;
+            }
+            
+            .service-card {
+                margin-bottom: 30px !important;
             }
 
             .services-slide {
@@ -1182,6 +1187,8 @@
             <div class="services-grid-modern fade-in" id="servicesGrid">
                 <!-- Services will be loaded here via AJAX -->
             </div>
+            <br>
+            <br>
 
             <div class="carousel-controls">
                 <button class="carousel-btn" id="prevBtn" onclick="changePage('prev')">
@@ -1464,6 +1471,8 @@
                         
                         grid.appendChild(card);
                     });
+                    
+                  
                     
                     currentPage = data.current_page;
                     totalPages = data.last_page;
