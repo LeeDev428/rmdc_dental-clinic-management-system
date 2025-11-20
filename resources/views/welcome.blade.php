@@ -402,9 +402,11 @@
         .services-grid-modern {
             display: grid !important;
             grid-template-columns: repeat(3, 1fr) !important;
-            gap: 30px 24px !important;
+            gap: 40px 30px !important;
             margin-top: 30px;
             padding: 0 20px;
+            row-gap: 40px !important;
+            column-gap: 30px !important;
         }
 
         /* Force 3 columns on desktop */
@@ -412,6 +414,7 @@
             .services-grid-modern {
                 grid-template-columns: repeat(3, 1fr) !important;
                 display: grid !important;
+                gap: 40px 30px !important;
             }
         }
 
