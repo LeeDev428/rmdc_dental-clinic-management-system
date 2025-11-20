@@ -147,12 +147,64 @@
             background: #03828b;
         }
 
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 15px 20px;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: white;
+                flex-direction: column;
+                padding: 30px;
+                gap: 20px;
+                transition: left 0.3s ease;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                align-items: flex-start;
+            }
+
+            .nav-links.active {
+                left: 0;
+            }
+
+            .nav-links a {
+                font-size: 18px;
+                width: 100%;
+                padding: 10px 0;
+            }
+
+            .btn-login {
+                width: 100%;
+                text-align: center;
+                display: block;
+            }
+        }
+
         /* Hero Section */
         .hero {
             min-height: 85vh;
             display: flex;
             align-items: center;
-            padding: 80px 0 40px;
+            padding: 100px 20px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -160,7 +212,7 @@
         .hero-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 40px;
+            padding: 40px 20px;
             display: grid;
             grid-template-columns: 1fr 1.3fr;
             gap: 50px;
@@ -219,16 +271,47 @@
             border-radius: 8px;
         }
 
+        @media (max-width: 768px) {
+            .hero {
+                min-height: auto;
+                padding: 90px 10px 30px;
+            }
+
+            .hero-container {
+                padding: 20px 10px;
+                gap: 30px;
+            }
+
+            .hero-content h1 {
+                font-size: 28px;
+            }
+
+            .hero-content p {
+                font-size: 14px;
+            }
+
+            .btn-primary {
+                padding: 12px 24px;
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .hero-image {
+                height: 300px;
+            }
+        }
+
         /* Info Cards */
         .info-section {
             background: transparent;
-            padding: 40px 0;
+            padding: 40px 20px;
         }
 
         .info-cards {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 40px;
+            padding: 0 20px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 30px;
@@ -247,6 +330,26 @@
             font-weight: 700;
             color: #333;
             margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .info-section {
+                padding: 30px 10px;
+            }
+
+            .info-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 10px;
+            }
+
+            .info-card {
+                padding: 20px;
+            }
+
+            .info-card h3 {
+                font-size: 28px;
+            }
         }
 
         .info-card p {
@@ -829,12 +932,15 @@
                 <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="RMDC Logo" style="height: 40px; width: auto;">
                 <span>RMDC</span>
             </a>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#locations">Locations</a></li>
-                <li><a href="#contact">Contact</a></li>
+            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#locations" class="nav-link">Locations</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
                 <li><a href="{{ route('login') }}" class="btn-login">Login</a></li>
             </ul>
         </div>
@@ -1311,6 +1417,45 @@
                 observer.observe(element);
             });
         };
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        if (mobileMenuToggle && navLinks) {
+            mobileMenuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = mobileMenuToggle.querySelector('i');
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close mobile menu when clicking on a link
+            const navLinksItems = document.querySelectorAll('.nav-link');
+            navLinksItems.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!navLinks.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+                    navLinks.classList.remove('active');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        }
 
         // Initialize animations on page load
         document.addEventListener('DOMContentLoaded', () => {
