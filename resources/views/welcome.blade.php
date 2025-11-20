@@ -20,6 +20,8 @@
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         body {
@@ -29,6 +31,9 @@
             position: relative;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
         }
 
         /* Animation Classes */
@@ -366,6 +371,8 @@
         .services-container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
         }
 
         .section-title {
@@ -374,6 +381,7 @@
             font-weight: 700;
             margin-bottom: 50px;
             color: #1a1a1a;
+            padding: 0 15px;
         }
 
         .services-carousel {
@@ -383,6 +391,8 @@
 
         .services-subtitle {
             text-align: center;
+            padding: 0 15px;
+        }
             color: #666;
             font-size: 16px;
             margin-top: -10px;
@@ -503,7 +513,7 @@
 
         /* About Section */
         .about-section {
-            padding: 100px 40px;
+            padding: 100px 20px;
             background: transparent;
             position: relative;
         }
@@ -515,6 +525,8 @@
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
+            padding: 0 20px;
+            width: 100%;
         }
 
         .about-content h2 {
@@ -618,13 +630,15 @@
 
         /* Clinic Locations */
         .locations {
-            padding: 80px 40px;
+            padding: 80px 20px;
             background: transparent;
         }
 
         .locations-container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
         }
 
         .locations-grid {
@@ -636,6 +650,8 @@
 
         .location-card {
             background: white;
+            width: 100%;
+        }
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -888,25 +904,57 @@
 
         /* Responsive */
         @media (max-width: 968px) {
+            body {
+                overflow-x: hidden;
+            }
+
             .hero-container {
                 grid-template-columns: 1fr;
                 gap: 40px;
+                padding: 20px 15px;
             }
             
             .hero-content h1 {
-                font-size: 36px;
+                font-size: 32px;
+            }
+
+            .hero-content p {
+                font-size: 14px;
             }
             
             .info-cards {
                 grid-template-columns: 1fr;
+                padding: 0 15px;
             }
 
             .services-slide {
                 grid-template-columns: 1fr;
             }
 
+            .services-container,
+            .about-container,
+            .locations-container,
+            .contact-container,
+            .knowledge-container {
+                padding: 40px 15px !important;
+                max-width: 100%;
+            }
+
+            .section-title {
+                font-size: 28px !important;
+            }
+
+            .services-subtitle {
+                font-size: 14px !important;
+            }
+
             .locations-grid {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .location-card {
+                margin: 0 10px;
             }
             
             .contact-info {
@@ -919,7 +967,78 @@
             }
 
             .faq-section {
-                padding: 20px;
+                padding: 20px 15px;
+            }
+
+            .faq-container {
+                padding: 0 10px;
+            }
+
+            .about-container {
+                grid-template-columns: 1fr !important;
+                gap: 30px;
+            }
+
+            .about-stats {
+                grid-template-columns: 1fr !important;
+                gap: 15px;
+            }
+
+            .value-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .services-grid-modern {
+                grid-template-columns: 1fr !important;
+                gap: 20px;
+                padding: 0 10px;
+            }
+
+            .service-card {
+                margin: 0;
+            }
+
+            .carousel-controls {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px 15px;
+            }
+
+            .carousel-btn {
+                width: 100%;
+            }
+
+            .footer-container {
+                padding: 40px 15px !important;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr !important;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 24px;
+            }
+
+            .hero-content p {
+                font-size: 13px;
+            }
+
+            .btn-primary {
+                font-size: 13px;
+                padding: 10px 20px;
+            }
+
+            .info-card h3 {
+                font-size: 24px;
+            }
+
+            .info-card p {
+                font-size: 13px;
             }
         }
     </style>
@@ -1050,7 +1169,7 @@
 
             <div class="carousel-controls">
                 <button class="carousel-btn" id="prevBtn" onclick="changePage('prev')">
-                    <i class="fas fa-chevron-left"></i> Previous
+                    <i class="fas fa-chevron-left"></i>
                 </button>
                 
                 <div class="carousel-indicators" id="paginationInfo">
@@ -1058,7 +1177,7 @@
                 </div>
                 
                 <button class="carousel-btn" id="nextBtn" onclick="changePage('next')">
-                    Next <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>
