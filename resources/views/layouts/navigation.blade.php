@@ -109,7 +109,7 @@
             </div>
 
             <!-- Notification Message (Right Corner) -->
-            <div class="flex items-center space-x-1">
+            <div class="flex items-center space-x-1 mr-4">
                 <button onclick="markMessagesAsRead()" class="relative p-3 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none transition-all duration-300 ease-in-out shadow-lg hover:shadow-2xl transform hover:scale-105">
                     <!-- Message Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-600 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
