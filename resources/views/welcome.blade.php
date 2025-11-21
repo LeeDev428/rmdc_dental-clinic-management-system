@@ -1107,7 +1107,7 @@
         </div>
         <div class="hero-container">
             <div class="hero-content">
-                <h1>Robles-Moncayo Dental Clinic</h1>
+                <h1>Roblewdasds-Moncayo Dental Clinic</h1>
                 <p>Experience modern dentistry with compassionate service. We provide comprehensive dental solutions for the whole family.</p>
                 <a href="{{ route('login') }}" class="btn-primary">Book Your Appointment</a>
             </div>
