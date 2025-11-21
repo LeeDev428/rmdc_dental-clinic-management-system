@@ -747,6 +747,45 @@ window.onclick = function(event) {
                                     <div class="booking-column">
                                         <h4 class="modal-section-title">Payment Information</h4>
                                         
+                                        @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                        <!-- Reschedule Mode - Show Existing Payment -->
+                                        <div class="p-6 bg-green-50 border-2 border-green-400 rounded-lg">
+                                            <div class="flex items-center mb-4">
+                                                <svg class="w-8 h-8 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                                <h5 class="text-xl font-bold text-green-800">Payment Completed</h5>
+                                            </div>
+                                            
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between py-2 border-b border-green-200">
+                                                    <span class="text-gray-700 font-medium">Procedure:</span>
+                                                    <span class="text-gray-900 font-semibold">{{ $reschedulingAppointment->procedure }}</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between py-2 border-b border-green-200">
+                                                    <span class="text-gray-700 font-medium">Amount Paid:</span>
+                                                    <span class="text-green-700 font-bold text-lg">₱{{ number_format($reschedulingAppointment->payment->amount ?? 0, 2) }}</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between py-2 border-b border-green-200">
+                                                    <span class="text-gray-700 font-medium">Payment Date:</span>
+                                                    <span class="text-gray-900">{{ $reschedulingAppointment->payment ? \Carbon\Carbon::parse($reschedulingAppointment->payment->created_at)->format('M d, Y') : 'N/A' }}</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between py-2">
+                                                    <span class="text-gray-700 font-medium">Payment Method:</span>
+                                                    <span class="text-gray-900 uppercase">{{ $reschedulingAppointment->payment->payment_method ?? 'N/A' }}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-4 p-3 bg-white border border-green-300 rounded-md">
+                                                <p class="text-sm text-gray-700">
+                                                    <strong>Note:</strong> No additional payment required. Your payment will be transferred to the new appointment date.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        @else
                                         <div class="payment-section">
                                             <div class="payment-breakdown">
                                                 <h5 class="font-semibold text-gray-800 mb-3 text-base">Price Breakdown</h5>
@@ -817,6 +856,7 @@ window.onclick = function(event) {
                                                     </div>
                                                 </label>
                                             </div>
+                                        @endif
 
                                             <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
                                                 <div class="flex items-start">
@@ -881,12 +921,20 @@ window.onclick = function(event) {
                                     
                                     <button type="submit" 
                                             id="submit-booking-btn"
-                                            class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'disabled' : '' }}>
+                                            class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'disabled' : '' }}>
                                         <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                         </svg>
-                                        <span id="submit-btn-text">{{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'Booking Disabled' : 'Book Appointment & Pay' }}</span>
+                                        <span id="submit-btn-text">
+                                            @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                                Confirm Reschedule
+                                            @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
+                                                Booking Disabled
+                                            @else
+                                                Book Appointment & Pay
+                                            @endif
+                                        </span>
                                     </button>
                                 </div>
                             </form>
