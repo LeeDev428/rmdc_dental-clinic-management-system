@@ -681,7 +681,7 @@
             html += `
                 <div class="detail-box full">
                     <div class="detail-label-pending">Valid ID / Supporting Document</div>
-                    <img src="/storage/${appointment.image_path}" alt="Valid ID" class="detail-image-pending">
+                    <img src="/image.php?path=${appointment.image_path}" alt="Valid ID" class="detail-image-pending" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Not+Found';">
                 </div>
             `;
         }
@@ -716,13 +716,21 @@
     
     // Close pending details modal
     function closePendingDetailsModal() {
-        document.getElementById('pendingDetailsModal').style.display = 'none';
+        const modal = document.getElementById('pendingDetailsModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
     
     // Close modal when clicking outside
-    document.getElementById('pendingDetailsModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closePendingDetailsModal();
+    window.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('pendingDetailsModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closePendingDetailsModal();
+                }
+            });
         }
     });
 </script>
