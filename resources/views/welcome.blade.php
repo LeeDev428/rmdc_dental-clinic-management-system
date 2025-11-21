@@ -1100,7 +1100,9 @@
             </div>
             
             <!-- AI Chatbot Component -->
-            <x-lee-ai-chatbot type="public" />
+            <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+                <x-lee-ai-chatbot type="public" />
+            </div>
         </div>
     </section>
 
