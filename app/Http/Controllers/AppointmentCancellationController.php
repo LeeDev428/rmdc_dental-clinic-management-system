@@ -135,12 +135,13 @@ class AppointmentCancellationController extends Controller
             'processed_at' => Carbon::now()
         ]);
         
-        // Update appointment status to 'rescheduled'
+        // Mark appointment as 'rescheduled' temporarily
         $appointment->update(['status' => 'rescheduled']);
         
         return response()->json([
-            'success' => 'Your appointment has been marked for rescheduling. An admin will contact you to arrange a new date and time.',
-            'remaining' => AppointmentCancellation::getRemainingCancellations($userId)
+            'success' => 'Please select a new date and time for your appointment.',
+            'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
+            'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
         ]);
     }
 }
