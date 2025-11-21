@@ -516,7 +516,7 @@ window.onclick = function(event) {
                             @if($blockingAppointment->status === 'rescheduled')
                                 <h4 class="font-semibold text-lg">Appointment Pending Reschedule</h4>
                                 <p class="text-sm mt-1">You requested to reschedule your appointment for <strong>{{ $blockingAppointment->procedure }}</strong>. Please select a new date and time to complete the reschedule process.</p>
-                                <a href="{{ route('appointments.index', ['reschedule' => $blockingAppointment->id]) }}" 
+                                <a href="{{ route('appointments', ['reschedule' => $blockingAppointment->id]) }}" 
                                    class="mt-3 inline-flex items-center px-4 py-2 {{ $blockingAppointment->status === 'rescheduled' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-yellow-600 hover:bg-yellow-700' }} text-white text-sm font-medium rounded-lg transition shadow">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -780,19 +780,26 @@ window.onclick = function(event) {
                                                     <span class="text-gray-900 font-semibold">{{ $reschedulingAppointment->procedure }}</span>
                                                 </div>
                                                 
+                                                @php
+                                                    $payment = $reschedulingAppointment->latestPayment;
+                                                    $amount = $payment ? $payment->amount : 0;
+                                                    $paymentMethod = $payment ? $payment->payment_method : 'N/A';
+                                                    $paymentDate = $payment ? \Carbon\Carbon::parse($payment->created_at)->format('M d, Y g:i A') : 'N/A';
+                                                @endphp
+                                                
                                                 <div class="flex justify-between py-2 border-b border-green-200">
                                                     <span class="text-gray-700 font-medium">Amount Paid:</span>
-                                                    <span class="text-green-700 font-bold text-lg">₱{{ number_format($reschedulingAppointment->payment->amount ?? 0, 2) }}</span>
+                                                    <span class="text-green-700 font-bold text-lg">₱{{ number_format($amount, 2) }}</span>
                                                 </div>
                                                 
                                                 <div class="flex justify-between py-2 border-b border-green-200">
                                                     <span class="text-gray-700 font-medium">Payment Date:</span>
-                                                    <span class="text-gray-900">{{ $reschedulingAppointment->payment ? \Carbon\Carbon::parse($reschedulingAppointment->payment->created_at)->format('M d, Y') : 'N/A' }}</span>
+                                                    <span class="text-gray-900">{{ $paymentDate }}</span>
                                                 </div>
                                                 
                                                 <div class="flex justify-between py-2">
                                                     <span class="text-gray-700 font-medium">Payment Method:</span>
-                                                    <span class="text-gray-900 uppercase">{{ $reschedulingAppointment->payment->payment_method ?? 'N/A' }}</span>
+                                                    <span class="text-gray-900 uppercase">{{ $paymentMethod }}</span>
                                                 </div>
                                             </div>
                                             
