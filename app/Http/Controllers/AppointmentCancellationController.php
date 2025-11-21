@@ -135,14 +135,12 @@ class AppointmentCancellationController extends Controller
             'processed_at' => Carbon::now()
         ]);
         
-        // Don't change appointment status yet - will change to pending after new date/time is selected
-        // Just mark it as "rescheduling" in session
-        session(['rescheduling_appointment' => $appointmentId]);
+        // Update appointment status to 'rescheduled'
+        $appointment->update(['status' => 'rescheduled']);
         
         return response()->json([
-            'success' => 'Please select a new date and time for your appointment.',
-            'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
-            'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
+            'success' => 'Your appointment has been marked for rescheduling. An admin will contact you to arrange a new date and time.',
+            'remaining' => AppointmentCancellation::getRemainingCancellations($userId)
         ]);
     }
 }
