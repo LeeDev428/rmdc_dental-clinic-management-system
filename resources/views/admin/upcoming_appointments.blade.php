@@ -381,7 +381,7 @@
                     <td style="font-size: 12px;">{{ $appointment->username }}</td>
                     <td style="font-size: 12px;">
                         @if($appointment->image_path)
-                            <img src="{{ Storage::url($appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
+                            <img src="{{ asset('storage/' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
                         @else
                             <img src="https://via.placeholder.com/100" alt="Default ID Image" class="id-image">
                         @endif
