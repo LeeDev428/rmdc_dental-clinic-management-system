@@ -377,12 +377,8 @@
                 if (response.ok) {
                     alert(data.success);
                     
-                    // If reschedule, redirect to appointments page
-                    if (actionType === 'reschedule' && data.redirect) {
-                        window.location.href = data.redirect;
-                    } else {
-                        window.location.reload();
-                    }
+                    // Reload page for both cancel and reschedule
+                    window.location.reload();
                 } else {
                     errorDiv.textContent = data.error || 'An error occurred';
                     errorDiv.classList.remove('hidden');
