@@ -7,6 +7,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-bottom: 40px;
 }
 
 .chatbot-card-lee {
@@ -544,6 +545,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .lee-ai-chatbot-container {
+        margin-bottom: 60px;
+    }
+    
     .chatbot-card-lee {
         max-width: 100%;
         border-radius: 0;
