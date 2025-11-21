@@ -757,6 +757,28 @@
 
 <!-- JavaScript -->
 <script>
+    // Function to preview image before upload
+    function previewImage(procedureId, input) {
+        const preview = document.getElementById('preview_' + procedureId);
+        const file = input.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // If preview is an img element, update src
+                if (preview.tagName === 'IMG') {
+                    preview.src = e.target.result;
+                } else {
+                    // If it's a div (no-image placeholder), replace it with an img
+                    preview.outerHTML = `<img src="${e.target.result}" alt="Procedure Image" id="preview_${procedureId}">`;
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+    }
+
     // Function to handle file input display
     document.addEventListener('DOMContentLoaded', function() {
         // Handle the custom file input for modal form
