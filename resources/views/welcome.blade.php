@@ -209,7 +209,7 @@
             min-height: 85vh;
             display: flex;
             align-items: center;
-            padding: 100px 20px 40px;
+            padding: 70px 20px 40px;
             position: relative;
             overflow: hidden;
         }
