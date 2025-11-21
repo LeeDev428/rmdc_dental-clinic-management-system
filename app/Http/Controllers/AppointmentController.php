@@ -364,6 +364,115 @@ $endTime = $startTime->copy()->addMinutes($duration);
     }
     
     /**
+     * Update rescheduled appointment with new date and time
+     */
+    public function rescheduleUpdate(Request $request, $id)
+    {
+        $user_id = Auth::id();
+        
+        // Find the appointment
+        $appointment = Appointment::findOrFail($id);
+        
+        // Verify ownership
+        if ($appointment->user_id != $user_id) {
+            return response()->json([
+                'error' => 'You can only reschedule your own appointments.'
+            ], 403);
+        }
+        
+        // Validate the new date and time
+        $validated = $request->validate([
+            'start' => 'required|date',
+            'time' => 'required|string',
+        ]);
+        
+        // Combine date and time
+        $dateStr = $validated['start'];
+        $timeStr = $validated['time'];
+        $newStartTime = Carbon::parse("$dateStr $timeStr");
+        $today = Carbon::today();
+        
+        // Apply same validation as new bookings (T+1 to T+7)
+        $tomorrow = $today->copy()->addDay()->startOfDay();
+        $lastBookingDay = $today->copy()->addDays(7)->endOfDay();
+        
+        if ($newStartTime->isSameDay($today)) {
+            return response()->json([
+                'error' => 'Cannot reschedule for today. Please select tomorrow (' . $tomorrow->format('M d, Y') . ') or later.'
+            ], 422);
+        }
+        
+        if ($newStartTime < $tomorrow) {
+            return response()->json([
+                'error' => 'Appointment date must be from tomorrow onwards.'
+            ], 422);
+        }
+        
+        if ($newStartTime > $lastBookingDay) {
+            return response()->json([
+                'error' => 'You can only book appointments up to 7 days in advance. Please select a date within ' . $lastBookingDay->format('M d, Y') . '.'
+            ], 422);
+        }
+        
+        // Check if time slot is available (same procedure duration logic as original booking)
+        $procedureName = $appointment->procedure;
+        $procedure = \App\Models\ProcedurePrice::where('procedure_name', $procedureName)->first();
+        $procedureDuration = $procedure ? (int) $procedure->duration : 30;
+        $newEndTime = $newStartTime->copy()->addMinutes($procedureDuration);
+        
+        // Check for conflicts (exclude current appointment)
+        $conflict = Appointment::where('id', '!=', $id)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->where(function ($query) use ($newStartTime, $newEndTime) {
+                $query->whereBetween('start', [$newStartTime, $newEndTime])
+                      ->orWhereBetween('end', [$newStartTime, $newEndTime])
+                      ->orWhere(function ($q) use ($newStartTime, $newEndTime) {
+                          $q->where('start', '<=', $newStartTime)
+                            ->where('end', '>=', $newEndTime);
+                      });
+            })
+            ->first();
+        
+        if ($conflict) {
+            return response()->json([
+                'error' => 'This time slot is already booked. Please select another time.'
+            ], 422);
+        }
+        
+        // Update appointment with new date/time and set status to pending
+        $appointment->update([
+            'start' => $newStartTime,
+            'end' => $newEndTime,
+            'time' => $timeStr,
+            'appointment_date' => $newStartTime->toDateString(),
+            'appointment_time' => $timeStr,
+            'status' => 'pending', // Reset to pending for admin approval
+        ]);
+        
+        // Clear rescheduling session
+        session()->forget('rescheduling_appointment');
+        
+        // Log activity
+        $this->logAppointmentActivity('rescheduled', $appointment, [
+            'description' => 'Appointment rescheduled to new date/time',
+            'new_date' => $newStartTime->format('Y-m-d'),
+            'new_time' => $timeStr,
+        ]);
+        
+        return response()->json([
+            'success' => 'Appointment rescheduled successfully! It will be reviewed by our team.',
+            'appointment' => [
+                'id' => $appointment->id,
+                'start' => $appointment->start,
+                'end' => $appointment->end,
+                'time' => $appointment->time,
+                'status' => $appointment->status,
+            ]
+        ]);
+    }
+
+    
+    /**
      * Clear pending payment session for the authenticated user
      */
     public function clearPendingSession(Request $request)
