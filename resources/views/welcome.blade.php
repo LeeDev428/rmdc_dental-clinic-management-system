@@ -1424,7 +1424,6 @@
     <footer>
         <div class="footer-content">
             <p>&copy; 2025 <a href="https://www.facebook.com/profile.php?id=100063581260298" target="_blank" style="color: #00b4d8; text-decoration: none;">Dr. Cristina Moncayo Dental Clinic</a>. All Rights Reserved.</p>
-            <p class="footer-credits">Designed by: <strong><a href="https://www.facebook.com/iten10" target="_blank" style="color: #00b4d8; text-decoration: none;">iten10</a></strong></p>
             <p class="footer-credits">By: <strong><a href="https://www.facebook.com/leedev428/" target="_blank" style="color: #00b4d8; text-decoration: none;">Lee Rafael Torres</a></strong></p>
         </div>
     </footer>
