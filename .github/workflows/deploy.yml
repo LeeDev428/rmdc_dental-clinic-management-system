@@ -20,9 +20,29 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           port: ${{ secrets.SSH_PORT }}
           script: |
+            # Go to the Laravel project
             cd ~/domains/roblesmoncayo.com/public_html
+            
+            # Pull latest code
             git pull origin master
+            
+            # Install/update PHP dependencies
+            composer install --no-interaction --prefer-dist --optimize-autoloader
+            
+            # Run database migrations (force in production)
             php artisan migrate --force
+            
+            # Clear Laravel caches
             php artisan config:clear
+            php artisan route:clear
             php artisan view:clear
+            php artisan cache:clear
+            
+            # Set folder permissions
             chmod -R 775 storage bootstrap/cache
+            
+            # Build frontend assets (if using Tailwind/Vite)
+            if [ -f package.json ]; then
+              npm install
+              npm run build
+            fi
