@@ -487,7 +487,21 @@ window.onclick = function(event) {
 
                 <br>
                 
-                @if(isset($hasPendingAppointment) && $hasPendingAppointment)
+                @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-lg">🔄 Rescheduling Appointment</h4>
+                            <p class="text-sm mt-1"><strong>Current Appointment:</strong> {{ $reschedulingAppointment->procedure }} on {{ \Carbon\Carbon::parse($reschedulingAppointment->start)->format('F d, Y \a\t g:i A') }}</p>
+                            <p class="text-sm mt-1"><strong>Payment Status:</strong> ✅ Already Paid (₱{{ number_format($reschedulingAppointment->payment->amount ?? 0, 2) }})</p>
+                            <p class="text-sm mt-1">Please select a new date and time below. Your procedure and payment information will remain the same.</p>
+                        </div>
+                    </div>
+                </div>
+                @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
                 <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-lg">
                     <div class="flex items-center">
                         <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -501,24 +515,41 @@ window.onclick = function(event) {
                 </div>
                 @endif
                 
-                <div id="calendar" style="max-width: 900px; margin: auto; {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'opacity: 0.5; pointer-events: none;' : '' }}"></div>
+                <div id="calendar" style="max-width: 900px; margin: auto; {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'opacity: 0.5; pointer-events: none;' : '' }}"></div>
 
                 <div id="booking-modal" class="hidden fixed z-10 inset-0 overflow-y-auto">
                     <div class="flex items-center justify-center min-h-screen p-4">
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-6xl border booking-modal-landscape">
-                            @if(isset($hasPendingAppointment) && $hasPendingAppointment)
+                            @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-md text-sm">
+                                <strong>🔄 Rescheduling Mode:</strong> Select a new date and time. Payment information will be preserved.
+                            </div>
+                            @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
                             <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md text-sm">
                                 <strong>⚠️ Booking Disabled:</strong> You have a pending appointment. Please wait for admin approval.
                             </div>
                             @endif
                             
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Book Your Appointment</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                                @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                    Reschedule Your Appointment
+                                @else
+                                    Book Your Appointment
+                                @endif
+                            </h3>
                             
-                            <form id="booking-form" method="POST" action="{{ route('appointments.store') }}" enctype="multipart/form-data" {{ isset($hasPendingAppointment) && $hasPendingAppointment ? 'onsubmit="return false;"' : '' }}>
+                            <form id="booking-form" method="POST" 
+                                  action="{{ isset($reschedulingAppointment) && $reschedulingAppointment ? route('appointments.reschedule.update', $reschedulingAppointment->id) : route('appointments.store') }}" 
+                                  enctype="multipart/form-data" 
+                                  {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'onsubmit="return false;"' : '' }}>
                                 @csrf
                                 <input type="hidden" id="booking-id" name="id">
                                 <input type="hidden" id="booking-start" name="start">
                                 <input type="hidden" id="booking-end" name="end">
+                                @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                <input type="hidden" name="reschedule_mode" value="1">
+                                <input type="hidden" name="appointment_id" value="{{ $reschedulingAppointment->id }}">
+                                @endif
 
                                 <div class="booking-modal-grid">
                                     <!-- Left Column: Appointment Details -->
@@ -536,6 +567,13 @@ window.onclick = function(event) {
                                         <!-- Procedure Dropdown -->
                                         <div class="mb-4">
                                             <label for="operation-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Dental Procedure</label>
+                                            @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                            <input type="text" value="{{ $reschedulingAppointment->procedure }}" readonly 
+                                                   class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm px-4 py-2.5" 
+                                                   style="background: #f5f5f5;">
+                                            <input type="hidden" name="procedure" value="{{ $reschedulingAppointment->procedure }}">
+                                            <p class="text-xs text-gray-500 mt-1">Procedure cannot be changed when rescheduling</p>
+                                            @else
                                             <select id="operation-type" name="procedure" required class="mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 px-4 py-2.5">
                                                 <option value="">Select a Procedure</option>
                                                 @foreach ($procedurePrices as $procedurePrice)
@@ -544,6 +582,7 @@ window.onclick = function(event) {
                                                     </option>
                                                 @endforeach
                                             </select>
+                                            @endif
                                         </div>
 
                                         <!-- Estimated Time Display -->
