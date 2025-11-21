@@ -282,8 +282,6 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::post('/mark-messages-as-read', [MessageController::class, 'markMessagesAsRead'])->middleware('auth');
     Route::get('/admin/unread-messages-count', [MessageController::class, 'getUnreadMessagesCount']);
     Route::post('/admin/mark-messages-read', [MessageController::class, 'markMessagesAsReadAdmin']);
-    Route::post('/appointment/{id}/{action}', [AdminAppointment::class, 'messageFromAdmin'])
-    ->name('appointment.messageFromAdmin');
 
 
 
