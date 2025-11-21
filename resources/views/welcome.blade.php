@@ -1423,8 +1423,8 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <p>&copy; 2025 <a href="https://www.facebook.com/profile.php?id=100063581260298" target="_blank" style="color: #00b4d8; text-decoration: underline;">Dr. Cristina Moncayo Dental Clinic</a>. All Rights Reserved.</p>
-            <p class="footer-credits">By: <strong><a href="https://www.facebook.com/leedev428/" target="_blank" style="color: #00b4d8; text-decoration: underline;">Lee Rafael Torres</a></strong></p>
+            <p>&copy; 2025 <a href="https://www.facebook.com/profile.php?id=100063581260298" target="_blank" style="color: #04748a; text-decoration: underline;">Dr. Cristina Moncayo Dental Clinic</a>. All Rights Reserved.</p>
+            <p class="footer-credits">By: <strong><a href="https://www.facebook.com/leedev428/" target="_blank" style="color: #04748a; text-decoration: underline;">Lee Rafael Torres</a></strong></p>
         </div>
     </footer>
 
