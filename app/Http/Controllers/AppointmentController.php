@@ -27,6 +27,19 @@ class AppointmentController extends Controller
         $appointments = Appointment::all();
         $procedurePrices = ProcedurePrice::all(); // Fetch procedure prices from the database
         $selectedDate = $request->input('date', now()->toDateString());
+        
+        // Check if this is a reschedule request
+        $reschedulingAppointmentId = $request->input('reschedule');
+        $reschedulingAppointment = null;
+        
+        if ($reschedulingAppointmentId) {
+            $reschedulingAppointment = Appointment::find($reschedulingAppointmentId);
+            
+            // Verify ownership
+            if ($reschedulingAppointment && $reschedulingAppointment->user_id != $user->id) {
+                $reschedulingAppointment = null;
+            }
+        }
     
         $workingHours = [
             '08:00', '08:15', '08:30', '08:45',
@@ -41,9 +54,14 @@ class AppointmentController extends Controller
         ];
     
     // Remove booked times (including all slots within duration) - exclude completed appointments
-    $availableTimes = array_filter($workingHours, function ($time) use ($appointments, $selectedDate) {
+    $availableTimes = array_filter($workingHours, function ($time) use ($appointments, $selectedDate, $reschedulingAppointmentId) {
         $currentTime = Carbon::parse("$selectedDate $time");
         foreach ($appointments as $appointment) {
+            // Skip the appointment being rescheduled
+            if ($reschedulingAppointmentId && $appointment->id == $reschedulingAppointmentId) {
+                continue;
+            }
+            
             // Skip completed, declined, or cancelled appointments
             if (in_array($appointment->status, ['completed', 'declined', 'cancelled'])) {
                 continue;
@@ -73,7 +91,7 @@ class AppointmentController extends Controller
         }
     
         // Return the HTML view for normal page load
-        return view('appointments', compact('availableTimes', 'selectedDate', 'appointments', 'procedurePrices', 'procedurePrice', 'selectedProcedure', 'hasPendingAppointment'));
+        return view('appointments', compact('availableTimes', 'selectedDate', 'appointments', 'procedurePrices', 'procedurePrice', 'selectedProcedure', 'hasPendingAppointment', 'reschedulingAppointment'));
     }
     
     
