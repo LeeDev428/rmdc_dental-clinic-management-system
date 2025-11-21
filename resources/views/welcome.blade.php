@@ -1424,7 +1424,7 @@
     <footer>
         <div class="footer-content">
             <p>&copy; 2025 Dr. Cristina Moncayo Dental Clinic. All Rights Reserved.</p>
-            <p class="footer-credits">Website & AI Creator: <strong>Lee Rafael Torres</strong></p>
+            <p class="footer-credits">By: <strong><a href="https://www.facebook.com/leedev428/" target="_blank" style="color: #00b4d8; text-decoration: none;">Lee Rafael Torres</a></strong></p>
         </div>
     </footer>
 
