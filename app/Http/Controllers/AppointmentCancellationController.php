@@ -95,53 +95,65 @@ class AppointmentCancellationController extends Controller
     // Process reschedule (redirects to appointments page with pre-filled data)
     public function reschedule(Request $request, $appointmentId)
     {
-        $userId = Auth::id();
-        
-        // Check if user can perform action (2 per week limit)
-        if (!AppointmentCancellation::canUserCancel($userId)) {
+        try {
+            $userId = Auth::id();
+            
+            // Check if user can perform action (2 per week limit)
+            if (!AppointmentCancellation::canUserCancel($userId)) {
+                return response()->json([
+                    'error' => 'You have reached your limit (2 actions per week). Please try again later.'
+                ], 422);
+            }
+            
+            // Find the appointment
+            $appointment = Appointment::findOrFail($appointmentId);
+            
+            // Verify ownership
+            if ($appointment->user_id != $userId) {
+                return response()->json([
+                    'error' => 'You can only reschedule your own appointments.'
+                ], 403);
+            }
+            
+            // Check if appointment is accepted
+            if ($appointment->status !== 'accepted') {
+                return response()->json([
+                    'error' => 'You can only reschedule accepted appointments. Pending appointments must be approved first.'
+                ], 422);
+            }
+            
+            // Validate reason
+            $validated = $request->validate([
+                'reason' => 'required|string|min:10|max:500'
+            ]);
+            
+            // Create reschedule record (type = 'reschedule')
+            AppointmentCancellation::create([
+                'user_id' => $userId,
+                'appointment_id' => $appointmentId,
+                'reason' => $validated['reason'],
+                'type' => 'reschedule',
+                'processed_at' => Carbon::now()
+            ]);
+            
+            // Mark appointment as 'rescheduled' temporarily
+            $appointment->update(['status' => 'rescheduled']);
+            
             return response()->json([
-                'error' => 'You have reached your limit (2 actions per week). Please try again later.'
+                'success' => 'Please select a new date and time for your appointment.',
+                'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
+                'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
+            ], 200);
+            
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Validation failed: ' . implode(', ', $e->validator->errors()->all())
             ], 422);
-        }
-        
-        // Find the appointment
-        $appointment = Appointment::findOrFail($appointmentId);
-        
-        // Verify ownership
-        if ($appointment->user_id != $userId) {
+        } catch (\Exception $e) {
+            \Log::error('Reschedule error: ' . $e->getMessage());
             return response()->json([
-                'error' => 'You can only reschedule your own appointments.'
-            ], 403);
+                'error' => 'An error occurred while processing your request: ' . $e->getMessage()
+            ], 500);
         }
-        
-        // Check if appointment is accepted
-        if ($appointment->status !== 'accepted') {
-            return response()->json([
-                'error' => 'You can only reschedule accepted appointments. Pending appointments must be approved first.'
-            ], 422);
-        }
-        
-        // Validate reason
-        $request->validate([
-            'reason' => 'required|string|min:10|max:500'
-        ]);
-        
-        // Create reschedule record (type = 'reschedule')
-        AppointmentCancellation::create([
-            'user_id' => $userId,
-            'appointment_id' => $appointmentId,
-            'reason' => $request->reason,
-            'type' => 'reschedule',
-            'processed_at' => Carbon::now()
-        ]);
-        
-        // Mark appointment as 'rescheduled' temporarily
-        $appointment->update(['status' => 'rescheduled']);
-        
-        return response()->json([
-            'success' => 'Please select a new date and time for your appointment.',
-            'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
-            'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
-        ]);
     }
 }
