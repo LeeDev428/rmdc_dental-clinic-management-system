@@ -381,7 +381,7 @@
                     <td style="font-size: 12px;">{{ $appointment->username }}</td>
                     <td style="font-size: 12px;">
                         @if($appointment->image_path)
-                            <img src="{{ asset('storage/' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
+                            <img src="{{ url('image.php?path=' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)" onerror="console.error('Image failed to load:', this.src); this.src='https://via.placeholder.com/100?text=Load+Error';">
                         @else
                             <img src="https://via.placeholder.com/100" alt="Default ID Image" class="id-image">
                         @endif
