@@ -177,7 +177,7 @@
         Route::delete('/admin/inventory-admin/{id}', [InventoryController::class, 'destroy'])->name('admin.inventory_admin.destroy');
 
         Route::get('/notification/{id}', [NotificationController::class, 'show'])->name('notification.show');
-        Route::post('/appointment/{id}/{action}', [AdminAppointment::class, 'handleAction'])->name('appointment.handleAction');
+        Route::post('/admin/appointment/{id}/{action}', [AdminAppointment::class, 'handleAction'])->name('admin.appointment.handleAction');
                 // This will ensure that the notification logic points to AdminAppointment controller
                 Route::post('/notifications/mark-as-read', [AdminAppointment::class, 'markNotificationsAsRead']);
                 Route::post('/notifications/accept-decline', [AdminAppointment::class, 'handleAction']);
