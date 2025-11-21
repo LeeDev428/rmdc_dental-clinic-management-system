@@ -1204,8 +1204,16 @@ window.onclick = function(event) {
                     showPopup('error', data.error);
                     // Re-enable button on error
                     resetSubmitButton();
+                } else if (isRescheduleMode) {
+                    // Reschedule success - no payment needed
+                    showPopup('success', data.success || 'Appointment rescheduled successfully!');
+                    
+                    // Reload page after short delay
+                    setTimeout(() => {
+                        window.location.href = '/appointments';
+                    }, 2000);
                 } else if (data.success && data.payment_url) {
-                    // Redirect to payment gateway
+                    // Normal booking - redirect to payment gateway
                     showPopup('success', data.message || 'Redirecting to payment gateway...');
                     setTimeout(() => {
                         window.location.href = data.payment_url;
