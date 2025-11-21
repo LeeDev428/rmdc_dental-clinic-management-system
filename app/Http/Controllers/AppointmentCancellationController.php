@@ -92,7 +92,7 @@ class AppointmentCancellationController extends Controller
         ]);
     }
     
-    // Process reschedule (marks old appointment as cancelled, user books new one)
+    // Process reschedule (redirects to appointments page with pre-filled data)
     public function reschedule(Request $request, $appointmentId)
     {
         $userId = Auth::id();
@@ -135,13 +135,14 @@ class AppointmentCancellationController extends Controller
             'processed_at' => Carbon::now()
         ]);
         
-        // Update appointment status to cancelled (frees up the time slot)
-        $appointment->update(['status' => 'cancelled']);
+        // Don't change appointment status yet - will change to pending after new date/time is selected
+        // Just mark it as "rescheduling" in session
+        session(['rescheduling_appointment' => $appointmentId]);
         
         return response()->json([
-            'success' => 'Appointment marked for rescheduling. Please book a new appointment.',
+            'success' => 'Please select a new date and time for your appointment.',
             'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
-            'redirect' => '/appointments'
+            'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
         ]);
     }
 }
