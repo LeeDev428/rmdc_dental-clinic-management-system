@@ -1097,8 +1097,15 @@ window.onclick = function(event) {
             const submitBtn = document.getElementById('submit-booking-btn');
             const submitBtnText = document.getElementById('submit-btn-text');
             
+            // Check if this is reschedule mode
+            const isRescheduleMode = formData.has('reschedule_mode');
+            
             // Validate all required fields before submission
-            const requiredFields = {
+            const requiredFields = isRescheduleMode ? {
+                'title': 'Patient Name',
+                'procedure': 'Procedure',
+                'time': 'Appointment Time'
+            } : {
                 'title': 'Patient Name',
                 'procedure': 'Procedure',
                 'time': 'Appointment Time',
@@ -1130,37 +1137,42 @@ window.onclick = function(event) {
                 return;
             }
             
-            // Ensure payment method is selected and explicitly added
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-            if (!paymentMethod) {
-                showPopup('error', 'Please select a payment method');
-                return;
+            // Only validate payment if NOT in reschedule mode
+            if (!isRescheduleMode) {
+                // Ensure payment method is selected and explicitly added
+                const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (!paymentMethod) {
+                    showPopup('error', 'Please select a payment method');
+                    return;
+                }
+                
+                // Explicitly add payment method to formData
+                formData.set('payment_method', paymentMethod.value);
+                
+                // Ensure hidden payment fields are included
+                const totalPrice = document.getElementById('total-price-hidden');
+                const downPayment = document.getElementById('down-payment-hidden');
+                
+                if (!totalPrice || !totalPrice.value || totalPrice.value === '0') {
+                    showPopup('error', 'Total price is missing. Please select a procedure.');
+                    return;
+                }
+                if (!downPayment || !downPayment.value || downPayment.value === '0') {
+                    showPopup('error', 'Down payment is missing. Please select a procedure.');
+                    return;
+                }
+                
+                formData.set('total_price', totalPrice.value);
+                formData.set('down_payment', downPayment.value);
+                
+                // Debug: Log what we're sending
+                console.log('Submitting appointment with:');
+                console.log('Payment Method:', paymentMethod.value);
+                console.log('Total Price:', totalPrice.value);
+                console.log('Down Payment:', downPayment.value);
+            } else {
+                console.log('Reschedule mode - skipping payment validation');
             }
-            
-            // Explicitly add payment method to formData
-            formData.set('payment_method', paymentMethod.value);
-            
-            // Ensure hidden payment fields are included
-            const totalPrice = document.getElementById('total-price-hidden');
-            const downPayment = document.getElementById('down-payment-hidden');
-            
-            if (!totalPrice || !totalPrice.value || totalPrice.value === '0') {
-                showPopup('error', 'Total price is missing. Please select a procedure.');
-                return;
-            }
-            if (!downPayment || !downPayment.value || downPayment.value === '0') {
-                showPopup('error', 'Down payment is missing. Please select a procedure.');
-                return;
-            }
-            
-            formData.set('total_price', totalPrice.value);
-            formData.set('down_payment', downPayment.value);
-            
-            // Debug: Log what we're sending
-            console.log('Submitting appointment with:');
-            console.log('Payment Method:', paymentMethod.value);
-            console.log('Total Price:', totalPrice.value);
-            console.log('Down Payment:', downPayment.value);
 
             // Disable button and show loading state
             isSubmitting = true;
