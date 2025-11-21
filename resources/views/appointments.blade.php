@@ -688,6 +688,7 @@ window.onclick = function(event) {
                                             </select>
                                         </div>
 
+                                        @if(!isset($reschedulingAppointment) || !$reschedulingAppointment)
                                         <!-- Valid ID Upload -->
                                         <div class="mb-4">
                                             <label for="valid-id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Valid ID</label>
@@ -702,6 +703,12 @@ window.onclick = function(event) {
 
                                             <small class="text-gray-500 mt-2 block">Accepts image files (JPEG, PNG, JPG, SVG).</small>
                                         </div>
+                                        @else
+                                        <!-- Reschedule Mode - No ID Upload Needed -->
+                                        <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+                                            <p class="text-sm text-green-800"><strong>✅ Valid ID:</strong> Already on file</p>
+                                        </div>
+                                        @endif
 
                                         <!-- Terms and Agreement -->
                                         <div class="mb-4 mt-6">
