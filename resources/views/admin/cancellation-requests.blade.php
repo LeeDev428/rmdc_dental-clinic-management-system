@@ -203,8 +203,8 @@
                         <td>
                             @php
                                 $appointmentTime = \Carbon\Carbon::parse($cancellation->appointment->start);
-                                $daysUntil = $cancellation->processed_at->diffInDays($appointmentTime, false);
-                                $hoursNotice = $cancellation->processed_at->diffInHours($appointmentTime, false);
+                                $daysUntil = (int)$cancellation->processed_at->diffInDays($appointmentTime, false);
+                                $hoursNotice = (int)$cancellation->processed_at->diffInHours($appointmentTime, false);
                             @endphp
                             @if($daysUntil >= 0)
                                 {{ $daysUntil }} days
