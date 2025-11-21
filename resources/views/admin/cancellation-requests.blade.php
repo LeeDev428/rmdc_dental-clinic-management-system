@@ -229,7 +229,7 @@
                             @endif
                         </td>
                         <td>
-                            <button class="btn btn-sm btn-info" onclick="viewDetails({{ $cancellation->id }})" title="View Details">
+                            <button class="btn btn-sm btn-info" onclick="viewDetails({{ $cancellation->id }}, '{{ $cancellation->user->name }}', '{{ $cancellation->appointment->procedure }}', '{{ \Carbon\Carbon::parse($cancellation->appointment->start)->format('M d, Y g:i A') }}', '{{ $cancellation->reason }}', '{{ $cancellation->type }}')" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </td>
