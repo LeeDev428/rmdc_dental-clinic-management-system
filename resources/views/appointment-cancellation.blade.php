@@ -372,25 +372,34 @@
                     body: JSON.stringify({ reason })
                 });
                 
-                const data = await response.json();
+                // Try to parse JSON response
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('Failed to parse response:', e);
+                    throw new Error('Invalid server response');
+                }
                 
                 if (response.ok) {
-                    alert(data.success);
-                    
-                    // If reschedule, redirect to appointments page
+                    // If reschedule, redirect to appointments page immediately without alert
                     if (actionType === 'reschedule' && data.redirect) {
                         window.location.href = data.redirect;
+                        return; // Don't show alert, just redirect
                     } else {
+                        alert(data.success);
                         window.location.reload();
                     }
                 } else {
                     errorDiv.textContent = data.error || 'An error occurred';
                     errorDiv.classList.remove('hidden');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = actionType === 'reschedule' ? 'Confirm Reschedule' : 'Confirm Cancellation';
                 }
             } catch (error) {
-                errorDiv.textContent = 'Network error. Please try again.';
+                console.error('Error:', error);
+                errorDiv.textContent = 'Network error. Please try again. ' + error.message;
                 errorDiv.classList.remove('hidden');
-            } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = actionType === 'reschedule' ? 'Confirm Reschedule' : 'Confirm Cancellation';
             }
