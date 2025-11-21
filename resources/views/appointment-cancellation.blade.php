@@ -117,6 +117,55 @@
                     @endif
                 </div>
             </div>
+            
+            <!-- Rescheduled Appointments (Pending Reschedule) -->
+            @php
+                $rescheduledAppointments = \App\Models\Appointment::where('user_id', Auth::id())
+                    ->where('status', 'rescheduled')
+                    ->orderBy('start', 'asc')
+                    ->get();
+            @endphp
+            
+            @if($rescheduledAppointments->count() > 0)
+            <div class="bg-blue-50 border border-blue-200 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-blue-900 mb-4">🔄 Appointments Pending Reschedule</h3>
+                    <p class="text-sm text-blue-700 mb-4">You have requested to reschedule these appointments. Please select a new date and time to complete the process.</p>
+                    
+                    <div class="space-y-4">
+                        @foreach($rescheduledAppointments as $appointment)
+                            <div class="bg-white border border-blue-300 rounded-lg p-4 shadow-sm">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h4 class="font-semibold text-gray-900">{{ $appointment->title }}</h4>
+                                        <p class="text-sm text-gray-600 mt-1">
+                                            <span class="font-medium">Procedure:</span> {{ $appointment->procedure }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">Original Date:</span> 
+                                            {{ \Carbon\Carbon::parse($appointment->start)->format('M d, Y g:i A') }}
+                                        </p>
+                                        <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                            Pending Reschedule
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="ml-4">
+                                        <a href="{{ route('appointments', ['reschedule' => $appointment->id]) }}"
+                                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition shadow">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Reschedule Now
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <!-- Cancellation History -->
             @if($cancellationHistory->count() > 0)
@@ -310,31 +359,44 @@
         }
 
         function openCancelModal(appointmentId, appointmentTitle, actionType = 'cancel') {
-            document.getElementById('appointmentId').value = appointmentId;
-            document.getElementById('appointmentTitle').textContent = appointmentTitle;
-            document.getElementById('cancelModal').classList.remove('hidden');
-            document.getElementById('cancelModal').classList.add('flex');
-            document.getElementById('reason').value = '';
-            document.getElementById('errorMessage').classList.add('hidden');
-            
-            // Store action type for submission
-            document.getElementById('cancelForm').dataset.actionType = actionType;
-            
-            // Update modal text based on action
+            const appointmentIdInput = document.getElementById('appointmentId');
+            const appointmentTitleSpan = document.getElementById('appointmentTitle');
+            const cancelModal = document.getElementById('cancelModal');
+            const reasonTextarea = document.getElementById('reason');
+            const errorMessage = document.getElementById('errorMessage');
+            const cancelForm = document.getElementById('cancelForm');
             const modalTitle = document.querySelector('#cancelModal h3');
-            const modalDescription = document.querySelector('#cancelModal .text-sm.text-gray-600');
+            const modalDescription = document.querySelector('#cancelModal p.text-sm');
             const reasonLabel = document.querySelector('label[for="reason"]');
             const submitBtn = document.getElementById('submitBtn');
             
+            // Check if all required elements exist
+            if (!appointmentIdInput || !cancelModal || !reasonTextarea || !errorMessage || !cancelForm || !submitBtn) {
+                console.error('Required modal elements not found');
+                return;
+            }
+            
+            // Set values
+            appointmentIdInput.value = appointmentId;
+            if (appointmentTitleSpan) appointmentTitleSpan.textContent = appointmentTitle;
+            cancelModal.classList.remove('hidden');
+            cancelModal.classList.add('flex');
+            reasonTextarea.value = '';
+            errorMessage.classList.add('hidden');
+            
+            // Store action type for submission
+            cancelForm.dataset.actionType = actionType;
+            
+            // Update modal text based on action
             if (actionType === 'reschedule') {
-                modalTitle.textContent = 'Reschedule Appointment';
-                modalDescription.innerHTML = `Are you sure you want to reschedule <span class="font-semibold">${appointmentTitle}</span>? Your current time slot will be freed for others.`;
-                reasonLabel.innerHTML = 'Reason for Rescheduling <span class="text-red-500">*</span>';
+                if (modalTitle) modalTitle.textContent = 'Reschedule Appointment';
+                if (modalDescription) modalDescription.innerHTML = `Are you sure you want to reschedule <span class="font-semibold">${appointmentTitle}</span>? Your current time slot will be freed for others.`;
+                if (reasonLabel) reasonLabel.innerHTML = 'Reason for Rescheduling <span class="text-red-500">*</span>';
                 submitBtn.textContent = 'Confirm Reschedule';
             } else {
-                modalTitle.textContent = 'Cancel Appointment';
-                modalDescription.innerHTML = `Are you sure you want to cancel <span class="font-semibold">${appointmentTitle}</span>?`;
-                reasonLabel.innerHTML = 'Reason for Cancellation <span class="text-red-500">*</span>';
+                if (modalTitle) modalTitle.textContent = 'Cancel Appointment';
+                if (modalDescription) modalDescription.innerHTML = `Are you sure you want to cancel <span class="font-semibold">${appointmentTitle}</span>?`;
+                if (reasonLabel) reasonLabel.innerHTML = 'Reason for Cancellation <span class="text-red-500">*</span>';
                 submitBtn.textContent = 'Confirm Cancellation';
             }
         }
