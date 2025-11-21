@@ -250,4 +250,71 @@
         </div>
     </div>
 </div>
+
+<!-- View Details Modal -->
+<div id="detailsModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background-color: white; margin: 5% auto; padding: 0; border-radius: 8px; width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #1f2937;">Cancellation/Reschedule Details</h3>
+                <button onclick="closeDetailsModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6b7280;">&times;</button>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 5px;">Patient Name:</label>
+                <p id="modalPatientName" style="margin: 0; color: #6b7280;"></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 5px;">Procedure:</label>
+                <p id="modalProcedure" style="margin: 0; color: #6b7280;"></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 5px;">Appointment Date & Time:</label>
+                <p id="modalDateTime" style="margin: 0; color: #6b7280;"></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 5px;">Action Type:</label>
+                <p id="modalType" style="margin: 0;"></p>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 5px;">Reason:</label>
+                <p id="modalReason" style="margin: 0; color: #6b7280; white-space: pre-wrap;"></p>
+            </div>
+        </div>
+        <div style="padding: 15px 20px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;">
+            <button onclick="closeDetailsModal()" style="background-color: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 500;">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewDetails(id, patientName, procedure, dateTime, reason, type) {
+    document.getElementById('modalPatientName').textContent = patientName;
+    document.getElementById('modalProcedure').textContent = procedure;
+    document.getElementById('modalDateTime').textContent = dateTime;
+    document.getElementById('modalReason').textContent = reason;
+    
+    const typeElement = document.getElementById('modalType');
+    if (type === 'reschedule') {
+        typeElement.innerHTML = '<span style="background-color: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 14px; font-weight: 500;">Reschedule</span>';
+    } else {
+        typeElement.innerHTML = '<span style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 14px; font-weight: 500;">Cancel</span>';
+    }
+    
+    document.getElementById('detailsModal').style.display = 'block';
+}
+
+function closeDetailsModal() {
+    document.getElementById('detailsModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('detailsModal');
+    if (event.target === modal) {
+        closeDetailsModal();
+    }
+}
+</script>
 @endsection
