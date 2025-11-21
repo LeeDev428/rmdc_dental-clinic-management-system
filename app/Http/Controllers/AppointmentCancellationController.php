@@ -142,7 +142,7 @@ class AppointmentCancellationController extends Controller
             return response()->json([
                 'success' => 'Please select a new date and time for your appointment.',
                 'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
-                'redirect' => route('appointments.index', ['reschedule' => $appointmentId])
+                'redirect' => route('appointments', ['reschedule' => $appointmentId])
             ], 200);
             
         } catch (\Illuminate\Validation\ValidationException $e) {
