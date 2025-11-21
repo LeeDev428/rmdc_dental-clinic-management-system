@@ -1665,6 +1665,21 @@ eventClick: function(info) {
                         $('#popup-message').addClass('hidden');
                     }, 3000);
                 }
+
+                // Auto-populate estimated time for reschedule mode
+                @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                    // Get the procedure duration from the backend
+                    @php
+                        $procedure = \App\Models\ProcedurePrice::where('procedure_name', $reschedulingAppointment->procedure)->first();
+                        $duration = $procedure ? $procedure->duration : 0;
+                    @endphp
+                    
+                    // Set the estimated time
+                    $('#estimated-time').val('{{ $duration }} minutes');
+                    
+                    // Show info popup
+                    showPopup('success', 'Please select a new date and time for your appointment. Your procedure and payment remain the same.');
+                @endif
             });
         </script>
         
