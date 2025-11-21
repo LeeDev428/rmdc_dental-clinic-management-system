@@ -1039,6 +1039,19 @@
             }
         }
 
+        .chatbot-wrapper-welcome {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-wrapper-welcome {
+                border-radius: 15px;
+                margin: 0 10px;
+            }
+        }
+
         @media (max-width: 480px) {
             .hero-content h1 {
                 font-size: 24px;
@@ -1100,7 +1113,7 @@
             </div>
             
             <!-- AI Chatbot Component -->
-            <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <div class="chatbot-wrapper-welcome">
                 <x-lee-ai-chatbot type="public" />
             </div>
         </div>
