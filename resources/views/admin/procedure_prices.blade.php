@@ -594,12 +594,12 @@
                             <div class="image-preview-container">
                                 <div class="image-preview">
                                     @if($procedure->image_path)
-                                        <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="Procedure Image">
+                                        <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="Procedure Image" id="preview_{{ $procedure->id }}">
                                     @else
-                                        <div class="no-image">No Image</div>
+                                        <div class="no-image" id="preview_{{ $procedure->id }}">No Image</div>
                                     @endif
                                 </div>
-                                <input type="file" id="image_path_{{ $procedure->id }}" class="form-control-file" style="font-size: 10px; padding: 2px;">
+                                <input type="file" id="image_path_{{ $procedure->id }}" class="form-control-file" accept="image/*" style="font-size: 10px; padding: 2px;" onchange="previewImage({{ $procedure->id }}, this)">
                             </div>
                         </td>
                         <td>
