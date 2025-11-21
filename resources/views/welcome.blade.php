@@ -887,9 +887,9 @@
 
         /* Footer */
         footer {
-            background: #1a1a1a;
-            color: white;
-            padding: 30px 0;
+          
+            color: black;
+            padding: 30px;
             text-align: center;
             margin: 0;
         }
