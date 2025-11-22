@@ -548,12 +548,13 @@
 /* Responsive */
 @media (max-width: 768px) {
     .lee-ai-chatbot-container {
-        padding: 0 15px 60px 15px;
+        padding: 0 0 60px 0;
     }
     
     .chatbot-card-lee {
         max-width: 100%;
         border-radius: 15px;
+        margin: 0 10px;
     }
     
     .chatbot-messages-lee {
@@ -570,5 +571,24 @@
     
     .message-body-lee ul.ai-list {
         padding-left: 18px;
+    }
+    
+    .chatbot-input-form-lee {
+        padding: 12px 8px;
+    }
+    
+    .chatbot-input-wrapper-lee {
+        gap: 6px;
+    }
+    
+    .chatbot-input-wrapper-lee input {
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+    
+    .chatbot-input-wrapper-lee button {
+        width: 60px;
+        height: 40px;
+        font-size: 14px;
     }
 }

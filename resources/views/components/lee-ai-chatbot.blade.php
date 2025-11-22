@@ -51,8 +51,8 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="{{ asset('css/lee-ai-chatbot.css?v=2.1') }}">
-<script src="{{ asset('js/lee-ai-chatbot.js?v=2.1') }}"></script>
+<link rel="stylesheet" href="{{ asset('css/lee-ai-chatbot.css?v=2.2') }}">
+<script src="{{ asset('js/lee-ai-chatbot.js?v=2.2') }}"></script>
 <script>
     // Initialize Lee AI Chatbot
     document.addEventListener('DOMContentLoaded', function() {
