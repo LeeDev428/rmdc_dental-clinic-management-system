@@ -2,14 +2,6 @@
 
 @section('content')
 <style>
-    /* Scoped styles to prevent sidebar conflicts */
-    #layoutSidenav_content .container-fluid {
-        background-color: #f8f9fa;
-        color: #1a1a1a;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-size: 14px;
-    }
-
     .content-wrapper {
         padding: 24px;
         max-width: 1200px;

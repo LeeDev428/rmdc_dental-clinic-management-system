@@ -122,18 +122,33 @@ class DentalRecordController extends Controller
             'recommendations' => 'nullable|string',
             'next_visit' => 'nullable|date',
             'notes' => 'nullable|string',
-            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120'
+            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'keep_attachments' => 'nullable|array'
         ]);
 
+        // Handle attachment removal - keep only the ones marked to keep
+        $currentAttachments = $record->attachments ?? [];
+        $keepAttachments = $request->input('keep_attachments', []);
+        
+        // Delete removed attachments from storage
+        foreach ($currentAttachments as $attachment) {
+            if (!in_array($attachment, $keepAttachments)) {
+                Storage::disk('public')->delete($attachment);
+            }
+        }
+        
+        // Start with kept attachments
+        $attachments = $keepAttachments;
+        
         // Handle new file attachments
         if ($request->hasFile('attachments')) {
-            $attachments = $record->attachments ?? [];
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('dental_records', 'public');
                 $attachments[] = $path;
             }
-            $validated['attachments'] = $attachments;
         }
+        
+        $validated['attachments'] = $attachments;
 
         $record->update($validated);
 

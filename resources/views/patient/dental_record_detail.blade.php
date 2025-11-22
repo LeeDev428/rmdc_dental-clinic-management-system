@@ -195,18 +195,19 @@
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             @foreach($record->attachments as $attachment)
                                 @php
+                                    $attachmentFilename = basename($attachment);
                                     $extension = pathinfo($attachment, PATHINFO_EXTENSION);
                                     $isPdf = strtolower($extension) === 'pdf';
                                 @endphp
                                 
-                                <a href="{{ asset('storage/' . $attachment) }}" 
+                                <a href="{{ url('dental-record/' . $attachmentFilename) }}" 
                                    target="_blank"
                                    class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg hover:shadow-lg transition-all text-center">
                                     @if($isPdf)
                                         <i class="fas fa-file-pdf text-red-500 text-4xl mb-2"></i>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">PDF Document</p>
                                     @else
-                                        <img src="{{ asset('storage/' . $attachment) }}" 
+                                        <img src="{{ url('dental-record/' . $attachmentFilename) }}" 
                                              alt="Attachment" 
                                              class="w-full h-32 object-cover rounded mb-2">
                                         <p class="text-sm text-gray-600 dark:text-gray-400">Image</p>

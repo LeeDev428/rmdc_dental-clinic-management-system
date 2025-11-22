@@ -278,20 +278,75 @@
 
         <!-- Attachments -->
         <div class="form-section">
-            <h3 class="section-title"><i class="fas fa-paperclip"></i> Add More Attachments</h3>
+            <h3 class="section-title"><i class="fas fa-paperclip"></i> Attachments</h3>
+            
+            <!-- Current Attachments -->
+            @if($record->attachments && count($record->attachments) > 0)
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #1a1a1a; margin-bottom: 12px;">
+                        Current Attachments ({{ count($record->attachments) }} files)
+                    </label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;">
+                        @foreach($record->attachments as $index => $attachment)
+                            @php
+                                $attachmentFilename = basename($attachment);
+                                $extension = pathinfo($attachment, PATHINFO_EXTENSION);
+                                $isPdf = strtolower($extension) === 'pdf';
+                            @endphp
+                            <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; background-color: #fafafa; position: relative;">
+                                <a href="{{ url('dental-record/' . $attachmentFilename) }}" target="_blank" style="display: block; text-align: center; text-decoration: none;">
+                                    @if($isPdf)
+                                        <i class="fas fa-file-pdf" style="font-size: 48px; color: #ef4444; margin-bottom: 8px;"></i>
+                                        <p style="font-size: 12px; color: #6b7280; margin: 0;">PDF</p>
+                                    @else
+                                        <img src="{{ url('dental-record/' . $attachmentFilename) }}" 
+                                             alt="Attachment"
+                                             style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px; margin-bottom: 8px;">
+                                        <p style="font-size: 12px; color: #6b7280; margin: 0;">Image</p>
+                                    @endif
+                                </a>
+                                <button type="button" 
+                                        onclick="removeAttachment({{ $index }}, '{{ $attachmentFilename }}')"
+                                        style="position: absolute; top: 8px; right: 8px; background-color: #ef4444; color: white; border: none; border-radius: 4px; width: 24px; height: 24px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center;"
+                                        title="Remove attachment">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <input type="hidden" name="keep_attachments[]" value="{{ $attachment }}" id="attachment_{{ $index }}">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+            
+            <!-- Add New Attachments -->
             <div class="form-group">
                 <label for="attachments">Upload Additional Files (X-rays, Photos, Documents)</label>
                 <input type="file" id="attachments" name="attachments[]" class="form-control file-input" multiple accept=".jpg,.jpeg,.png,.pdf">
                 <small style="color: #6b7280; display: block; margin-top: 8px;">
                     Accepted formats: JPG, JPEG, PNG, PDF. Max size: 5MB per file.
                 </small>
-                @if($record->attachments && count($record->attachments) > 0)
-                    <p style="margin-top: 12px; color: #16a34a; font-size: 14px;">
-                        <i class="fas fa-check-circle"></i> {{ count($record->attachments) }} file(s) currently attached
-                    </p>
-                @endif
             </div>
         </div>
+
+        <script>
+        function removeAttachment(index, filename) {
+            if (confirm('Are you sure you want to remove this attachment: ' + filename + '?')) {
+                const input = document.getElementById('attachment_' + index);
+                if (input) {
+                    input.remove();
+                }
+                const container = event.target.closest('div[style*="position: relative"]');
+                if (container) {
+                    container.style.opacity = '0.3';
+                    container.style.pointerEvents = 'none';
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = 'position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.1); border-radius: 8px;';
+                    overlay.innerHTML = '<span style="color: #ef4444; font-weight: 600; font-size: 14px;"><i class="fas fa-trash"></i> Will be removed</span>';
+                    container.appendChild(overlay);
+                }
+            }
+        }
+        </script>
 
         <!-- Form Actions -->
         <div class="form-actions">
