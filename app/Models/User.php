@@ -65,7 +65,9 @@ class User extends Authenticatable implements MustVerifyEmail
             if (strpos($this->avatar, 'img/') === 0) {
                 return asset($this->avatar); // Use asset() for public folder files
             }
-            return Storage::url($this->avatar); // Use Storage for uploaded files
+            // Extract filename from path (e.g., 'avatars/filename.jpg' -> 'filename.jpg')
+            $filename = basename($this->avatar);
+            return url('avatar/' . $filename); // Use route-based URL
         }
         
         // Fallback to default avatar

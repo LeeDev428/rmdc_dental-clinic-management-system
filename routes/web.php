@@ -65,6 +65,22 @@
         return response()->file($path);
     })->where('filename', '.*');
     
+    Route::get('/avatar/{filename}', function ($filename) {
+        $path = storage_path('app/public/avatars/' . $filename);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    })->where('filename', '.*');
+    
+    Route::get('/dental-record/{filename}', function ($filename) {
+        $path = storage_path('app/public/dental_records/' . $filename);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    })->where('filename', '.*');
+    
     // Public AI Chatbot (No authentication required) - Rate limited to 10 requests per minute per IP
     Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])
         ->middleware('throttle:10,1')

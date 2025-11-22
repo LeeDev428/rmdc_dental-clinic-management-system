@@ -395,12 +395,13 @@
                 @endphp
                 
                 <div class="attachment-item {{ $isPdf ? 'pdf' : '' }}">
+                    @php $attachmentFilename = basename($attachment); @endphp
                     @if($isPdf)
                         <i class="fas fa-file-pdf"></i>
                     @else
-                        <img src="{{ asset('storage/' . $attachment) }}" alt="Attachment">
+                        <img src="{{ url('dental-record/' . $attachmentFilename) }}" alt="Attachment">
                     @endif
-                    <a href="{{ asset('storage/' . $attachment) }}" 
+                    <a href="{{ url('dental-record/' . $attachmentFilename) }}" 
                        target="_blank" 
                        class="attachment-link">
                         <i class="fas fa-external-link-alt"></i> View
