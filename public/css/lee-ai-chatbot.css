@@ -372,9 +372,9 @@
 }
 
 .chatbot-input-wrapper-lee button {
-    width: 42px;
+    width: 65px;
     height: 42px;
-    border-radius: 50%;
+    border-radius: 22px;
     border: none;
     background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
     color: white;
