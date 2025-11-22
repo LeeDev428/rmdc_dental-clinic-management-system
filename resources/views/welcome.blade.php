@@ -279,11 +279,11 @@
         @media (max-width: 768px) {
             .hero {
                 min-height: auto;
-                padding: 90px 10px 30px;
+                padding: 90px 0 30px;
             }
 
             .hero-container {
-                padding: 20px 10px;
+                padding: 20px 0;
                 gap: 30px;
             }
 
@@ -1048,7 +1048,7 @@
         @media (max-width: 768px) {
             .chatbot-wrapper-welcome {
                 border-radius: 15px;
-                margin: 0 10px;
+                margin: 0;
             }
         }
 
