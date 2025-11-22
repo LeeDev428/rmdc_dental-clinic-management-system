@@ -1,6 +1,5 @@
 <x-guest-layout>
     @section('title', 'Recover')
-    @vite('resources/css/forgotpassword.css')
     
     <div class="bg-white rounded-lg shadow-lg flex flex-col md:flex-row w-full max-w-4xl mx-auto mt-6 overflow-hidden">
 
