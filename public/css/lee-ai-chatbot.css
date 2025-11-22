@@ -343,28 +343,26 @@
 
 /* Input Form */
 .chatbot-input-form-lee {
-    padding: 14px 12px;
+    padding: 14px 16px;
     background: white;
     border-top: 1px solid #e9ecef;
 }
 
 .chatbot-input-wrapper-lee {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     align-items: center;
-    width: 100%;
 }
 
 .chatbot-input-wrapper-lee input {
     flex: 1;
-    padding: 11px 14px;
+    padding: 11px 16px;
     border: 2px solid #e9ecef;
     border-radius: 22px;
     font-size: 13px;
     outline: none;
     transition: all 0.3s;
     font-family: 'Poppins', sans-serif;
-    min-width: 0;
 }
 
 .chatbot-input-wrapper-lee input:focus {
@@ -374,9 +372,9 @@
 }
 
 .chatbot-input-wrapper-lee button {
-    width: 65px;
+    width: 42px;
     height: 42px;
-    border-radius: 22px;
+    border-radius: 50%;
     border: none;
     background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
     color: white;
@@ -387,7 +385,6 @@
     font-size: 15px;
     transition: all 0.3s;
     box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
-    flex-shrink: 0;
 }
 
 .chatbot-input-wrapper-lee button:hover {
@@ -547,14 +544,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-    .lee-ai-chatbot-container {
-        padding: 0 0 60px 0;
-    }
-    
     .chatbot-card-lee {
         max-width: 100%;
-        border-radius: 15px;
-        margin: 0 10px;
+        border-radius: 0;
     }
     
     .chatbot-messages-lee {
@@ -571,24 +563,5 @@
     
     .message-body-lee ul.ai-list {
         padding-left: 18px;
-    }
-    
-    .chatbot-input-form-lee {
-        padding: 12px 8px;
-    }
-    
-    .chatbot-input-wrapper-lee {
-        gap: 6px;
-    }
-    
-    .chatbot-input-wrapper-lee input {
-        padding: 10px 12px;
-        font-size: 12px;
-    }
-    
-    .chatbot-input-wrapper-lee button {
-        width: 60px;
-        height: 40px;
-        font-size: 14px;
     }
 }
