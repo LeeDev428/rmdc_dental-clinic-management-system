@@ -19,10 +19,3 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
-
-# Cache Control for CSS and JS files
-<IfModule mod_headers.c>
-    <FilesMatch "\.(css|js)$">
-        Header set Cache-Control "no-cache, must-revalidate"
-    </FilesMatch>
-</IfModule>
