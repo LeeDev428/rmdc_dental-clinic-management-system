@@ -48,9 +48,17 @@
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
     Route::get('/get-services', [WelcomeController::class, 'getServices'])->name('get.services');
     
-    // Direct image serving route
+    // Direct image serving routes
     Route::get('/valid-id/{filename}', function ($filename) {
         $path = storage_path('app/public/valid_ids/' . $filename);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    })->where('filename', '.*');
+    
+    Route::get('/procedure-image/{filename}', function ($filename) {
+        $path = storage_path('app/public/procedure_images/' . $filename);
         if (!file_exists($path)) {
             abort(404);
         }

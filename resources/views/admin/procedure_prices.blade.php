@@ -594,7 +594,8 @@
                             <div class="image-preview-container">
                                 <div class="image-preview">
                                     @if($procedure->image_path)
-                                        <img src="{{ asset('storage/' . $procedure->image_path) }}" alt="Procedure Image" id="preview_{{ $procedure->id }}">
+                                        @php $filename = basename($procedure->image_path); @endphp
+                                        <img src="{{ url('procedure-image/' . $filename) }}" alt="Procedure Image" id="preview_{{ $procedure->id }}">
                                     @else
                                         <div class="no-image" id="preview_{{ $procedure->id }}">No Image</div>
                                     @endif

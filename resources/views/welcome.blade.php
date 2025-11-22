@@ -1461,7 +1461,8 @@
                         
                         let imageHtml = '';
                         if (procedure.image_path) {
-                            imageHtml = `<img src="/storage/${procedure.image_path}" alt="${procedure.procedure_name}" class="service-image">`;
+                            const filename = procedure.image_path.split('/').pop();
+                            imageHtml = `<img src="/procedure-image/${filename}" alt="${procedure.procedure_name}" class="service-image">`;
                         } else {
                             imageHtml = '<div class="service-image"></div>';
                         }
