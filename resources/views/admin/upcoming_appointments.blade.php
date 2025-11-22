@@ -381,9 +381,9 @@
                     <td style="font-size: 12px;">{{ $appointment->username }}</td>
                     <td style="font-size: 12px;">
                         @if($appointment->image_path)
-                            <img src="{{ url('image.php?path=' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)" onerror="console.error('Image failed to load:', this.src); this.src='https://via.placeholder.com/100?text=Load+Error';">
+                            <img src="{{ asset('storage/' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)" onerror="this.style.display='none';">
                         @else
-                            <img src="https://via.placeholder.com/100" alt="Default ID Image" class="id-image">
+                            <span style="color: #999;">No ID</span>
                         @endif
                     </td>
                     <td style="font-size: 12px;">{{ $appointment->status }}</td>
@@ -678,10 +678,11 @@
         
         // Valid ID Image
         if (appointment.image_path) {
+            const imgSrc = '/storage/' + appointment.image_path;
             html += `
                 <div class="detail-box full">
                     <div class="detail-label-pending">Valid ID / Supporting Document</div>
-                    <img src="/image.php?path=${appointment.image_path}" alt="Valid ID" class="detail-image-pending" onerror="this.src='https://via.placeholder.com/400x300?text=Image+Not+Found';">
+                    <img src="${imgSrc}" alt="Valid ID" class="detail-image-pending" onerror="this.style.display='none'; this.parentElement.innerHTML += '<p style=color:#999;>Image not available</p>';">
                 </div>
             `;
         }
