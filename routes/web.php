@@ -48,6 +48,15 @@
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
     Route::get('/get-services', [WelcomeController::class, 'getServices'])->name('get.services');
     
+    // Direct image serving route
+    Route::get('/valid-id/{filename}', function ($filename) {
+        $path = storage_path('app/public/valid_ids/' . $filename);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    })->where('filename', '.*');
+    
     // Public AI Chatbot (No authentication required) - Rate limited to 10 requests per minute per IP
     Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])
         ->middleware('throttle:10,1')

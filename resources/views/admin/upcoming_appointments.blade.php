@@ -381,7 +381,10 @@
                     <td style="font-size: 12px;">{{ $appointment->username }}</td>
                     <td style="font-size: 12px;">
                         @if($appointment->image_path)
-                            <img src="{{ asset('storage/' . $appointment->image_path) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)" onerror="this.style.display='none';">
+                            @php
+                                $filename = basename($appointment->image_path);
+                            @endphp
+                            <img src="{{ url('valid-id/' . $filename) }}" alt="Valid ID" class="id-image" onclick="zoomImage(this)">
                         @else
                             <span style="color: #999;">No ID</span>
                         @endif
@@ -678,11 +681,12 @@
         
         // Valid ID Image
         if (appointment.image_path) {
-            const imgSrc = '/storage/' + appointment.image_path;
+            const filename = appointment.image_path.split('/').pop();
+            const imgSrc = '/valid-id/' + filename;
             html += `
                 <div class="detail-box full">
                     <div class="detail-label-pending">Valid ID / Supporting Document</div>
-                    <img src="${imgSrc}" alt="Valid ID" class="detail-image-pending" onerror="this.style.display='none'; this.parentElement.innerHTML += '<p style=color:#999;>Image not available</p>';">
+                    <img src="${imgSrc}" alt="Valid ID" class="detail-image-pending">
                 </div>
             `;
         }
