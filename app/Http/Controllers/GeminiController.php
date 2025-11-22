@@ -31,7 +31,7 @@ class GeminiController extends Controller
         ]);
 
         $question = $request->input('question');
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('gemini.api_key');
 
         // Check if API key is configured
         if (!$apiKey) {
