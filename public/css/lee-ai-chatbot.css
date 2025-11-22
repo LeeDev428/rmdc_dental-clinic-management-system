@@ -343,26 +343,28 @@
 
 /* Input Form */
 .chatbot-input-form-lee {
-    padding: 14px 16px;
+    padding: 14px 12px;
     background: white;
     border-top: 1px solid #e9ecef;
 }
 
 .chatbot-input-wrapper-lee {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
+    width: 100%;
 }
 
 .chatbot-input-wrapper-lee input {
     flex: 1;
-    padding: 11px 16px;
+    padding: 11px 14px;
     border: 2px solid #e9ecef;
     border-radius: 22px;
     font-size: 13px;
     outline: none;
     transition: all 0.3s;
     font-family: 'Poppins', sans-serif;
+    min-width: 0;
 }
 
 .chatbot-input-wrapper-lee input:focus {
@@ -385,6 +387,7 @@
     font-size: 15px;
     transition: all 0.3s;
     box-shadow: 0 4px 12px rgba(0, 119, 182, 0.3);
+    flex-shrink: 0;
 }
 
 .chatbot-input-wrapper-lee button:hover {
