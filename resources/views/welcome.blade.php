@@ -283,7 +283,7 @@
             }
 
             .hero-container {
-                padding: 20px 0;
+                padding: 0;
                 gap: 30px;
             }
 
@@ -1049,6 +1049,11 @@
             .chatbot-wrapper-welcome {
                 border-radius: 15px;
                 margin: 0;
+                width: 100%;
+            }
+            
+            .hero-content {
+                padding: 0 15px;
             }
         }
 
