@@ -43,7 +43,7 @@
                     autocomplete="off"
                 />
                 <button type="submit" id="{{ $type === 'public' ? 'publicSendBtn' : 'protectedSendBtn' }}">
-                    <i class="fas fa-paper-plane fa-sm"></i>
+                    <i class="fas fa-paper-plane fa-xs"></i>
                 </button>
             </div>
         </form>
