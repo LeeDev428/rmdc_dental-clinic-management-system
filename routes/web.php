@@ -80,6 +80,15 @@
         }
         return response()->file($path);
     })->where('filename', '.*');
+
+    // Serve static images from public/img folder
+    Route::get('/img/{filename}', function ($filename) {
+        $path = public_path('img/' . $filename);
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        return response()->file($path);
+    })->where('filename', '.*');
     
     // Public AI Chatbot (No authentication required) - Rate limited to 10 requests per minute per IP
     Route::post('/ask-gemini-public', [GeminiController::class, 'ask'])
