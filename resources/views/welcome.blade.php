@@ -1177,7 +1177,7 @@
             </div>
             
             <div class="slide-in-right">
-                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="Robles-Moncayo Dental Clinic" class="about-image">
+                <img src="{{ asset('img/doc.jpg') }}" alt="Robles-Moncayo Dental Clinic" class="about-image">
                 
                 <div class="about-stats scale-in">
                     <div class="stat-card">
@@ -1202,7 +1202,7 @@
         <div class="services-container">
             <h2 class="section-title fade-in"><span style="color: #00b4d8;">Our</span> Services</h2>
             <p class="services-subtitle fade-in">Comprehensive dental care for your complete oral health</p>
-            
+            <br>
             <div class="services-grid-modern fade-in" id="servicesGrid">
                 <!-- Services will be loaded here via AJAX -->
             </div>
