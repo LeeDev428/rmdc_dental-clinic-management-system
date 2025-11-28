@@ -1177,7 +1177,7 @@
             </div>
             
             <div class="slide-in-right">
-                <img src="{{ asset('img/doc.jpg') }}" alt="Robles-Moncayo Dental Clinic" class="about-image">
+                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="Robles-Moncayo Dental Clinic" class="about-image">
                 
                 <div class="about-stats scale-in">
                     <div class="stat-card">
