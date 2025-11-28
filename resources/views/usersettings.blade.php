@@ -54,12 +54,12 @@
                     </div> -->
 
                     <!-- Theme Settings Card -->
-                    <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
+                    {{-- <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Theme Settings</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">Switch between light and dark mode.</p>
                         <a href="{{ route('theme.settings') }}" class="text-blue-600 hover:text-blue-400">Change Theme</a>
 
-                    </div>
+                    </div> --}}
 
                     <!-- History Settings Card -->
                      <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out">
