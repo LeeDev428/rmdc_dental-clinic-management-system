@@ -58,9 +58,9 @@
     </div>
 
     <div id="main-content" style="display: none;">
-        <div class="flex justify-center items-center min-h-screen">
+        <div class="flex justify-center items-center min-h-screen px-4 sm:px-6">
             <!-- Login Form Container -->
-            <div class="form-container">
+            <div class="form-container w-full">
                 {{ $slot }}
             </div>
         </div>
