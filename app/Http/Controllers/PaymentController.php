@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AppointmentBooked;
 use App\Traits\LogsActivity;
 
 class PaymentController extends Controller
@@ -73,7 +75,7 @@ class PaymentController extends Controller
                             'billing' => [
                                 'name' => Auth::user()->name,
                                 'email' => Auth::user()->email,
-                                'phone' => '09123456789', // Default phone for sandbox testing
+                                'phone' => Auth::user()->phone ?? '09123456789',
                             ],
                             'metadata' => [
                                 'session_key' => $sessionKey,
@@ -211,6 +213,19 @@ class PaymentController extends Controller
                         'total_price' => $appointmentData['total_price'],
                         'description' => 'Down payment received for appointment',
                     ]);
+                    
+                    // Send booking confirmation email
+                    try {
+                        Mail::to($appointment->user->email)->send(new AppointmentBooked($appointment));
+                        Log::info('Booking confirmation email sent', [
+                            'appointment_id' => $appointment->id,
+                            'user_email' => $appointment->user->email
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
+                            'appointment_id' => $appointment->id
+                        ]);
+                    }
                     
                     // Clear session data and save to database
                     session()->forget($sessionKey);
