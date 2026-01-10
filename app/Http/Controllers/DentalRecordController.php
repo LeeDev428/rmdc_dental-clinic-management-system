@@ -135,7 +135,7 @@ class DentalRecordController extends Controller
             if (!in_array($attachment, $keepAttachments)) {
                 Storage::disk('public')->delete($attachment);
             }
-        }
+        } 
         
         // Start with kept attachments
         $attachments = $keepAttachments;
