@@ -16,6 +16,7 @@
     use App\Http\Controllers\ProcedurePriceController;
     use App\Http\Controllers\RatingController;
     use App\Http\Controllers\Admin\ReviewController;
+    use App\Http\Controllers\Admin\DashboardBannerController;
     use App\Http\Controllers\DashboardController;
     use App\Http\Controllers\WelcomeController;
     use App\Http\Controllers\Admin\ToothRecordController;
@@ -173,6 +174,10 @@
         
         // Admin Service Feedbacks View
         Route::get('/admin/service-feedbacks', [ServiceFeedbackController::class, 'index'])->name('admin.service.feedbacks');
+
+        // Dashboard banner management (Admin)
+        Route::get('/admin/dashboard-banner', [DashboardBannerController::class, 'index'])->name('admin.dashboard.banner');
+        Route::post('/admin/dashboard-banner', [DashboardBannerController::class, 'store'])->name('admin.dashboard.banner.store');
     });
     //realtime notifications in admin
     Route::get('/notifications/unread-count', [AdminAppointment::class, 'getUnreadCount'])->name('notifications.unread-count');
