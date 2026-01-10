@@ -56,7 +56,7 @@ class PaymentController extends Controller
                 ->post('https://api.paymongo.com/v1/checkout_sessions', [
                     'data' => [
                         'attributes' => [
-                            'send_email_receipt' => true,
+                            'send_email_receipt' => false, // Disabled - we send our own comprehensive email
                             'show_description' => true,
                             'show_line_items' => true,
                             'description' => "RMDC Dental Clinic - {$appointmentData['procedure']}",
@@ -196,6 +196,9 @@ class PaymentController extends Controller
                         'status' => 'pending', // Ready for admin approval
                     ]);
                     
+                    // Load the user relationship for email sending
+                    $appointment = $appointment->fresh('user');
+                    
                     // Log appointment creation after successful payment
                     $this->logAppointmentActivity('created', $appointment, [
                         'payment_reference' => $paymentId,
@@ -223,7 +226,8 @@ class PaymentController extends Controller
                         ]);
                     } catch (\Exception $e) {
                         Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
-                            'appointment_id' => $appointment->id
+                            'appointment_id' => $appointment->id,
+                            'error' => $e->getMessage()
                         ]);
                     }
                     
