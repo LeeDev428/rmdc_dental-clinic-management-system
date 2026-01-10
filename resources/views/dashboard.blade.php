@@ -119,12 +119,12 @@
 
     <!-- Quick Actions Section -->
     <div class="py-6 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <div class="text-center font-semibold text-2xl text-gray-800 dark:text-white mb-6">
+        {{-- <div class="text-center font-semibold text-2xl text-gray-800 dark:text-white mb-6">
             Quick Actions
-        </div>
+        </div> --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Book Appointment -->
-            <a href="{{ route('appointments') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-blue-50 dark:hover:bg-gray-700">
+            {{-- <a href="{{ route('appointments') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-blue-50 dark:hover:bg-gray-700">
                 <div class="flex flex-col items-center">
                     <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-4 mb-4">
                         <i class="fas fa-calendar-plus text-3xl text-blue-600 dark:text-blue-400"></i>
@@ -132,9 +132,9 @@
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Book Appointment</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Schedule your next dental visit</p>
                 </div>
-            </a>
+            </a> --}}
 
-            <!-- View Messages -->
+            {{-- <!-- View Messages -->
             <a href="{{ route('messages.index') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-purple-50 dark:hover:bg-gray-700">
                 <div class="flex flex-col items-center">
                     <div class="bg-purple-100 dark:bg-purple-900 rounded-full p-4 mb-4">
@@ -143,9 +143,9 @@
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">View Messages</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Check messages from dentist</p>
                 </div>
-            </a>
+            </a> --}}
 
-            <!-- View History -->
+            {{-- <!-- View History -->
             <a href="{{ route('usersettings') }}" class="quick-action-card bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center hover:bg-green-50 dark:hover:bg-gray-700">
                 <div class="flex flex-col items-center">
                     <div class="bg-green-100 dark:bg-green-900 rounded-full p-4 mb-4">
@@ -154,7 +154,7 @@
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">View History</h3>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">Access appointment history</p>
                 </div>
-            </a>
+            </a> --}}
         </div>
     </div>
 
