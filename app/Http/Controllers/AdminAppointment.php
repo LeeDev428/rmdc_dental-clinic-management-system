@@ -11,8 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Events\AppointmentStatusChanged;
 use App\Traits\LogsActivity;
+use App\Mail\AppointmentStatusUpdated;
 
 class AdminAppointment extends Controller
 {
@@ -32,7 +34,7 @@ class AdminAppointment extends Controller
     $dateTime = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
     $reason = $request->message;
 
-$autoMessage = " for <strong regret to inform you that your appointment scheduledtrong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
+    $autoMessage = "We regret to inform you that your appointment scheduled for <strong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
 
 // Save the auto-generated message
 Message::create([
@@ -68,6 +70,29 @@ Notification::create([
     'message' => "Your appointment has been declined. You may reschedule your appointment."
 ]);
 
+// Load user relationship for email
+$appointment = $appointment->fresh('user');
+
+// Send email notification
+Log::info('About to send decline email', [
+    'appointment_id' => $appointment->id,
+    'user_id' => $appointment->user_id,
+    'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+]);
+
+try {
+    if (!$appointment->user) {
+        throw new \Exception('User relationship is null');
+    }
+    Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'declined'));
+    Log::info('Decline email sent successfully', ['appointment_id' => $appointment->id]);
+} catch (\Exception $e) {
+    Log::error('Failed to send decline email: ' . $e->getMessage(), [
+        'appointment_id' => $appointment->id,
+        'trace' => $e->getTraceAsString()
+    ]);
+}
+
 broadcast(new AppointmentStatusChanged($appointment));
 
 return redirect()->back()->with('success', 'Appointment declined successfully and message sent.');
@@ -96,6 +121,29 @@ return redirect()->back()->with('success', 'Appointment declined successfully an
         'user_id' => $appointment->user_id,
         'message' => $message,
     ]);
+
+    // Load user relationship for email
+    $appointment = $appointment->fresh('user');
+
+    // Send email notification
+    Log::info('About to send acceptance email', [
+        'appointment_id' => $appointment->id,
+        'user_id' => $appointment->user_id,
+        'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+    ]);
+    
+    try {
+        if (!$appointment->user) {
+            throw new \Exception('User relationship is null');
+        }
+        Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'accepted'));
+        Log::info('Acceptance email sent successfully', ['appointment_id' => $appointment->id]);
+    } catch (\Exception $e) {
+        Log::error('Failed to send acceptance email: ' . $e->getMessage(), [
+            'appointment_id' => $appointment->id,
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
 
     // Broadcast the status change (optional)
     broadcast(new AppointmentStatusChanged($appointment));
@@ -281,6 +329,29 @@ Message::create([
             'message' => "Your appointment has been declined."
         ]);
 
+        // Load user relationship for email
+        $appointment = $appointment->fresh('user');
+
+        // Send email notification
+        Log::info('About to send decline email from messageFromAdmin', [
+            'appointment_id' => $appointment->id,
+            'user_id' => $appointment->user_id,
+            'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+        ]);
+
+        try {
+            if (!$appointment->user) {
+                throw new \Exception('User relationship is null');
+            }
+            Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'declined'));
+            Log::info('Decline email sent successfully from messageFromAdmin', ['appointment_id' => $appointment->id]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send decline email from messageFromAdmin: ' . $e->getMessage(), [
+                'appointment_id' => $appointment->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+
         // Broadcast the status change (optional)
         broadcast(new AppointmentStatusChanged($appointment));
 
@@ -303,6 +374,29 @@ Message::create([
             'user_id' => $appointment->user_id,
             'message' => "Your appointment has been accepted."
         ]);
+
+        // Load user relationship for email
+        $appointment = $appointment->fresh('user');
+
+        // Send email notification
+        Log::info('About to send acceptance email from messageFromAdmin', [
+            'appointment_id' => $appointment->id,
+            'user_id' => $appointment->user_id,
+            'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+        ]);
+
+        try {
+            if (!$appointment->user) {
+                throw new \Exception('User relationship is null');
+            }
+            Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'accepted'));
+            Log::info('Acceptance email sent successfully from messageFromAdmin', ['appointment_id' => $appointment->id]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send acceptance email from messageFromAdmin: ' . $e->getMessage(), [
+                'appointment_id' => $appointment->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
 
         // Broadcast the status change (optional)
         broadcast(new AppointmentStatusChanged($appointment));
