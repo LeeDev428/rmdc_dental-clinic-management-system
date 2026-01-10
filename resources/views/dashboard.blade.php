@@ -172,7 +172,7 @@
             <span class="text-blue-600">Your</span> Appointment
         </div>
 
-        <div class="border border-gray-300 rounded-lg p-6 bg-gray  dark:bg-white shadow-md mt-6">
+        <div class="border border-gray-300 rounded-lg p-6 bg-gray  dark:bg-white shadow-md mt-6" id="billing-invoice">
 
             <!-- Invoice Title -->
             <div class="flex justify-between items-center border-b pb-4">
@@ -183,9 +183,8 @@
                 </div>
                 <div class="text-right">
                     <h2 class="text-lg font-semibold text-gray-700">
-                        INVOICE #{{ $appointments ? $appointments->id : 'N/A' }}
+                        INVOICE #{{ $appointments ? str_pad($appointments->id, 6, '0', STR_PAD_LEFT) : 'N/A' }}
                     </h2>
-
                     <br>
                     <p class="text-sm text-gray-500">
                         Status:
@@ -201,20 +200,25 @@
                         @endif">
                         {{ $appointments ? ucfirst($appointments->status) : 'N/A' }}
                     </span>
-
                     </p>
                 </div>
             </div>
 
-            <!-- Billing Details -->
-            <div class="mt-4 flex justify-between">
+            <!-- Clinic & Patient Information -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <p class="font-semibold text-gray-600">Billed To:</p>
-                    <p class="text-sm text-gray-500">{{ auth()->user()->name ?? 'Unknown' }}</p>
+                    <p class="font-semibold text-gray-700 text-lg mb-2">RMDC - Robles Moncayo Dental Clinic</p>
+                    <p class="text-sm text-gray-600">Unit F Medina Bldg, Niog Elementary School</p>
+                    <p class="text-sm text-gray-600">Bacoor, Cavite, Philippines</p>
+                    <p class="text-sm text-gray-600 mt-2"><strong>Email:</strong> robles_moncayo@yahoo.com</p>
+                    <p class="text-sm text-gray-600"><strong>Phone:</strong> (+63) 912-3456-789</p>
                 </div>
                 <div class="text-right">
-                    <p class="font-semibold text-gray-600">Doctor:</p>
-                    <span id="doctor-name" class="text-sm text-gray-500"></span>
+                    <p class="font-semibold text-gray-700 mb-2">Patient Information</p>
+                    <p class="text-sm text-gray-600"><strong>Name:</strong> {{ auth()->user()->name ?? 'Unknown' }}</p>
+                    <p class="text-sm text-gray-600"><strong>Email:</strong> {{ auth()->user()->email ?? 'N/A' }}</p>
+                    <p class="text-sm text-gray-600 mt-2"><strong>Attending Doctor:</strong></p>
+                    <span id="doctor-name" class="text-sm text-gray-600"></span>
                 </div>
             </div>
             <script>
@@ -231,25 +235,54 @@
             <table class="w-full border-collapse border border-gray-200 min-w-[600px]">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Procedure</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Date</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Time</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Duration</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Price</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Status</th>
+                        <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-600">Description</th>
+                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Details</th>
+                        <th class="border border-gray-200 px-4 py-2 text-right text-sm font-semibold text-gray-600">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="border border-gray-200">
-                        <td class="px-4 py-2 text-center text-sm text-gray-600">{{ $appointments->procedure ?? 'N/A' }}</td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600">{{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('F j, Y') : 'N/A' }}</td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600">
-                            {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('h:i A') : 'N/A' }} -
-                            {{ $appointments && $appointments->end ? \Carbon\Carbon::parse($appointments->end)->format('h:i A') : 'N/A' }}
+                        <td class="px-4 py-3 text-sm text-gray-700">
+                            <strong>{{ $appointments->procedure ?? 'N/A' }}</strong>
+                            <p class="text-xs text-gray-500 mt-1">Dental Procedure</p>
                         </td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600"> <span id="estimated-time"></span></td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600">₱<span id="procedure-price"></span></td>
-                        <td class="px-4 py-2 text-center text-sm text-gray-600">
+                        <td class="px-4 py-3 text-center text-sm text-gray-600">
+                            <p><strong>Date:</strong> {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('F j, Y') : 'N/A' }}</p>
+                            <p><strong>Time:</strong> {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('h:i A') : 'N/A' }} - {{ $appointments && $appointments->end ? \Carbon\Carbon::parse($appointments->end)->format('h:i A') : 'N/A' }}</p>
+                            <p><strong>Duration:</strong> <span id="estimated-time"></span></p>
+                        </td>
+                        <td class="px-4 py-3 text-right text-sm text-gray-700">
+                            ₱<span id="procedure-price"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="mt-6 border-t pt-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Payment Information</p>
+                    <div class="space-y-1">
+                        <p class="text-sm text-gray-600">
+                            <strong>Payment Method:</strong> 
+                            @if($appointments && $appointments->payment_method)
+                                <span class="uppercase">{{ $appointments->payment_method }}</span>
+                            @else
+                                <span class="text-gray-400">N/A</span>
+                            @endif
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>Payment Reference:</strong> 
+                            @if($appointments && $appointments->payment_reference)
+                                <span class="font-mono text-xs">{{ $appointments->payment_reference }}</span>
+                            @else
+                                <span class="text-gray-400">N/A</span>
+                            @endif
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>Payment Status:</strong>
                             @if($appointments && $appointments->payment_status)
                                 <span class="px-2 py-1 rounded text-xs font-semibold
                                     {{ $appointments->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
@@ -258,19 +291,49 @@
                             @else
                                 <span class="text-gray-400">N/A</span>
                             @endif
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <strong>Booked:</strong> {{ $appointments && $appointments->created_at ? $appointments->created_at->format('F j, Y h:i A') : 'N/A' }}
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Payment Breakdown -->
+                <div class="text-right">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Total Amount:</span>
+                                <span class="font-semibold text-gray-700">₱<span id="total-price"></span></span>
+                            </div>
+                            <div class="flex justify-between text-sm text-green-700">
+                                <span>Down Payment (20%):</span>
+                                <span class="font-semibold">
+                                    @if($appointments && $appointments->down_payment)
+                                        ₱{{ number_format($appointments->down_payment, 2) }}
+                                    @else
+                                        <span class="text-gray-400">N/A</span>
+                                    @endif
+                                </span>
+                            </div>
+                            <div class="border-t pt-2 flex justify-between text-sm text-orange-700">
+                                <span class="font-semibold">Balance Due:</span>
+                                <span class="font-bold">₱<span id="balance-due"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- Total and Footer -->
-        <div class="flex flex-col md:flex-row justify-between mt-6 border-t pt-4">
-            <div class="text-sm text-gray-500">
-                <p>• {{ $appointments && $appointments->created_at ? $appointments->created_at->diffForHumans() : 'N/A' }}</p>
-            </div>
-            <div class="text-right mt-2 md:mt-0">
-                <p class="text-lg font-semibold text-gray-700">Total: ₱<span id="procedure-price2"></span></p>
-            </div>
+        
+        <!-- Export Button -->
+        <div class="mt-6 flex justify-end border-t pt-4">
+            <button onclick="exportToPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export as PDF
+            </button>
         </div>
     </div>
 </div>
@@ -279,19 +342,58 @@
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
                         let procedureName = "{{ $appointments->procedure ?? '' }}";
+                        let downPayment = {{ $appointments->down_payment ?? 0 }};
 
                         if (procedureName) {
                             fetch(`/get-procedure-details?procedure=${encodeURIComponent(procedureName)}`)
                                 .then(response => response.json())
                                 .then(data => {
-                                    document.getElementById("estimated-time").textContent = data.duration;
-                                    document.getElementById("procedure-price").textContent = data.price;
-                                    document.getElementById("procedure-price2").textContent = data.price;
+                                    let duration = data.duration;
+                                    let price = parseFloat(data.price);
+                                    
+                                    document.getElementById("estimated-time").textContent = duration + " minutes";
+                                    document.getElementById("procedure-price").textContent = price.toFixed(2);
+                                    document.getElementById("total-price").textContent = price.toFixed(2);
+                                    
+                                    // Calculate balance
+                                    let balance = price - downPayment;
+                                    document.getElementById("balance-due").textContent = balance.toFixed(2);
                                 })
                                 .catch(error => console.error("Error fetching procedure details:", error));
                         }
                     });
+                    
+                    // PDF Export Function
+                    function exportToPDF() {
+                        window.print();
+                    }
                 </script>
+                
+                <style>
+                    @media print {
+                        /* Hide everything except the invoice */
+                        body * {
+                            visibility: hidden;
+                        }
+                        #billing-invoice, #billing-invoice * {
+                            visibility: visible;
+                        }
+                        #billing-invoice {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                        }
+                        /* Hide the export button when printing */
+                        #billing-invoice button {
+                            display: none;
+                        }
+                        /* Ensure proper page breaks */
+                        .border {
+                            page-break-inside: avoid;
+                        }
+                    }
+                </style>
         </div>
     </div>
 
