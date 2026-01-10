@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
 use App\Models\Appointment;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use App\Notifications\AppointmentStatusUpdatedNotification;
 
 class UserController extends Controller
 {
@@ -39,9 +41,11 @@ class UserController extends Controller
         if ($action === 'accept') {
             $appointment->status = 'accepted';
             $message = "Appointment Title named {$appointment->procedure} has been accepted.";
+            $actionType = 'accepted';
         } elseif ($action === 'decline') {
             $appointment->status = 'declined';
             $message = "Appointment Title named {$appointment->procedure} has been declined.";
+            $actionType = 'declined';
         } else {
             return redirect()->back()->with('error', 'Invalid action.');
         }
@@ -54,6 +58,13 @@ class UserController extends Controller
             'user_id' => $appointment->user_id,
             'message' => $message,
         ]);
+        
+        // Send email notification to the patient
+        try {
+            $appointment->user->notify(new AppointmentStatusUpdatedNotification($appointment, $actionType));
+        } catch (\Exception $e) {
+            Log::error('Failed to send appointment status email: ' . $e->getMessage());
+        }
         
         // Redirect back with the success message
         return redirect()->back()->with('success', $message);
