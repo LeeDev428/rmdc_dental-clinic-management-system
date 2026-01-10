@@ -178,6 +178,12 @@ class PaymentController extends Controller
                 }
                 
                 if ($isPaid && $paymentId) {
+                    Log::info('🚀 Starting appointment creation process', [
+                        'session_key' => $sessionKey,
+                        'payment_id' => $paymentId,
+                        'appointment_data' => $appointmentData
+                    ]);
+                    
                     // NOW CREATE THE APPOINTMENT after payment is confirmed
                     $appointment = Appointment::create([
                         'title' => $appointmentData['title'],
@@ -296,7 +302,12 @@ class PaymentController extends Controller
                 ->with('warning', 'Payment verification pending. We will confirm your appointment once payment is verified.');
                 
         } catch (\Exception $e) {
-            Log::error('Payment Success Callback Error: ' . $e->getMessage());
+            Log::error('❌ Payment Success Callback Error: ' . $e->getMessage(), [
+                'session_key' => $sessionKey ?? 'unknown',
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return redirect()->route('dashboard')
                 ->with('error', 'Payment verification failed. Please contact support.');
         }
