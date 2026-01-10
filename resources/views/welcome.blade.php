@@ -7,9 +7,7 @@
     <title>RMDC - Robles Moncayo Dental Clinic</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <style>
         * {
@@ -1232,7 +1230,17 @@
             
             <div class="locations-grid">
                 <div class="location-card slide-in-left">
-                    <div id="map1" class="location-map"></div>
+                    <div class="location-map">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3863.7234567890!2d120.9517!3d14.4164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDI0JzU5LjAiTiAxMjDCsDU3JzA4LjAiRQ!5e0!3m2!1sen!2sph!4v1234567890"
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; border-radius: 10px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
                     <div class="location-info">
                         <h3><i class="fas fa-map-marker-alt"></i> Clinic 1 - Morning Branch</h3>
                         <p><strong>Address:</strong> Unit F Medina Bldg, in front gate of Niog Elementary School, Bacoor, Cavite</p>
@@ -1242,7 +1250,17 @@
                 </div>
 
                 <div class="location-card slide-in-right">
-                    <div id="map2" class="location-map"></div>
+                    <div class="location-map">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3863.6234567890!2d120.9578!3d14.4200!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDI1JzEyLjAiTiAxMjDCsDU3JzMzLjYiRQ!5e0!3m2!1sen!2sph!4v1234567890"
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; border-radius: 10px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
                     <div class="location-info">
                         <h3><i class="fas fa-map-marker-alt"></i> Clinic 2 - Afternoon & Evening</h3>
                         <p><strong>Address:</strong> Marigold corner Hyacinth Sts, F E De Castro Village, Bacoor, Cavite</p>
@@ -1518,29 +1536,7 @@
         // Load services on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadServices(1);
-            initMaps();
         });
-
-        // Initialize Maps
-        function initMaps() {
-            // Main Clinic Map
-            const map1 = L.map('map1').setView([14.4164, 120.9539], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map1);
-            L.marker([14.4164, 120.9539]).addTo(map1)
-                .bindPopup('<b>RMDC Main Clinic</b><br>Bacoor, Cavite')
-                .openPopup();
-
-            // Branch Clinic Map
-            const map2 = L.map('map2').setView([14.4200, 120.9600], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map2);
-            L.marker([14.4200, 120.9600]).addTo(map2)
-                .bindPopup('<b>RMDC Branch</b><br>Bacoor, Cavite')
-                .openPopup();
-        }
 
         // FAQ Toggle Function
         function toggleFAQ(element) {
