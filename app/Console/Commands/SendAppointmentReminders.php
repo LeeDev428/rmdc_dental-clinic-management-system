@@ -60,7 +60,17 @@ class SendAppointmentReminders extends Command
         $failCount = 0;
         
         foreach ($appointments as $appointment) {
+            Log::info('Processing reminder for appointment', [
+                'appointment_id' => $appointment->id,
+                'user_loaded' => $appointment->user ? 'YES' : 'NO',
+                'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+            ]);
+            
             try {
+                if (!$appointment->user) {
+                    throw new \Exception('User relationship is null');
+                }
+                
                 // Send reminder email
                 Mail::to($appointment->user->email)->send(new AppointmentReminder($appointment));
                 
@@ -68,7 +78,7 @@ class SendAppointmentReminders extends Command
                 $appointment->update(['reminder_sent_at' => now()]);
                 
                 $this->info("✓ Reminder sent to {$appointment->user->email} for appointment #{$appointment->id}");
-                Log::info('Appointment reminder sent', [
+                Log::info('✅ Appointment reminder sent successfully', [
                     'appointment_id' => $appointment->id,
                     'user_email' => $appointment->user->email,
                     'appointment_time' => $appointment->start
@@ -77,7 +87,8 @@ class SendAppointmentReminders extends Command
                 $successCount++;
             } catch (\Exception $e) {
                 $this->error("✗ Failed to send reminder for appointment #{$appointment->id}: {$e->getMessage()}");
-                Log::error('Failed to send appointment reminder', [
+                Log::error('❌ Failed to send appointment reminder', [
+                    'trace' => $e->getTraceAsString(),
                     'appointment_id' => $appointment->id,
                     'error' => $e->getMessage()
                 ]);
