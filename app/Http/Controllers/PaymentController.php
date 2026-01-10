@@ -196,8 +196,20 @@ class PaymentController extends Controller
                         'status' => 'pending', // Ready for admin approval
                     ]);
                     
-                    // Load the user relationship for email sending
+                    // Load the user relationship for logging and email sending - MUST DO THIS FIRST!
                     $appointment = $appointment->fresh('user');
+                    
+                    if (!$appointment) {
+                        throw new \Exception('Failed to reload appointment from database');
+                    }
+                    
+                    if (!$appointment->user) {
+                        Log::error('User relationship is null after fresh()', [
+                            'appointment_id' => $appointment->id,
+                            'user_id' => $appointment->user_id
+                        ]);
+                        throw new \Exception('User not found for appointment');
+                    }
                     
                     // Log appointment creation after successful payment
                     $this->logAppointmentActivity('created', $appointment, [
@@ -218,16 +230,29 @@ class PaymentController extends Controller
                     ]);
                     
                     // Send booking confirmation email
+                    Log::info('About to send booking confirmation email', [
+                        'appointment_id' => $appointment->id,
+                        'user_id' => $appointment->user_id,
+                        'user_loaded' => $appointment->user ? 'YES' : 'NO',
+                        'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+                    ]);
+                    
                     try {
+                        if (!$appointment->user) {
+                            throw new \Exception('User relationship is null after fresh()');
+                        }
+                        
                         Mail::to($appointment->user->email)->send(new AppointmentBooked($appointment));
-                        Log::info('Booking confirmation email sent', [
+                        
+                        Log::info('✅ Booking confirmation email sent successfully', [
                             'appointment_id' => $appointment->id,
                             'user_email' => $appointment->user->email
                         ]);
                     } catch (\Exception $e) {
-                        Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
+                        Log::error('❌ Failed to send booking confirmation email: ' . $e->getMessage(), [
                             'appointment_id' => $appointment->id,
-                            'error' => $e->getMessage()
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString()
                         ]);
                     }
                     
