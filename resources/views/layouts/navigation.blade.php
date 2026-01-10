@@ -388,7 +388,7 @@ function formatDate(dateString) {
 
     <!-- Dropdown Menu - Positioned to the left -->
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
-  <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link> 
+  {{-- <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link>  --}}
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.history')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.cancel')" class="text-gray-700 dark:text-white">{{ __('Cancel Appointment') }}</x-dropdown-link>
