@@ -11,8 +11,24 @@ use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
 {
+    /**
+     * Check if MongoDB is available
+     */
+    private function isMongoAvailable()
+    {
+        return extension_loaded('mongodb') && !empty(config('database.connections.mongodb.dsn'));
+    }
+
     public function index()
     {
+        if (!$this->isMongoAvailable()) {
+            return view('messages.index', [
+                'messages' => collect([]),
+                'adminUser' => User::where('usertype', 'admin')->first() ?? User::find(1),
+                'mongoUnavailable' => true
+            ]);
+        }
+
         if (Auth::check()) {
             $currentUserId = Auth::id();
             
