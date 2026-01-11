@@ -17,20 +17,20 @@
                         <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" role="tablist">
                             <li class="mr-2" role="presentation">
                                 <button class="inline-block p-4 border-b-2 rounded-t-lg tab-button active" 
-                                        id="notification-tab" 
-                                        data-tab="notification" 
-                                        type="button" 
-                                        role="tab">
-                                    <i class="fas fa-bell mr-2"></i>Notification History
-                                </button>
-                            </li>
-                            <li class="mr-2" role="presentation">
-                                <button class="inline-block p-4 border-b-2 rounded-t-lg tab-button" 
                                         id="appointment-tab" 
                                         data-tab="appointment" 
                                         type="button" 
                                         role="tab">
                                     <i class="fas fa-calendar-alt mr-2"></i>Appointment History
+                                </button>
+                            </li>
+                            <li class="mr-2" role="presentation">
+                                <button class="inline-block p-4 border-b-2 rounded-t-lg tab-button" 
+                                        id="notification-tab" 
+                                        data-tab="notification" 
+                                        type="button" 
+                                        role="tab">
+                                    <i class="fas fa-bell mr-2"></i>Notification History
                                 </button>
                             </li>
                             <li class="mr-2" role="presentation">
@@ -47,14 +47,14 @@
 
                     <!-- Tabs Content -->
                     <div id="tabs-content">
-                        <!-- Notification History Tab -->
-                        <div class="tab-content active" id="notification-content" role="tabpanel">
-                            @include('history.notification-history')
+                        <!-- Appointment History Tab -->
+                        <div class="tab-content active" id="appointment-content" role="tabpanel">
+                            @include('history.appointment-history')
                         </div>
                         
-                        <!-- Appointment History Tab -->
-                        <div class="tab-content hidden" id="appointment-content" role="tabpanel">
-                            @include('history.appointment-history')
+                        <!-- Notification History Tab -->
+                        <div class="tab-content hidden" id="notification-content" role="tabpanel">
+                            @include('history.notification-history')
                         </div>
                         
                         <!-- Billing History Tab -->
@@ -98,6 +98,24 @@
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabContents = document.querySelectorAll('.tab-content');
             
+            // Check URL hash or query parameter to restore active tab
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeTab = urlParams.get('tab') || window.location.hash.replace('#', '') || 'appointment';
+            
+            // Activate the correct tab on page load
+            if (activeTab) {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.add('hidden'));
+                
+                const targetButton = document.querySelector(`[data-tab="${activeTab}"]`);
+                const targetContent = document.getElementById(activeTab + '-content');
+                
+                if (targetButton && targetContent) {
+                    targetButton.classList.add('active');
+                    targetContent.classList.remove('hidden');
+                }
+            }
+            
             tabButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const targetTab = this.getAttribute('data-tab');
@@ -109,6 +127,10 @@
                     // Add active class to clicked button and show corresponding content
                     this.classList.add('active');
                     document.getElementById(targetTab + '-content').classList.remove('hidden');
+                    
+                    // Update URL without page reload
+                    const newUrl = window.location.pathname + '?tab=' + targetTab;
+                    window.history.pushState({tab: targetTab}, '', newUrl);
                 });
             });
         });
