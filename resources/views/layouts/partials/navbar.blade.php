@@ -1,57 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RMDC</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebarToggle {
-            position: absolute;
-            left: 10px;  /* Adjust this value to your desired distance from the left edge */
-            top: 50%;  /* Center the button vertically */
-            transform: translateY(-50%);  /* Corrects the centering */
-            z-index: 1000;  /* Ensures the button stays on top of other elements */
-        }
+<style>
+    .sidebarToggle {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1000;
+    }
 
-        .notification-bell {
-            position: relative;
-            margin-right: 20px;
-            color: white;
-            font-size: 20px; /* Ensure it's visible */
-            cursor: pointer;
-            top: 12px;
-        }
-        .notification-bell .badge {
-            position: absolute;
-            top: -5px;
-            right: -10px;
-            background-color: red;
-            color: white;
-            font-size: 12px;
-            border-radius: 50%;
-            padding: 3px 6px;
-        }
-    </style>
-</head>
-<body>
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="{{ url('admin/dashboard') }}">RMDC</a>
-        <!-- Sidebar Toggle-->
-        <button class="btn btn-link btn-sm sidebar-toggle-btn" id="sidebarToggle" href="#!">
-            <i class="fas fa-bars"></i>
-        </button>
-        <!-- Navbar Search-->
-        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-            {{-- Uncomment this block if you want to enable the search feature --}}
-            {{-- <div class="input-group">
-                <input type="text" class="form-control" name="search" placeholder="Search by ID, Name, Email, Usertype..." value="{{ request('search') }}">
-                <button class="btn btn-primary" type="submit">Search</button>
-            </div> --}}
-        </form>
-        <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+    .notification-bell {
+        position: relative;
+        margin-right: 20px;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        top: 12px;
+    }
+    .notification-bell .badge {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        background-color: red;
+        color: white;
+        font-size: 12px;
+        border-radius: 50%;
+        padding: 3px 6px;
+    }
+</style>
+
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="{{ url('admin/dashboard') }}">RMDC</a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm sidebar-toggle-btn" id="sidebarToggle" href="#!">
+        <i class="fas fa-bars"></i>
+    </button>
+    <!-- Spacer to push profile dropdown to right -->
+    <div class="ms-auto"></div>
+    <!-- Navbar-->
+    <ul class="navbar-nav me-3 me-lg-4">
             <!-- Notification Bell
             <li class="nav-item">
                 <a class="nav-link notification-bell" href="{{ route('admin.upcoming_appointments') }}">
@@ -185,7 +171,9 @@
             }
         };
 
-        document.querySelector('.notification-bell').addEventListener('click', markAsRead);
+        // Only add listener if notification bell exists
+        const bellElement = document.querySelector('.notification-bell');
+        if (bellElement) {
+            bellElement.addEventListener('click', markAsRead);
+        }
     </script>
-</body>
-</html>
