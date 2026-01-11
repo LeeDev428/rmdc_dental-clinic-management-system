@@ -96,16 +96,8 @@ class User extends Authenticatable implements MustVerifyEmail
             return $this->hasMany(Message::class);
         }
         
-        // MongoDB messages relationship
-        public function mongoMessages()
-        {
-            return $this->hasMany(MongoMessage::class, 'sender_id');
-        }
-        
-        public function receivedMongoMessages()
-        {
-            return $this->hasMany(MongoMessage::class, 'recipient_id');
-        }
+        // MongoDB messages - relationships removed due to cross-database compatibility
+        // Use MongoMessage::where('sender_id', $userId) or MongoMessage::where('recipient_id', $userId) instead
 
         // Relationship with Appointment model
         public function appointments()
