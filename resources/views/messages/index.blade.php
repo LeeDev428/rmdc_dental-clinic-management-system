@@ -98,11 +98,17 @@
 
     <script>
         const currentUserId = {{ Auth::id() }};
-        const adminUserId = {{ isset($adminUser) && $adminUser ? $adminUser->id : 1 }};
+        const adminUserId = {{ isset($adminUser) && $adminUser ? $adminUser->id : 'null' }};
         
         console.log('Patient messaging page loaded', {
             patientId: currentUserId,
             talkingToAdminId: adminUserId
+        });
+        
+        if (!adminUserId || adminUserId === null) {
+            console.error('No admin user found! Cannot send messages.');
+            alert('Error: No admin available to chat with. Please contact support.');
+        }
         });
         
         document.addEventListener('DOMContentLoaded', function () {
@@ -187,7 +193,14 @@
             
             if (!message) return;
             
+            if (!adminUserId || adminUserId === null) {
+                alert('Cannot send message: No admin user available');
+                return;
+            }
+            
             button.disabled = true;
+            
+            console.log('Sending message:', { message, recipient_id: adminUserId });
             
             fetch('/mongo-messages/send', {
                 method: 'POST',
@@ -201,7 +214,15 @@
                     recipient_id: adminUserId
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        console.error('Server error:', err);
+                        throw new Error(err.message || 'Failed to send message');
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     addMessageToUI(data.message, true);
