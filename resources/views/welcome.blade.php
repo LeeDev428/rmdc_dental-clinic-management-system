@@ -1193,6 +1193,9 @@
     </style>
 </head>
 <body>
+    <!-- Toast Notification Component -->
+    <x-toast-notification />
+    
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
