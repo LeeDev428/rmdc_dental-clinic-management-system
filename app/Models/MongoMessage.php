@@ -27,16 +27,8 @@ class MongoMessage extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relationships
-    public function sender()
-    {
-        return $this->belongsTo(User::class, 'sender_id', 'id', 'sender');
-    }
-
-    public function recipient()
-    {
-        return $this->belongsTo(User::class, 'recipient_id', 'id', 'recipient');
-    }
+    // Relationships removed - MongoDB can't directly join with MySQL
+    // User data should be manually attached by controllers when needed
 
     // Mark as read
     public function markAsRead()
