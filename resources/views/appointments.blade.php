@@ -1288,11 +1288,11 @@ window.onclick = function(event) {
                 const downPayment = document.getElementById('down-payment-hidden');
                 
                 if (!totalPrice || !totalPrice.value || totalPrice.value === '0') {
-                    showToast( 'Total price is missing. Please select a procedure.');
+                    showToast('Total price is missing. Please select a procedure.', 'error');
                     return;
                 }
                 if (!downPayment || !downPayment.value || downPayment.value === '0') {
-                    showToast( 'Down payment is missing. Please select a procedure.');
+                    showToast('Down payment is missing. Please select a procedure.', 'error');
                     return;
                 }
                 
@@ -1335,12 +1335,12 @@ window.onclick = function(event) {
                 console.log('Form submitted successfully:', data);
                 
                 if (data.error) {
-                    showToast( data.error);
+                    showToast(data.error, 'error');
                     // Re-enable button on error
                     resetSubmitButton();
                 } else if (isRescheduleMode) {
                     // Reschedule success - no payment needed
-                    showToast( data.success || 'Appointment rescheduled successfully!');
+                    showToast(data.success || 'Appointment rescheduled successfully!', 'success');
                     
                     // Reload page after short delay
                     setTimeout(() => {
@@ -1348,12 +1348,12 @@ window.onclick = function(event) {
                     }, 2000);
                 } else if (data.success && data.payment_url) {
                     // Normal booking - redirect to payment gateway
-                    showToast( data.message || 'Redirecting to payment gateway...');
+                    showToast(data.message || 'Redirecting to payment gateway...', 'info');
                     setTimeout(() => {
                         window.location.href = data.payment_url;
                     }, 1500);
                 } else {
-                    showToast( data.message || 'Appointment booked successfully!');
+                    showToast(data.message || 'Appointment booked successfully!', 'success');
                     
                     // Show rating modal after 3 seconds
                     setTimeout(() => {
@@ -1386,7 +1386,7 @@ window.onclick = function(event) {
                     errorMessage = error.message;
                 }
                 
-                showToast( errorMessage);
+                showToast(errorMessage, 'error');
             });
         });
 
@@ -1734,11 +1734,11 @@ eventClick: function(info) {
                         }
 
                         $('#booking-modal').addClass('hidden');
-                        showToast( 'Appointment successfully updated!');
+                        showToast('Appointment successfully updated!', 'success');
                     },
                     error: function(xhr) {
                         const errorMessage = xhr.responseJSON?.message || 'An error occurred.';
-                        showToast( 'Failed to book appointment: ' + errorMessage);
+                        showToast('Failed to book appointment: ' + errorMessage, 'error');
                     }
                 });
             });
@@ -1757,11 +1757,11 @@ eventClick: function(info) {
                                 const event = calendar.getEventById(appointmentId);
                                 event.remove();
                                 $('#booking-modal').addClass('hidden');
-                                showToast( 'Appointment successfully deleted!');
+                                showToast('Appointment successfully deleted!', 'success');
                             },
                             error: function(xhr) {
                                 const errorMessage = xhr.responseJSON?.message || 'An error occurred.';
-                                showToast( 'Failed to delete appointment: ' + errorMessage);
+                                showToast('Failed to delete appointment: ' + errorMessage, 'error');
                             }
                         });
                     }
@@ -1770,16 +1770,6 @@ eventClick: function(info) {
                 $('#close-modal').on('click', function() {
                     $('#booking-modal').addClass('hidden');
                 });
-
-                function showPopup(type, message) {
-                    const icon = type === 'success' ? '✔️' : '❌';
-                    $('#popup-icon').text(icon);
-                    $('#popup-text').text(message);
-                    $('#popup-message').removeClass('hidden');
-                    setTimeout(function() {
-                        $('#popup-message').addClass('hidden');
-                    }, 3000);
-                }
 
                 // Auto-populate estimated time for reschedule mode
                 @if(isset($reschedulingAppointment) && $reschedulingAppointment)
@@ -1793,7 +1783,7 @@ eventClick: function(info) {
                     $('#estimated-time').val('{{ $duration }} minutes');
                     
                     // Show info popup
-                    showToast( 'Please select a new date and time for your appointment. Your procedure and payment remain the same.');
+                    showToast('Please select a new date and time for your appointment. Your procedure and payment remain the same.', 'info');
                 @endif
             });
         </script>
