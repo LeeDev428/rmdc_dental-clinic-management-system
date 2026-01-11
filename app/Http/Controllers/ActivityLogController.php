@@ -34,7 +34,7 @@ class ActivityLogController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
-        $logs = $query->paginate(50);
+        $logs = $query->paginate(50)->onEachSide(1);
         $types = ActivityLog::select('type')->distinct()->pluck('type');
 
         return view('admin.activity-logs', compact('logs', 'types'));
