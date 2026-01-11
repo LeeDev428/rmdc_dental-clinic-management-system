@@ -185,11 +185,7 @@
                         <p class="text-xs text-gray-500 dark:text-gray-500">
                             Issued: {{ $billing->created_at->format('M j, Y h:i A') }}
                         </p>
-                        <a href="{{ route('invoice.download', $billing->id) }}" 
-                           class="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center"
-                           target="_blank">
-                            <i class="fas fa-download mr-1"></i>Download Invoice
-                        </a>
+                        <x-download-invoice-button :appointment="$billing" />
                     </div>
                 </div>
             @endforeach
