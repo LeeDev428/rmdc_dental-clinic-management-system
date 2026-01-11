@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Message;
+use App\Models\MongoMessage;
 use App\Models\User;
 use App\Models\Appointment;
 
@@ -13,7 +14,7 @@ class AdminMessageController extends Controller
     public function index(Request $request)  {
 
    // Search logic for user_id or user name
-   $query = User::has('messages');  // Get users who have messages
+   $query = User::where('is_admin', 0);  // Get all patients
 
    if ($request->has('search')) {
        $search = $request->search;
@@ -23,22 +24,18 @@ class AdminMessageController extends Controller
        });
    }
 
-   // Retrieve users with their latest message
-   $users = $query->with(['messages' => function ($query) {
-       $query->orderByDesc('created_at'); // Sort by message date (latest first)
-   }])->get();
-
-   // Sort users by the most recent message timestamp
-   $users = $users->sortByDesc(function ($user) {
-       return $user->messages->first()->created_at ?? now(); // If no messages, put them at the bottom
-   });
+   // Retrieve users
+   $users = $query->get();
 
    $messages = [];
    $selectedUser = null;
 
    if ($request->has('user_id')) {
        $selectedUser = User::find($request->user_id);
-       $messages = Message::where('user_id', $selectedUser->id)
+       
+       // Fetch messages from MongoDB
+       $messages = MongoMessage::conversation(auth()->id(), $selectedUser->id)
+           ->with(['sender', 'recipient'])
            ->orderBy('created_at', 'asc')
            ->get();
    }
