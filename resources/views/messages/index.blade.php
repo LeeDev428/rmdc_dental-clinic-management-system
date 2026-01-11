@@ -5,6 +5,19 @@
             {{ __('Chat with the Dentist') }}
         </h2>
     </x-slot>
+    
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 
     <div class="py-3">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -31,15 +44,15 @@
 @foreach ($messages as $message)
     <div class="flex mb-3">
         <!-- If message is from the patient (right side) -->
-        @if($message->is_admin == 0)
+        @if($message->sender_id == Auth::id())
             <div class="ml-auto p-3 bg-blue-600 text-white rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Patient's Profile Image -->
-                    <img src="{{ $message->user->avatar_url ?? asset('img/default-dp.jpg') }}"
+                    <img src="{{ $message->sender->avatar_url ?? Auth::user()->avatar_url ?? asset('img/default-dp.jpg') }}"
                          alt="Patient Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-200 hover:text-gray-100 cursor-pointer">
-                        • {{ $message->created_at->diffForHumans() }}
+                        • {{ $message->created_at instanceof \MongoDB\BSON\UTCDateTime ? $message->created_at->toDateTime()->setTimezone(new \DateTimeZone(config('app.timezone')))->diffForHumans() : \Carbon\Carbon::parse($message->created_at)->diffForHumans() }}
                     </div>
                 </div>
                 <p class="whitespace-pre-line break-words">{{ $message->message }}</p>
@@ -49,11 +62,11 @@
             <div class="mr-auto p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Admin's Profile Image -->
-                    <img src="{{ $message->user->avatar_url ?? asset('img/default-dp.jpg') }}"
+                    <img src="{{ $message->sender->avatar_url ?? asset('img/default-dp.jpg') }}"
                          alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-600 cursor-pointer">
-                        • {{ $message->created_at->diffForHumans() }}
+                        • {{ $message->created_at instanceof \MongoDB\BSON\UTCDateTime ? $message->created_at->toDateTime()->setTimezone(new \DateTimeZone(config('app.timezone')))->diffForHumans() : \Carbon\Carbon::parse($message->created_at)->diffForHumans() }}
                     </div>
                 </div>
                 <p class="whitespace-pre-line break-words">{{ $message->message }}</p>
@@ -67,10 +80,10 @@
 
                     <!-- Input Form (fixed at the bottom) -->
                     <div class="flex items-center p-4 bg-white dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 mt-auto">
-                        <form action="{{ route('messages.store') }}" method="POST" class="w-full flex items-center space-x-4">
+                        <form id="messageForm" onsubmit="sendMessage(event)" class="w-full flex items-center space-x-4">
                             @csrf
-                            <textarea name="message" class="w-full p-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 resize-none" placeholder="Type your message..." required></textarea>
-                            <button type="submit" class="text-white bg-blue-600 rounded-full p-3 hover:bg-blue-700 focus:outline-none">
+                            <textarea id="messageInput" name="message" class="w-full p-4 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 resize-none" placeholder="Type your message..." required></textarea>
+                            <button type="submit" id="sendButton" class="text-white bg-blue-600 rounded-full p-3 hover:bg-blue-700 focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -84,11 +97,156 @@
     </div>
 
     <script>
+        const currentUserId = {{ Auth::id() }};
+        const adminUserId = 1; // Default admin user ID
+        
         document.addEventListener('DOMContentLoaded', function () {
             const messageContainer = document.getElementById('message-container');
             // Scroll to the bottom of the message container
             messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            // Setup Pusher real-time listeners
+            if (window.Echo) {
+                console.log('✅ Setting up Pusher listeners for patient...');
+                
+                // Listen for new messages from admin
+                window.Echo.channel(`messages.${currentUserId}`)
+                    .listen('.new.message', (data) => {
+                        console.log('📨 New message received:', data);
+                        if (data.sender_id !== currentUserId) {
+                            addMessageToUI(data, false);
+                            scrollToBottom();
+                            markMessagesAsRead([data.id]);
+                        }
+                    });
+                
+                // Listen for read receipts
+                window.Echo.channel(`messages.${currentUserId}`)
+                    .listen('.message.read', (data) => {
+                        console.log('✓✓ Message read:', data);
+                    });
+            }
         });
+        
+        // Add message to UI
+        function addMessageToUI(msg, isSent) {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex mb-3';
+            messageDiv.style.animation = 'slideIn 0.3s ease-out';
+            
+            const avatar = isSent 
+                ? '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}'
+                : '{{ asset("img/default-dp.jpg") }}';
+            
+            const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            
+            if (isSent) {
+                messageDiv.innerHTML = `
+                    <div class="ml-auto p-3 bg-blue-600 text-white rounded-lg max-w-full">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <img src="${avatar}" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ asset('img/default-dp.jpg') }}'">
+                            <div class="text-xs text-gray-200 hover:text-gray-100 cursor-pointer">
+                                • Just now
+                            </div>
+                        </div>
+                        <p class="whitespace-pre-line break-words">${escapeHtml(msg.message)}</p>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="mr-auto p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg max-w-full">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <img src="${avatar}" alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ asset('img/default-dp.jpg') }}'">
+                            <div class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-600 cursor-pointer">
+                                • Just now
+                            </div>
+                        </div>
+                        <p class="whitespace-pre-line break-words">${escapeHtml(msg.message)}</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+        }
+        
+        // Send message via AJAX to MongoDB
+        function sendMessage(event) {
+            event.preventDefault();
+            
+            const input = document.getElementById('messageInput');
+            const button = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            button.disabled = true;
+            
+            fetch('/mongo-messages/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    recipient_id: adminUserId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessageToUI(data.message, true);
+                    input.value = '';
+                    scrollToBottom();
+                } else {
+                    alert('Failed to send message. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('Network error. Please check your connection.');
+            })
+            .finally(() => {
+                button.disabled = false;
+                input.focus();
+            });
+        }
+        
+        // Mark messages as read
+        function markMessagesAsRead(messageIds) {
+            fetch('/mongo-messages/mark-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    message_ids: messageIds
+                })
+            })
+            .then(response => response.json())
+            .catch(error => console.error('Error marking messages as read:', error));
+        }
+        
+        // Scroll to bottom
+        function scrollToBottom() {
+            const container = document.getElementById('message-container');
+            if (container) {
+                setTimeout(() => {
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            }
+        }
+        
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // Automatically scroll the message container to the bottom on new messages
         window.addEventListener('message', function () {
