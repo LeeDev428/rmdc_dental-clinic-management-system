@@ -156,7 +156,7 @@ return redirect()->back()->with('success', 'Appointment declined successfully an
     // Broadcast the status change (optional)
     try {
         broadcast(new AppointmentStatusChanged($appointment));
-    } catch (\\Exception $e) {
+    } catch (\Exception $e) {
         Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
     }
 
