@@ -6,6 +6,9 @@
         </h2>
     </x-slot>
 
+    <!-- Global Toast Notification Component -->
+    <x-toast-notification />
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -1200,12 +1203,12 @@ window.onclick = function(event) {
             })
             .then(data => {
                 console.log('Rating submitted:', data);
-                showPopup('success', 'Thank you for your feedback!');
+                showToast('Thank you for your feedback!', 'success');
                 ratingModal.classList.add('hidden');
             })
             .catch(error => {
                 console.error('Error submitting rating:', error);
-                showPopup('error', 'An error occurred while submitting your rating. Please try again.');
+                showToast('An error occurred while submitting your rating. Please try again.', 'error');
             });
         });
 
@@ -1219,7 +1222,7 @@ window.onclick = function(event) {
             // Prevent double submission with explicit flag
             if (isSubmitting) {
                 console.log('Form already submitting, please wait...');
-                showPopup('warning', 'Please wait, processing your booking...');
+                showToast('Please wait, processing your booking...', 'info');
                 return;
             }
 
@@ -1264,7 +1267,7 @@ window.onclick = function(event) {
             }
 
             if (missingFields.length > 0) {
-                showPopup('error', 'Please fill in all required fields:\n' + missingFields.join(', '));
+                showToast('Please fill in all required fields:\n' + missingFields.join(', '), 'error');
                 return;
             }
             
@@ -1273,7 +1276,7 @@ window.onclick = function(event) {
                 // Ensure payment method is selected and explicitly added
                 const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
                 if (!paymentMethod) {
-                    showPopup('error', 'Please select a payment method');
+                    showToast('Please select a payment method', 'error');
                     return;
                 }
                 
@@ -1403,25 +1406,6 @@ window.onclick = function(event) {
             ratingModal.classList.add('hidden');
         });
 
-        // Function to show modern success/failed popup
-        function showPopup(type, message) {
-            const popup = document.createElement('div');
-            popup.className = `fixed top-5 right-5 z-50 px-4 py-3 rounded-lg shadow-lg text-white ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            }`;
-            popup.innerHTML = `
-                <div class="flex items-center">
-                    <span class="mr-2">${type === 'success' ? '✔️' : '❌'}</span>
-                    <span>${message}</span>
-                </div>
-            `;
-            document.body.appendChild(popup);
-
-            setTimeout(() => {
-                popup.classList.add('opacity-0');
-                setTimeout(() => popup.remove(), 500); // Remove after fade-out
-            }, 3000); // Show for 3 seconds
-        }
         
 
     });
