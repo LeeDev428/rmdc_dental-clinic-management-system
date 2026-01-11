@@ -12,10 +12,22 @@ use App\Events\MessageRead;
 class MongoMessageController extends Controller
 {
     /**
+     * Check if MongoDB is available
+     */
+    private function isMongoAvailable()
+    {
+        return extension_loaded('mongodb') && !empty(config('database.connections.mongodb.dsn'));
+    }
+
+    /**
      * Show admin real-time messages view
      */
     public function adminIndex(Request $request)
     {
+        if (!$this->isMongoAvailable()) {
+            return redirect()->back()->with('error', 'Real-time messaging is currently unavailable. Please contact support.');
+        }
+
         $selectedUserId = $request->get('user_id');
         $selectedUser = null;
         
@@ -34,6 +46,10 @@ class MongoMessageController extends Controller
      */
     public function patientIndex()
     {
+        if (!$this->isMongoAvailable()) {
+            return redirect()->back()->with('error', 'Real-time messaging is currently unavailable. Please contact support.');
+        }
+
         return view('messages.index_realtime');
     }
 
@@ -42,6 +58,10 @@ class MongoMessageController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
+        }
+
         $request->validate([
             'message' => 'required|string|max:1000',
             'recipient_id' => 'required|exists:users,id',
@@ -104,6 +124,10 @@ class MongoMessageController extends Controller
      */
     public function typing(Request $request)
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
+        }
+
         $request->validate([
             'recipient_id' => 'required|exists:users,id',
             'typing' => 'required|boolean',
@@ -126,6 +150,10 @@ class MongoMessageController extends Controller
      */
     public function markAsRead(Request $request)
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
+        }
+
         $request->validate([
             'message_ids' => 'required|array',
             'message_ids.*' => 'required|string',
@@ -163,6 +191,10 @@ class MongoMessageController extends Controller
      */
     public function unreadCount()
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['count' => 0]);
+        }
+
         $user = Auth::user();
         
         $count = MongoMessage::where('recipient_id', $user->id)
@@ -177,6 +209,10 @@ class MongoMessageController extends Controller
      */
     public function getMessages(Request $request)
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['error' => 'Messaging service is currently unavailable', 'messages' => []], 503);
+        }
+
         $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
@@ -225,6 +261,10 @@ class MongoMessageController extends Controller
      */
     public function getUserList()
     {
+        if (!$this->isMongoAvailable()) {
+            return response()->json(['error' => 'Messaging service is currently unavailable', 'users' => []], 503);
+        }
+
         if (Auth::user()->usertype !== 'admin') {
             abort(403);
         }
