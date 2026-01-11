@@ -93,6 +93,28 @@ class MongoMessageController extends Controller
     }
 
     /**
+     * Broadcast typing status
+     */
+    public function typing(Request $request)
+    {
+        $request->validate([
+            'recipient_id' => 'required|exists:users,id',
+            'typing' => 'required|boolean',
+        ]);
+
+        $user = Auth::user();
+
+        // Broadcast typing status to the recipient
+        broadcast(new \App\Events\UserTyping([
+            'sender_id' => $user->id,
+            'recipient_id' => $request->recipient_id,
+            'typing' => $request->typing,
+        ]))->toOthers();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Mark messages as read
      */
     public function markAsRead(Request $request)
@@ -115,7 +137,15 @@ class MongoMessageController extends Controller
             }
         }
 
-        return response()->json(['success' => true]);
+        // Get updated unread count
+        $unreadCount = MongoMessage::where('recipient_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'unread_count' => $unreadCount
+        ]);
     }
 
     /**
