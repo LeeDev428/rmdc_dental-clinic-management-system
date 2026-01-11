@@ -41,10 +41,10 @@
                 Reschedule Requests
                 <span id="sidebarRescheduleBadge" class="badge bg-secondary ms-2">0</span>
             </a>
-            <a class="nav-link" href="#">
+            {{-- <a class="nav-link" href="#">
                 <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>
                 Edit Availability
-            </a>
+            </a> --}}
             <a class="nav-link" href="{{ route('admin.inventory_admin') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
                 Inventory
