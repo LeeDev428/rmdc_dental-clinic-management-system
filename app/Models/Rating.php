@@ -11,5 +11,5 @@ class Rating extends Model
 
     protected $table = 'ratings_review'; // Updated table name
 
-    protected $fillable = ['rating', 'message']; // Removed user_id and appointment_id
+    protected $fillable = ['rating', 'message', 'user_id', 'appointment_id'];
 }
