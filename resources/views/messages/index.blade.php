@@ -109,7 +109,6 @@
             console.error('No admin user found! Cannot send messages.');
             alert('Error: No admin available to chat with. Please contact support.');
         }
-        });
         
         document.addEventListener('DOMContentLoaded', function () {
             const messageContainer = document.getElementById('message-container');
