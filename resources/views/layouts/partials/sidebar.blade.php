@@ -33,14 +33,14 @@
             </a>
             <a class="nav-link" href="{{ route('admin.cancellation.requests') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-ban"></i></div>
-                Cancellation Requests
+                Cancels/Rescheds
                 <span id="sidebarCancellationBadge" class="badge bg-secondary ms-2">0</span>
             </a>
-            <a class="nav-link" href="{{ route('admin.reschedule.requests') }}">
+            {{-- <a class="nav-link" href="{{ route('admin.reschedule.requests') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
                 Reschedule Requests
                 <span id="sidebarRescheduleBadge" class="badge bg-secondary ms-2">0</span>
-            </a>
+            </a> --}}
             {{-- <a class="nav-link" href="#">
                 <div class="sb-nav-link-icon"><i class="fas fa-edit"></i></div>
                 Edit Availability
