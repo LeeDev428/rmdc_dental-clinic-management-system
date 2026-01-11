@@ -135,11 +135,13 @@
             messageDiv.className = 'flex mb-3';
             messageDiv.style.animation = 'slideIn 0.3s ease-out';
             
-            const avatar = isSent 
-                ? '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}'
-                : '{{ asset("img/default-dp.jpg") }}';
-            
-            const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            // Get avatar from message data or fallback
+            let avatar;
+            if (isSent) {
+                avatar = msg.sender && msg.sender.avatar_url ? msg.sender.avatar_url : '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}';
+            } else {
+                avatar = msg.sender && msg.sender.avatar_url ? msg.sender.avatar_url : '{{ asset("img/default-dp.jpg") }}';
+            }
             
             if (isSent) {
                 messageDiv.innerHTML = `
