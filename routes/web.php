@@ -367,6 +367,7 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     use App\Http\Controllers\MongoMessageController;
     Route::middleware('auth')->prefix('mongo-messages')->group(function () {
         Route::post('/send', [MongoMessageController::class, 'store'])->name('mongo.messages.send');
+        Route::post('/typing', [MongoMessageController::class, 'typing'])->name('mongo.messages.typing');
         Route::post('/mark-read', [MongoMessageController::class, 'markAsRead'])->name('mongo.messages.mark-read');
         Route::get('/unread-count', [MongoMessageController::class, 'unreadCount'])->name('mongo.messages.unread-count');
         Route::get('/conversation', [MongoMessageController::class, 'getMessages'])->name('mongo.messages.conversation');
