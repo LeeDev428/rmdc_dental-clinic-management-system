@@ -16,77 +16,94 @@ const conditionColors = {
     'missing': '#6b7280'
 };
 
-// Search and select user
-function filterUsers() {
-    const searchValue = document.getElementById('user-search').value.toLowerCase();
-    const userList = document.getElementById('user-list');
-    const users = userList.getElementsByTagName('li');
-    for (let user of users) {
-        user.style.display = user.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
-    }
-    userList.style.display = searchValue ? 'block' : 'none';
+// Filter patient table
+function filterPatientTable() {
+    const filter = document.getElementById('patient-filter').value.toLowerCase();
+    const rows = document.querySelectorAll('#patient-table tbody tr');
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name') || '';
+        const id = row.getAttribute('data-id') || '';
+        row.style.display = (name.includes(filter) || id.includes(filter)) ? '' : 'none';
+    });
 }
 
+// Select user and show teeth layout
 function selectUser(userId, userName) {
     selectedUserId = userId;
     selectedUserName = userName;
-    document.getElementById('user-search').value = userName;
-    document.getElementById('user-list').style.display = 'none';
     document.getElementById('patient-name').textContent = userName;
     document.getElementById('patient-id').textContent = `ID: #${userId}`;
+    
+    // Hide table, show teeth layout
+    document.querySelector('.content-card').style.display = 'none';
+    document.getElementById('teeth-layout-container').classList.remove('d-none');
+    
     loadTeethLayout(userId);
 }
 
+// Go back to patient list
+function goBackToList() {
+    document.querySelector('.content-card').style.display = 'block';
+    document.getElementById('teeth-layout-container').classList.add('d-none');
+    selectedUserId = null;
+    selectedUserName = null;
+    teethRecords = [];
+}
+
 function loadTeethLayout(userId) {
-    if (!userId) {
-        document.getElementById('teeth-layout-container').classList.add('d-none');
-        return;
-    }
-    document.getElementById('teeth-layout-container').classList.remove('d-none');
+    if (!userId) return;
     
     fetch(`/admin/teeth-layout/records/${userId}`)
         .then(response => response.json())
         .then(data => {
             teethRecords = data.records || [];
-            renderSimpleChart();
+            renderArchChart();
             updateStatistics();
         })
         .catch(error => {
             console.error('Error:', error);
             teethRecords = [];
-            renderSimpleChart();
+            renderArchChart();
         });
 }
 
-// Render simple chart with div-based teeth
-function renderSimpleChart() {
-    // Clear all quadrants
+// Render curved arch chart
+function renderArchChart() {
     ['upper-right', 'upper-left', 'lower-right', 'lower-left'].forEach(id => {
-        document.getElementById(id).innerHTML = '';
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = '';
     });
     
-    // Upper Right: teeth 1-8 (displayed 8 to 1, right to left)
+    // Upper Right: teeth 1-8 (displayed 8 to 1 from center outward)
     const upperRight = document.getElementById('upper-right');
-    for (let i = 8; i >= 1; i--) {
-        upperRight.appendChild(createTooth(i));
+    if (upperRight) {
+        for (let i = 8; i >= 1; i--) {
+            upperRight.appendChild(createTooth(i));
+        }
     }
     
-    // Upper Left: teeth 9-16 (displayed 9 to 16, left to right)
+    // Upper Left: teeth 9-16 (displayed 9 to 16 from center outward)
     const upperLeft = document.getElementById('upper-left');
-    for (let i = 9; i <= 16; i++) {
-        upperLeft.appendChild(createTooth(i));
+    if (upperLeft) {
+        for (let i = 9; i <= 16; i++) {
+            upperLeft.appendChild(createTooth(i));
+        }
     }
     
-    // Lower Left: teeth 17-24 (displayed 17 to 24, left to right)
+    // Lower Left: teeth 17-24 (displayed 17 to 24 from center outward)
     const lowerLeft = document.getElementById('lower-left');
-    for (let i = 17; i <= 24; i++) {
-        lowerLeft.appendChild(createTooth(i));
+    if (lowerLeft) {
+        for (let i = 17; i <= 24; i++) {
+            lowerLeft.appendChild(createTooth(i));
+        }
     }
     
-    // Lower Right: teeth 25-32 (displayed 32 to 25, right to left)
+    // Lower Right: teeth 25-32 (displayed 32 to 25 from center outward)
     const lowerRight = document.getElementById('lower-right');
-    for (let i = 32; i >= 25; i--) {
-        lowerRight.appendChild(createTooth(i));
+    if (lowerRight) {
+        for (let i = 32; i >= 25; i--) {
+            lowerRight.appendChild(createTooth(i));
+        }
     }
 }
 
@@ -101,7 +118,10 @@ function createTooth(number) {
     tooth.style.backgroundColor = conditionColors[condition] || conditionColors['healthy'];
     tooth.setAttribute('data-tooth', number);
     tooth.innerHTML = `<span class="tooth-num">${number}</span>`;
-    tooth.onclick = () => showToothDetails(number, record);
+    tooth.onclick = (e) => {
+        e.stopPropagation();
+        showToothDetails(number, record);
+    };
     
     return tooth;
 }
@@ -151,7 +171,11 @@ function showToothDetails(toothNumber, record) {
     document.getElementById('condition-select').value = record?.condition || 'healthy';
     
     loadToothNotes(record?.id);
-    document.getElementById('tooth-detail-modal').classList.add('show');
+    
+    const modal = document.getElementById('tooth-detail-modal');
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 }
 
 function getQuadrantName(number) {
@@ -215,7 +239,10 @@ function loadToothNotes(toothRecordId) {
 }
 
 function closeToothModal() {
-    document.getElementById('tooth-detail-modal').classList.remove('show');
+    const modal = document.getElementById('tooth-detail-modal');
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
     document.getElementById('note-content').value = '';
     document.getElementById('note-type-select').value = 'treatment';
     currentToothId = null;
@@ -270,6 +297,14 @@ function saveToothChanges() {
 function markToothAsMissing() {
     document.getElementById('condition-select').value = 'missing';
     saveToothChanges();
+}
+
+// Handle modal backdrop click (close only when clicking backdrop)
+function handleModalClick(e) {
+    // Only close if clicking directly on the modal overlay (backdrop area)
+    if (e.target.classList.contains('tooth-modal-overlay')) {
+        closeToothModal();
+    }
 }
 
 // Keyboard shortcut
