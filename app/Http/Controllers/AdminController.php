@@ -554,10 +554,10 @@ public function cancellationRequests()
  */
 public function getCancellationCount()
 {
-    // Count pending cancellations from appointment_cancellations table
-    $count = \App\Models\AppointmentCancellation::whereHas('appointment', function($query) {
-        $query->where('status', 'cancelled');
-    })->count();
+    // Count appointments with status 'cancelled' that have pending cancellation requests
+    $count = \App\Models\Appointment::where('status', 'cancelled')
+        ->whereHas('cancellation')
+        ->count();
     
     return response()->json(['count' => $count]);
 }
@@ -586,8 +586,11 @@ public function rescheduleRequests()
  */
 public function getRescheduleCount()
 {
-    // Placeholder - implement when reschedule tracking is added
-    $count = 0;
+    // Count appointments that have reschedule_request = 1
+    $count = \App\Models\Appointment::where('reschedule_request', 1)
+        ->whereIn('status', ['accepted', 'pending'])
+        ->count();
+    
     return response()->json(['count' => $count]);
 }
 
