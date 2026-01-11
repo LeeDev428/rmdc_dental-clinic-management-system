@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
+use App\Models\MongoMessage;
 use App\Models\User;  // Import the User model
 use Illuminate\Support\Facades\DB;
 
@@ -13,15 +14,16 @@ class MessageController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            // Retrieve all messages for the authenticated user (patient)
-            $messages = Message::with('user')  // Assuming the Message model has a user relationship
-                ->where('user_id', Auth::id())  // Ensure we're fetching messages for the logged-in user
+            $adminUser = User::where('is_admin', 1)->first();
+            
+            // Fetch messages from MongoDB
+            $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
+                ->with(['sender', 'recipient'])
                 ->orderBy('created_at', 'asc')
                 ->get();
             
             // Retrieve the logged-in user's details
             $selectedUser = Auth::user();  // Fetch the currently authenticated user (patient)
-            
             
             // Pass both messages and the selected user to the view
             return view('messages.index', compact('messages', 'selectedUser'));
