@@ -462,8 +462,6 @@ $endTime = $startTime->copy()->addMinutes($duration);
             'start' => $newStartTime,
             'end' => $newEndTime,
             'time' => $timeStr,
-            'appointment_date' => $newStartTime->toDateString(),
-            'appointment_time' => $timeStr,
             'status' => 'pending', // Reset to pending for admin approval
         ]);
         
