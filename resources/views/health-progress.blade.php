@@ -461,7 +461,7 @@
         
         <!-- Pagination for Timeline -->
         <div class="mt-6">
-            {{ $paginatedAppointments->links() }}
+            {{ $paginatedAppointments->appends(request()->query())->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     @endif
 </div>
