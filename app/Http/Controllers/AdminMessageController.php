@@ -13,8 +13,8 @@ class AdminMessageController extends Controller
 
     public function index(Request $request)  {
 
-   // Search logic for user_id or user name
-   $query = User::where('is_admin', 0);  // Get all patients
+   // Search logic for user_id or user name - get all non-admin users (patients)
+   $query = User::where('usertype', '!=', 'admin');  // Get all patients
 
    if ($request->has('search')) {
        $search = $request->search;
