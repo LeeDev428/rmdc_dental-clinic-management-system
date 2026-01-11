@@ -307,7 +307,8 @@ Route::delete('admin/appointments/delete-all-declined', [AdminAppointment::class
     });
 
     Route::prefix('admin')->middleware(['auth', AdminMiddleware::class])->group(function () {
-        Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews');
+        Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
+        Route::post('/reviews/{id}/toggle-featured', [ReviewController::class, 'toggleFeatured'])->name('admin.reviews.toggle-featured');
     });
 
     Route::get('/get-procedure-details', [ProcedurePriceController::class, 'getProcedureDetails'])->name('getProcedureDetails');
