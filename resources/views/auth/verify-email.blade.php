@@ -1,32 +1,6 @@
 <x-guest-layout>
     @section('title', 'Verify Email')
-
-    <!-- Toast Notification -->
-    @if (session('success'))
-        <div id="toast" class="fixed top-5 right-5 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 z-50 animate-slide-in">
-            <i class="fas fa-check-circle text-2xl"></i>
-            <div>
-                <p class="font-semibold">Success!</p>
-                <p class="text-sm">{{ session('success') }}</p>
-            </div>
-            <button onclick="document.getElementById('toast').remove()" class="ml-4 text-white hover:text-gray-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    @endif
-
-    @if (session('status') == 'verification-link-sent')
-        <div id="toast" class="fixed top-5 right-5 bg-blue-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 z-50 animate-slide-in">
-            <i class="fas fa-paper-plane text-2xl"></i>
-            <div>
-                <p class="font-semibold">Email Sent!</p>
-                <p class="text-sm">A new verification link has been sent to your email.</p>
-            </div>
-            <button onclick="document.getElementById('toast').remove()" class="ml-4 text-white hover:text-gray-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    @endif
+    <x-toast-notification />
 
     <div class="bg-white rounded-lg shadow-lg p-8 max-w-md mx-auto mt-10">
         <!-- Icon -->
@@ -65,32 +39,18 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- Toast Animation -->
-    <style>
-        @keyframes slide-in {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .animate-slide-in {
-            animation: slide-in 0.3s ease-out;
-        }
-    </style>
-
-    <!-- Auto-hide toast after 5 seconds -->
     <script>
-        setTimeout(() => {
-            const toast = document.getElementById('toast');
-            if (toast) {
-                toast.style.animation = 'slide-in 0.3s ease-out reverse';
-                setTimeout(() => toast.remove(), 300);
-            }
-        }, 5000);
+        // Show toast for session messages
+        @if (session('success'))
+            window.addEventListener('DOMContentLoaded', function() {
+                showToast('{{ session('success') }}', 'success');
+            });
+        @endif
+        
+        @if (session('status') == 'verification-link-sent')
+            window.addEventListener('DOMContentLoaded', function() {
+                showToast('A new verification link has been sent to your email.', 'info');
+            });
+        @endif
     </script>
 </x-guest-layout>
