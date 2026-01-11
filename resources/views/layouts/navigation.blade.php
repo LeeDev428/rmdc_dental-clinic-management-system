@@ -51,7 +51,7 @@
                                     <i class="fas fa-calendar-plus mr-2"></i>Appointment
                                 </x-nav-link>
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
-                                <x-nav-link :href="route('appointment.history')" :active="request()->routeIs('appointment.history')" 
+                                <x-nav-link :href="route('history.settings')" :active="request()->routeIs('history.settings')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
                                     <i class="fas fa-history mr-2"></i>History
                                 </x-nav-link>
@@ -390,7 +390,7 @@ function formatDate(dateString) {
     <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 shadow-lg rounded-lg ring-1 ring-black ring-opacity-5 z-10">
   {{-- <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link>  --}}
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
-        <x-dropdown-link :href="route('appointment.history')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('history.settings')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.cancel')" class="text-gray-700 dark:text-white">{{ __('Cancel/Resched Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
         <x-dropdown-link :href="route('health.progress')" class="text-gray-700 dark:text-white">{{ __('Health Progress') }}</x-dropdown-link>
