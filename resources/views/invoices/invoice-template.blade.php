@@ -286,92 +286,105 @@
                 <p class="invoice-label">Invoice Number</p>
                 <div class="invoice-number">#{{ str_pad($appointment->id, 6, '0', STR_PAD_LEFT) }}</div>
                 <span class="status-badge">{{ ucfirst($appointment->payment_status ?? 'Completed') }}</span>
-                </p>
             </div>
         </div>
         
-        <!-- Invoice Details -->
-        <div class="invoice-details">
-            <div class="detail-section">
-                <h3>Bill To:</h3>
-                <p>
-                    <strong>{{ $appointment->user->name ?? 'N/A' }}</strong><br>
-                    {{ $appointment->user->email ?? 'N/A' }}
-                </p>
+        <!-- Info Grid -->
+        <div class="info-grid">
+            <div class="info-box clinic">
+                <h3>Clinic Information</h3>
+                <p><strong>RMDC - Robles Moncayo Dental Clinic</strong></p>
+                <p>Unit F Medina Bldg, Niog Elementary School</p>
+                <p>Bacoor, Cavite, Philippines</p>
+                <p><br></p>
+                <p>Email: robles_moncayo@yahoo.com</p>
+                <p>Phone: (+63) 912-3456-789</p>
             </div>
-            <div class="detail-section">
-                <h3>Appointment Details:</h3>
-                <p>
-                    <strong>Date:</strong> {{ \Carbon\Carbon::parse($appointment->start)->format('F d, Y') }}<br>
-                    <strong>Time:</strong> {{ $appointment->time }}<br>
-                    <strong>Duration:</strong> {{ $appointment->duration }}
-                </p>
-            </div>
-        </div>
-        
-        <!-- Services Table -->
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Service Description</th>
-                    <th class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <strong>{{ $appointment->procedure }}</strong><br>
-                        <small>{{ $appointment->title }}</small>
-                    </td>
-                    <td class="text-right">₱{{ number_format($amount, 2) }}</td>
-                </tr>
-            </tbody>
-        </table>
-        
-        <!-- Totals -->
-        <div class="invoice-totals">
-            @if($appointment->down_payment)
-            <div class="total-row">
-                <span>Subtotal:</span>
-                <span>₱{{ number_format($amount, 2) }}</span>
-            </div>
-            <div class="total-row">
-                <span>Down Payment:</span>
-                <span>₱{{ number_format($appointment->down_payment, 2) }}</span>
-            </div>
-            <div class="total-row">
-                <span>Balance:</span>
-                <span>₱{{ number_format($amount - $appointment->down_payment, 2) }}</span>
-            </div>
-            @endif
-            <div class="total-row grand-total">
-                <span>Total Amount:</span>
-                <span>₱{{ number_format($amount, 2) }}</span>
+            
+            <div class="info-box patient">
+                <h3>Patient Information</h3>
+                <p><strong>Patient Name</strong></p>
+                <p>{{ $appointment->user->name }}</p>
+                <p><br></p>
+                <p><strong>Email Address</strong></p>
+                <p>{{ $appointment->user->email }}</p>
+                <p><br></p>
+                <p><strong>Attending Doctor</strong></p>
+                <p>Admin User</p>
             </div>
         </div>
         
-        <!-- Payment Information -->
-        @if($appointment->payment_method || $appointment->payment_reference)
-        <div class="invoice-details" style="margin-top: 30px;">
-            <div class="detail-section">
-                <h3>Payment Information:</h3>
-                <p>
-                    @if($appointment->payment_method)
-                        <strong>Method:</strong> {{ strtoupper($appointment->payment_method) }}<br>
-                    @endif
-                    @if($appointment->payment_reference)
-                        <strong>Reference:</strong> {{ $appointment->payment_reference }}<br>
-                    @endif
-                </p>
+        <!-- Appointment Details Section -->
+        <div class="details-section">
+            <h2 class="section-title">Appointment Details</h2>
+            
+            <table class="details-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Schedule & Duration</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="procedure-name">{{ $appointment->procedure }}</div>
+                            <div class="procedure-type">Dental Procedure</div>
+                        </td>
+                        <td>
+                            <div>Date: {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('F d, Y') }}</div>
+                            <div>Time: {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->appointment_time)->addMinutes($appointment->duration ?? 60)->format('g:i A') }}</div>
+                            <div>Duration: {{ $appointment->duration ?? '1.5 hours' }} minutes</div>
+                        </td>
+                        <td>₱{{ number_format($appointment->price, 2) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Payment Information & Summary -->
+        <div class="payment-section">
+            <div class="payment-box">
+                <h4>Payment Information</h4>
+                <div class="payment-row">
+                    <span class="payment-label">Payment Method</span>
+                    <span class="payment-value">{{ strtoupper($appointment->payment_method ?? 'GCASH') }}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Reference ID</span>
+                    <span class="payment-value">{{ $appointment->payment_reference ?? 'pay_7z?Qw?qPADVNwV4F1jLQsb?q' }}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Status</span>
+                    <span class="payment-value">{{ strtoupper($appointment->payment_status ?? 'PAID') }}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Booked On</span>
+                    <span class="payment-value">{{ $appointment->created_at->format('M d, Y g:i A') }}</span>
+                </div>
+            </div>
+            
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span class="summary-label">Total Amount</span>
+                    <span class="summary-value">₱{{ number_format($appointment->price, 2) }}</span>
+                </div>
+                <div class="summary-row deduction">
+                    <span class="summary-label">Down Payment (20%)</span>
+                    <span class="summary-value">- ₱{{ number_format($appointment->down_payment ?? ($appointment->price * 0.2), 2) }}</span>
+                </div>
+                <div class="summary-row total">
+                    <span class="summary-label">Balance Due</span>
+                    <span class="summary-value">₱{{ number_format($appointment->price - ($appointment->down_payment ?? ($appointment->price * 0.2)), 2) }}</span>
+                </div>
             </div>
         </div>
-        @endif
         
         <!-- Footer -->
         <div class="invoice-footer">
             <p>Thank you for choosing RMDC - Robles Moncayo Dental Clinic</p>
-            <p>This is a computer-generated invoice and does not require a signature.</p>
-            <p>For questions about this invoice, please contact us at contact@rmdc.com</p>
+            <p>For questions regarding this invoice, please contact us at robles_moncayo@yahoo.com</p>
         </div>
     </div>
 </body>
