@@ -427,18 +427,18 @@
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">#</th>
+                        {{-- <th style="width: 60px;">#</th> --}}
                         <th style="width: 220px;">User</th>
-                        <th style="width: 140px;">Rating</th>
+                        <th style="width: 220px;">Rating</th>
                         <th>Message</th>
-                        <th style="width: 120px;">Status</th>
-                        <th style="width: 140px;">Action</th>
+                        <th style="width: 220px;">Status</th>
+                        <th style="width: 200px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($reviews as $index => $review)
                     <tr>
-                        <td>{{ $reviews->firstItem() + $index }}</td>
+                        {{-- <td>{{ $reviews->firstItem() + $index }}</td> --}}
                         <td>
                             <div class="user-info">
                                 <div class="user-avatar">
@@ -535,28 +535,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update button
-                button.dataset.featured = data.featured ? 'true' : 'false';
-                button.classList.remove('featured', 'not-featured');
-                button.classList.add(data.featured ? 'featured' : 'not-featured');
-                
-                const icon = button.querySelector('i');
-                icon.className = data.featured ? 'fas fa-star' : 'fas fa-star-o';
-                
-                const span = button.querySelector('span');
-                span.textContent = data.featured ? 'Unfeature' : 'Feature';
-                
-                // Update badge
-                const badge = button.closest('tr').querySelector('.badge');
-                if (data.featured) {
-                    badge.className = 'badge badge-warning';
-                    badge.innerHTML = '<i class="fas fa-star"></i> Featured';
-                } else {
-                    badge.className = 'badge badge-success';
-                    badge.innerHTML = '<i class="fas fa-check"></i> Active';
-                }
-                
-                // Show success message and reload to update count
+                // Show success message and reload to update everything
                 alert(data.message);
                 window.location.reload();
             } else {
