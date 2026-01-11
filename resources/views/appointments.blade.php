@@ -783,6 +783,13 @@ window.onclick = function(event) {
                                         
                                         @if(isset($reschedulingAppointment) && $reschedulingAppointment)
                                         <!-- Reschedule Mode - Show Existing Payment -->
+                                        @php
+                                            $payment = $reschedulingAppointment->latestPayment;
+                                            $hasPayment = $payment !== null;
+                                        @endphp
+                                        
+                                        @if($hasPayment)
+                                        <!-- Accepted appointment with payment -->
                                         <div class="p-6 bg-green-50 border-2 border-green-400 rounded-lg">
                                             <div class="flex items-center mb-4">
                                                 <svg class="w-8 h-8 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -798,10 +805,9 @@ window.onclick = function(event) {
                                                 </div>
                                                 
                                                 @php
-                                                    $payment = $reschedulingAppointment->latestPayment;
-                                                    $amount = $payment ? $payment->amount : 0;
-                                                    $paymentMethod = $payment ? $payment->payment_method : 'N/A';
-                                                    $paymentDate = $payment ? \Carbon\Carbon::parse($payment->created_at)->format('M d, Y g:i A') : 'N/A';
+                                                    $amount = $payment->amount;
+                                                    $paymentMethod = $payment->payment_method;
+                                                    $paymentDate = \Carbon\Carbon::parse($payment->created_at)->format('M d, Y g:i A');
                                                 @endphp
                                                 
                                                 <div class="flex justify-between py-2 border-b border-green-200">
@@ -842,6 +848,51 @@ window.onclick = function(event) {
                                                 </button>
                                             </div>
                                         </div>
+                                        @else
+                                        <!-- Pending appointment without payment -->
+                                        <div class="p-6 bg-blue-50 border-2 border-blue-400 rounded-lg">
+                                            <div class="flex items-center mb-4">
+                                                <svg class="w-8 h-8 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                                </svg>
+                                                <h5 class="text-xl font-bold text-blue-800">Pending Appointment</h5>
+                                            </div>
+                                            
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between py-2 border-b border-blue-200">
+                                                    <span class="text-gray-700 font-medium">Procedure:</span>
+                                                    <span class="text-gray-900 font-semibold">{{ $reschedulingAppointment->procedure }}</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between py-2 border-b border-blue-200">
+                                                    <span class="text-gray-700 font-medium">Status:</span>
+                                                    <span class="text-orange-600 font-semibold uppercase">{{ $reschedulingAppointment->status }}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mt-4 p-3 bg-white border border-blue-300 rounded-md">
+                                                <p class="text-sm text-gray-700">
+                                                    <strong>Note:</strong> This appointment is still pending approval. You can reschedule to a different date and time.
+                                                </p>
+                                            </div>
+                                            
+                                            <!-- Form Action Buttons for Reschedule -->
+                                            <div class="flex justify-end gap-3 mt-6">
+                                                <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                                    Cancel
+                                                </button>
+                                                
+                                                <button type="submit" 
+                                                        id="submit-booking-btn"
+                                                        class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span id="submit-btn-text">Confirm Reschedule</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        @endif
                                         @else
                                         <div class="payment-section">
                                             <div class="payment-breakdown">
@@ -1080,6 +1131,11 @@ window.onclick = function(event) {
         const closeRatingModal = document.getElementById('close-rating-modal');
         const stars = document.querySelectorAll('#star-rating svg');
         let selectedRating = 0;
+        
+        // Auto-show review modal for completed appointments that haven't been reviewed
+        @if(session('show_review_modal'))
+            ratingModal.classList.remove('hidden');
+        @endif
 
         // Hover effect for stars
         stars.forEach(star => {
@@ -1106,6 +1162,8 @@ window.onclick = function(event) {
                 alert('Please select a rating before submitting.');
                 return;
             }
+            
+            const appointmentId = '{{ session("review_appointment_id") ?? "" }}';
 
             fetch("{{ route('ratings.store') }}", {
                 method: 'POST',
@@ -1116,6 +1174,7 @@ window.onclick = function(event) {
                 body: JSON.stringify({
                     rating: selectedRating,
                     message: message,
+                    appointment_id: appointmentId
                 })
             })
             .then(response => {
