@@ -36,13 +36,17 @@ class AdminAppointment extends Controller
 
     $autoMessage = "We regret to inform you that your appointment scheduled for <strong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
 
-// Save the auto-generated message
-Message::create([
-    'user_id' => $appointment->user_id,
-    'message' => $autoMessage,
-    'is_admin' => true,
-    'status' => 'unread'
-]);
+// Try to save auto-generated message (might fail if using MongoDB for messages)
+try {
+    Message::create([
+        'user_id' => $appointment->user_id,
+        'message' => $autoMessage,
+        'is_admin' => true,
+        'status' => 'unread'
+    ]);
+} catch (\Exception $e) {
+    Log::warning('Could not save message to messages table: ' . $e->getMessage());
+}
 
 // Save decline record
 DeclinedAppointment::create([
