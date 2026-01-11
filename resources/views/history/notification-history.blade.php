@@ -57,66 +57,106 @@
     
     @php
         use Illuminate\Support\Facades\Cache;
+        use Illuminate\Support\Facades\Schema;
+        use Illuminate\Support\Facades\DB;
         use Carbon\Carbon;
         
         // Cache key for this user's comprehensive notifications
-        $cacheKey = 'user_comprehensive_notifications_' . auth()->id();
-        $cacheDuration = 3600; // 1 hour cache
+        $cacheKey = 'user_comprehensive_notifications_' . auth()->id() . '_v2';
+        $cacheDuration = 300; // 5 minutes cache (reduced for fresher data)
+        
+        // Clear cache for fresh data (optional, remove in production)
+        // Cache::forget($cacheKey);
         
         // Get all notifications, emails, and messages
         $allItems = Cache::remember($cacheKey, $cacheDuration, function() {
             $items = collect();
             
-            // 1. System Notifications (from database notifications table)
-            $systemNotifications = auth()->user()->notifications()
-                ->where('created_at', '>=', Carbon::now()->subWeeks(7))
-                ->get()
-                ->map(function($notification) {
-                    return [
-                        'id' => $notification->id,
-                        'type' => 'notification',
-                        'type_label' => 'System Notification',
-                        'icon' => 'bell',
-                        'icon_color' => 'text-blue-500',
-                        'title' => $notification->data['title'] ?? 'Notification',
-                        'message' => $notification->data['message'] ?? 'No message available',
-                        'created_at' => $notification->created_at,
-                        'read_at' => $notification->read_at,
-                        'is_new' => $notification->created_at->gt(Carbon::now()->subHours(24)),
-                        'data' => $notification->data
-                    ];
-                });
-            
-            // 2. Messages (from messages table if exists)
-            if (Schema::hasTable('messages')) {
-                $messages = App\Models\Message::where('user_id', auth()->id())
+            // 1. System Notifications (from notifications table - Laravel's notification system)
+            try {
+                $systemNotifications = auth()->user()->notifications()
                     ->where('created_at', '>=', Carbon::now()->subWeeks(7))
-                    ->orderBy('created_at', 'desc')
                     ->get()
-                    ->map(function($message) {
+                    ->map(function($notification) {
                         return [
-                            'id' => $message->id,
-                            'type' => 'message',
-                            'type_label' => 'Message',
-                            'icon' => 'comment',
-                            'icon_color' => 'text-green-500',
-                            'title' => 'Message from Admin',
-                            'message' => $message->message ?? $message->content ?? '',
-                            'created_at' => $message->created_at,
-                            'read_at' => $message->read_at ?? $message->is_read ?? null,
-                            'is_new' => $message->created_at->gt(Carbon::now()->subHours(24)),
-                            'data' => []
+                            'id' => $notification->id,
+                            'type' => 'notification',
+                            'type_label' => 'System Notification',
+                            'icon' => 'bell',
+                            'icon_color' => 'text-blue-500',
+                            'title' => $notification->data['title'] ?? 'Notification',
+                            'message' => $notification->data['message'] ?? 'No message available',
+                            'created_at' => $notification->created_at,
+                            'read_at' => $notification->read_at,
+                            'is_new' => $notification->created_at->gt(Carbon::now()->subHours(24)),
+                            'data' => $notification->data
                         ];
                     });
-                $items = $items->merge($messages);
+                $items = $items->merge($systemNotifications);
+            } catch (\Exception $e) {
+                \Log::warning('Could not fetch system notifications: ' . $e->getMessage());
             }
             
-            // 3. Email Notifications (from email logs or sent emails)
-            // Note: This is a placeholder - adjust based on your email tracking system
-            // You might track sent emails in a separate table
+            // 2. Custom Notifications (from our notifications table)
+            try {
+                if (Schema::hasTable('notifications') && Schema::hasColumn('notifications', 'user_id')) {
+                    $customNotifications = DB::table('notifications')
+                        ->where('user_id', auth()->id())
+                        ->where('created_at', '>=', Carbon::now()->subWeeks(7))
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->map(function($notification) {
+                            return [
+                                'id' => $notification->id,
+                                'type' => 'notification',
+                                'type_label' => 'Notification',
+                                'icon' => 'bell',
+                                'icon_color' => 'text-purple-500',
+                                'title' => 'Notification',
+                                'message' => $notification->message ?? '',
+                                'created_at' => Carbon::parse($notification->created_at),
+                                'read_at' => isset($notification->status) && $notification->status === 'read' ? Carbon::now() : null,
+                                'is_new' => Carbon::parse($notification->created_at)->gt(Carbon::now()->subHours(24)),
+                                'data' => []
+                            ];
+                        });
+                    $items = $items->merge($customNotifications);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Could not fetch custom notifications: ' . $e->getMessage());
+            }
             
-            // Merge all items
-            $items = $items->merge($systemNotifications);
+            // 3. Messages (from messages table - only if using MySQL, not MongoDB)
+            try {
+                // Check if messages table exists and is using MySQL (not MongoDB)
+                $connection = config('database.default');
+                if ($connection !== 'mongodb' && Schema::hasTable('messages')) {
+                    $messages = DB::table('messages')
+                        ->where('user_id', auth()->id())
+                        ->where('is_admin', true) // Only messages from admin
+                        ->where('created_at', '>=', Carbon::now()->subWeeks(7))
+                        ->orderBy('created_at', 'desc')
+                        ->get()
+                        ->map(function($message) {
+                            return [
+                                'id' => $message->id,
+                                'type' => 'message',
+                                'type_label' => 'Admin Message',
+                                'icon' => 'comment',
+                                'icon_color' => 'text-green-500',
+                                'title' => 'Message from Admin',
+                                'message' => $message->message ?? $message->content ?? '',
+                                'created_at' => Carbon::parse($message->created_at),
+                                'read_at' => isset($message->status) && $message->status === 'read' ? Carbon::now() : null,
+                                'is_new' => Carbon::parse($message->created_at)->gt(Carbon::now()->subHours(24)),
+                                'data' => []
+                            ];
+                        });
+                    $items = $items->merge($messages);
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Could not fetch messages: ' . $e->getMessage());
+            }
             
             return $items->sortByDesc('created_at')->values()->all();
         });
