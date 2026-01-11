@@ -156,24 +156,24 @@
 }
 
 /* Tooth with curved positioning - Upper arch teeth curve up at ends */
-.upper-arch .tooth:nth-child(1) { margin-bottom: 20px; }
-.upper-arch .tooth:nth-child(2) { margin-bottom: 14px; }
-.upper-arch .tooth:nth-child(3) { margin-bottom: 9px; }
-.upper-arch .tooth:nth-child(4) { margin-bottom: 5px; }
-.upper-arch .tooth:nth-child(5) { margin-bottom: 3px; }
-.upper-arch .tooth:nth-child(6) { margin-bottom: 1px; }
-.upper-arch .tooth:nth-child(7) { margin-bottom: 0px; }
-.upper-arch .tooth:nth-child(8) { margin-bottom: 0px; }
+.upper-arch .arch-quadrant .tooth:nth-child(1) { margin-bottom: 22px; }
+.upper-arch .arch-quadrant .tooth:nth-child(2) { margin-bottom: 16px; }
+.upper-arch .arch-quadrant .tooth:nth-child(3) { margin-bottom: 11px; }
+.upper-arch .arch-quadrant .tooth:nth-child(4) { margin-bottom: 7px; }
+.upper-arch .arch-quadrant .tooth:nth-child(5) { margin-bottom: 4px; }
+.upper-arch .arch-quadrant .tooth:nth-child(6) { margin-bottom: 2px; }
+.upper-arch .arch-quadrant .tooth:nth-child(7) { margin-bottom: 1px; }
+.upper-arch .arch-quadrant .tooth:nth-child(8) { margin-bottom: 0px; }
 
 /* Lower arch teeth curve down at ends */
-.lower-arch .tooth:nth-child(1) { margin-top: 20px; }
-.lower-arch .tooth:nth-child(2) { margin-top: 14px; }
-.lower-arch .tooth:nth-child(3) { margin-top: 9px; }
-.lower-arch .tooth:nth-child(4) { margin-top: 5px; }
-.lower-arch .tooth:nth-child(5) { margin-top: 3px; }
-.lower-arch .tooth:nth-child(6) { margin-top: 1px; }
-.lower-arch .tooth:nth-child(7) { margin-top: 0px; }
-.lower-arch .tooth:nth-child(8) { margin-top: 0px; }
+.lower-arch .arch-quadrant .tooth:nth-child(1) { margin-top: 22px; }
+.lower-arch .arch-quadrant .tooth:nth-child(2) { margin-top: 16px; }
+.lower-arch .arch-quadrant .tooth:nth-child(3) { margin-top: 11px; }
+.lower-arch .arch-quadrant .tooth:nth-child(4) { margin-top: 7px; }
+.lower-arch .arch-quadrant .tooth:nth-child(5) { margin-top: 4px; }
+.lower-arch .arch-quadrant .tooth:nth-child(6) { margin-top: 2px; }
+.lower-arch .arch-quadrant .tooth:nth-child(7) { margin-top: 1px; }
+.lower-arch .arch-quadrant .tooth:nth-child(8) { margin-top: 0px; }
 
 /* Tooth with realistic shape */
 .tooth { 
