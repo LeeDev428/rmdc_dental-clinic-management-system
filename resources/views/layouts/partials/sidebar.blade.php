@@ -101,7 +101,7 @@
 // Update unread messages badge in sidebar
 function updateSidebarUnreadMessagesCount() {
     $.ajax({
-        url: "{{ url('/admin/unread-messages-count') }}",
+        url: "{{ route('mongo.messages.unread-count') }}",
         method: "GET",
         success: function(response) {
             let badge = $("#sidebarUnreadMessagesBadge");
@@ -110,9 +110,23 @@ function updateSidebarUnreadMessagesCount() {
             } else {
                 badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
             }
+        },
+        error: function(xhr) {
+            console.error('Error fetching unread count:', xhr);
         }
     });
 }
+
+// Setup Pusher real-time listener for new messages
+@auth
+if (window.Echo) {
+    window.Echo.channel('messages.{{ Auth::id() }}')
+        .listen('.new.message', (data) => {
+            console.log('📨 New message notification - updating badge');
+            updateSidebarUnreadMessagesCount();
+        });
+}
+@endauth
 
 // Update pending appointments badge in sidebar
 function updateSidebarPendingCount() {
