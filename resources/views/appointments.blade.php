@@ -1109,14 +1109,6 @@ window.onclick = function(event) {
                 </script>
 
 
-                <!-- Success or Failure Popup -->
-                <div id="popup-message" class="hidden fixed z-10 inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
-                    <div id="popup-content" class="bg-white dark:bg-gray-800 rounded-lg p-5 max-w-xs mx-auto text-center">
-                        <div id="popup-icon" class="text-3xl mb-4"></div>
-                        <p id="popup-text" class="text-lg font-medium text-gray-900 dark:text-gray-300"></p>
-                    </div>
-                </div>
-
                 <!-- Rating Modal -->
                 <div id="rating-modal" class="hidden fixed z-20 inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
                     <div class="bg-white dark:bg-gray-800 rounded-lg p-5 w-96 shadow-lg relative">
@@ -1174,7 +1166,7 @@ window.onclick = function(event) {
             const message = document.getElementById('rating-message').value;
 
             if (selectedRating === 0) {
-                alert('Please select a rating before submitting.');
+                showToast('Please select a rating before submitting.', 'warning');
                 return;
             }
             
@@ -1520,19 +1512,19 @@ window.onclick = function(event) {
     
     // Check if selected date is today (not allowed)
     if (selectedDate.getTime() === today.getTime()) {
-        showErrorMessage(`Cannot book for today. Please select ${tomorrowStr} or later.`);
+        showToast(`Cannot book for today. Please select ${tomorrowStr} or later.`, 'warning');
         return;
     }
     
     // Check if selected date is before tomorrow
     if (selectedDate < tomorrow) {
-        showErrorMessage(`Please select ${tomorrowStr} or later.`);
+        showToast(`Please select ${tomorrowStr} or later.`, 'warning');
         return;
     }
     
     // Check if selected date is beyond 7 days
     if (selectedDate > lastBookingDay) {
-        showErrorMessage(`Booking limit is ${lastDayStr}. Please select an earlier date.`);
+        showToast(`Booking limit is ${lastDayStr}. Please select an earlier date.`, 'warning');
         return;
     }
 
@@ -1559,7 +1551,7 @@ window.onclick = function(event) {
                 // Validate the selected time is within 8 AM - 5 PM
                 const [hour, minute] = appointmentTime.split(':').map(Number);
                 if (hour < 8 || hour >= 17) {
-                    showErrorMessage("Appointments can only be scheduled between 08:00 and 17:00.");
+                    showToast("Appointments can only be scheduled between 08:00 and 17:00.", 'warning');
                     return;
                 }
 
@@ -1640,37 +1632,6 @@ eventClick: function(info) {
         const selectedProcedure = $(this).val();
         $('#estimated-time').val(procedureTimes[selectedProcedure] || 'Select a procedure');
     });
-
-    function showErrorMessage(message) {
-        // Remove any existing error messages before adding a new one
-        const existingError = document.getElementById("error-message");
-        if (existingError) existingError.remove();
-
-        const errorModal = document.createElement("div");
-        errorModal.id = "error-message";
-        errorModal.innerHTML = `
-            <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                        background: rgba(255, 0, 0, 0.9); color: white; padding: 15px 20px;
-                        border-radius: 8px; text-align: center; font-size: 16px;
-                        width: 350px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-                        z-index: 9999;">
-                <p style="margin: 0; font-weight: bold;">⚠️ ${message}</p>
-                <br>
-                <button onclick="document.getElementById('error-message').remove()"
-                        style="background: white; color: red; padding: 5px 10px; border: none;
-                        cursor: pointer; font-size: 14px; border-radius: 4px;">
-                    Close
-                </button>
-            </div>`;
-
-        document.body.appendChild(errorModal);
-
-        // Auto-remove the error message after 5 seconds
-        setTimeout(() => {
-            const modal = document.getElementById("error-message");
-            if (modal) modal.remove();
-        }, 5000);
-    }
 
                 // OLD JQUERY SUBMIT HANDLER - COMMENTED OUT
                 // This was causing duplicate submissions without payment fields
