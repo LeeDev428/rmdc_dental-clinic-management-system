@@ -322,6 +322,21 @@
             </div>
             
             <div class="messages-container" id="messagesContainer">
+                <!-- Typing indicator -->
+                <div id="typing-indicator" class="hidden message-wrapper received">
+                    <img src="{{ $selectedUser->avatar_url ?? asset('img/default-dp.jpg') }}" 
+                         alt="{{ $selectedUser->name }}"
+                         onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
+                         class="message-avatar">
+                    <div class="message-bubble" style="background: #f0f2f5;">
+                        <div class="flex items-center space-x-1">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+                            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+                        </div>
+                    </div>
+                </div>
+                
                 @foreach ($messages as $message)
                     <div class="message-wrapper {{ $message->sender_id == Auth::id() ? 'sent' : 'received' }}">
                         @if($message->sender_id != Auth::id())
@@ -381,15 +396,80 @@
     const currentUserId = {{ Auth::id() }};
     const selectedUserId = {{ $selectedUser->id }};
     
+    let typingTimer;
+    const typingTimeout = 3000; // 3 seconds
+    let isTyping = false;
+    
     document.addEventListener("DOMContentLoaded", function() {
         const messagesContainer = document.getElementById("messagesContainer");
+        const messageInput = document.getElementById("messageInput");
+        const typingIndicator = document.getElementById("typing-indicator");
+        
         if (messagesContainer) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Mark all unread messages as read when page loads
+        const unreadMessages = [];
+        @foreach ($messages as $message)
+            @if($message->recipient_id == Auth::id() && !$message->is_read)
+                unreadMessages.push('{{ $message->_id }}');
+            @endif
+        @endforeach
+        
+        if (unreadMessages.length > 0) {
+            console.log('Admin: Marking', unreadMessages.length, 'messages as read');
+            markMessagesAsRead(unreadMessages);
+        }
+        
+        // Typing indicator - send typing status
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                if (!isTyping) {
+                    isTyping = true;
+                    sendTypingStatus(true);
+                }
+                
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    isTyping = false;
+                    sendTypingStatus(false);
+                }, typingTimeout);
+            });
+        }
+        
+        // Send typing status to server
+        function sendTypingStatus(typing) {
+            fetch('/mongo-messages/typing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                },
+                body: JSON.stringify({
+                    recipient_id: selectedUserId,
+                    typing: typing
+                })
+            }).catch(err => console.error('Error sending typing status:', err));
         }
         
         // Setup Pusher real-time listening
         if (window.Echo) {
             console.log('✅ Setting up Pusher listeners...');
+            
+            // Listen for typing events
+            window.Echo.channel(`messages.${currentUserId}`)
+                .listen('.user.typing', (data) => {
+                    console.log('⌨️ Typing event received:', data);
+                    if (data.sender_id == selectedUserId) {
+                        if (data.typing) {
+                            typingIndicator.classList.remove('hidden');
+                            scrollToBottom();
+                        } else {
+                            typingIndicator.classList.add('hidden');
+                        }
+                    }
+                });
             
             // Listen for new messages
             window.Echo.channel(`messages.${currentUserId}`)
@@ -399,6 +479,9 @@
                         addMessageToUI(data);
                         scrollToBottom();
                         markMessagesAsRead([data.id]);
+                    } else {
+                        // Message from another user - update badge
+                        updateSidebarUnreadMessagesCount();
                     }
                 });
             
@@ -496,7 +579,33 @@
             })
         })
         .then(response => response.json())
+        .then(data => {
+            if (data.success && data.unread_count !== undefined) {
+                // Update sidebar badge
+                updateUnreadBadge(data.unread_count);
+            }
+        })
         .catch(error => console.error('Error marking messages as read:', error));
+    }
+    
+    // Update the unread messages badge in sidebar
+    function updateUnreadBadge(count) {
+        const badge = document.getElementById('sidebarUnreadMessagesBadge');
+        if (badge) {
+            badge.textContent = count;
+            if (count > 0) {
+                badge.classList.remove('bg-secondary');
+                badge.classList.add('bg-danger');
+            } else {
+                badge.classList.remove('bg-danger');
+                badge.classList.add('bg-secondary');
+            }
+        }
+        
+        // Also update the function in sidebar if it exists
+        if (typeof updateSidebarUnreadMessagesCount === 'function') {
+            updateSidebarUnreadMessagesCount();
+        }
     }
     
     // Scroll to bottom
