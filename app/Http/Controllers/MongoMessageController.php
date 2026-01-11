@@ -66,12 +66,21 @@ class MongoMessageController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'avatar' => $user->avatar,
+            'avatar_url' => $user->avatar_url,
         ];
         $messageData['recipient'] = [
             'id' => $recipient->id,
             'name' => $recipient->name,
             'avatar' => $recipient->avatar,
+            'avatar_url' => $recipient->avatar_url,
         ];
+        
+        // Format created_at for JavaScript
+        if (isset($messageData['created_at'])) {
+            if ($messageData['created_at'] instanceof \MongoDB\BSON\UTCDateTime) {
+                $messageData['created_at'] = $messageData['created_at']->toDateTime()->format('Y-m-d H:i:s');
+            }
+        }
 
         // Broadcast the message via Pusher
         broadcast(new NewMessage($message))->toOthers();
@@ -179,13 +188,22 @@ class MongoMessageController extends Controller
             abort(403);
         }
 
-        $users = User::where('usertype', '!=', 'admin')
-            ->withCount(['mongoMessages as unread_count' => function ($query) {
-                $query->where('recipient_id', Auth::id())
-                      ->where('is_read', false);
-            }])
-            ->orderByDesc('unread_count')
-            ->get();
+        $users = User::where('usertype', '!=', 'admin')->get();
+        
+        // Manually add unread count from MongoDB
+        $users = $users->map(function($user) {
+            $unreadCount = MongoMessage::where('sender_id', $user->id)
+                ->where('recipient_id', Auth::id())
+                ->where('is_read', false)
+                ->count();
+            
+            $userData = $user->toArray();
+            $userData['unread_count'] = $unreadCount;
+            return $userData;
+        });
+        
+        // Sort by unread count
+        $users = collect($users)->sortByDesc('unread_count')->values();
 
         return response()->json([
             'success' => true,
