@@ -1,8 +1,15 @@
 <div id="teeth-layout-container" class="d-none">
+    <!-- Back Button -->
+    <div class="back-btn">
+        <button class="btn btn-secondary btn-sm" onclick="goBackToList()">
+            <i class="fas fa-arrow-left"></i> Back to Patient List
+        </button>
+    </div>
+
     <!-- Patient Header -->
     <div class="patient-header">
         <div class="patient-info-left">
-            <h3 id="patient-name">Patient Name</h3>
+            <h3><i class="fas fa-user"></i> <span id="patient-name">Patient Name</span></h3>
             <span id="patient-id">ID: #000</span>
         </div>
         <button class="btn btn-success btn-sm" onclick="initializeDefaultLayout()">
@@ -12,9 +19,9 @@
 
     <!-- Stats Row -->
     <div class="stats-row">
-        <div class="stat-box"><span id="stat-total" class="stat-num">0</span><small>Total</small></div>
+        <div class="stat-box"><span id="stat-total" class="stat-num">0</span><small>Total Teeth</small></div>
         <div class="stat-box good"><span id="stat-healthy" class="stat-num">0</span><small>Healthy</small></div>
-        <div class="stat-box bad"><span id="stat-treatment" class="stat-num">0</span><small>Treatment</small></div>
+        <div class="stat-box bad"><span id="stat-treatment" class="stat-num">0</span><small>Needs Treatment</small></div>
     </div>
 
     <!-- Legend -->
@@ -29,42 +36,35 @@
         <span class="legend-item"><i class="dot" style="background:#6b7280"></i> Missing</span>
     </div>
 
-    <!-- Simple Dental Chart -->
+    <!-- Curved Arch Dental Chart -->
     <div class="dental-chart-card">
         <div class="chart-header">
             <span><i class="fas fa-tooth"></i> Dental Chart</span>
             <small>Click any tooth to edit</small>
         </div>
         
-        <div class="simple-chart">
-            <!-- Upper Jaw -->
-            <div class="jaw-section upper">
-                <div class="jaw-title">UPPER</div>
-                <div class="teeth-row">
-                    <div class="quadrant right" id="upper-right"></div>
-                    <div class="divider"></div>
-                    <div class="quadrant left" id="upper-left"></div>
+        <div class="arch-chart">
+            <div class="mouth-container">
+                <!-- Upper Arch (Like looking down at upper jaw) -->
+                <div class="upper-arch">
+                    <div class="upper-teeth-row">
+                        <div class="arch-quadrant right" id="upper-right"></div>
+                        <div class="arch-divider-v"></div>
+                        <div class="arch-quadrant left" id="upper-left"></div>
+                    </div>
                 </div>
-                <div class="tooth-numbers">
-                    <span class="q-label">8 7 6 5 4 3 2 1</span>
-                    <span class="q-label">1 2 3 4 5 6 7 8</span>
+                
+                <!-- Bite Line Divider -->
+                <div class="arch-divider"></div>
+                
+                <!-- Lower Arch (Like looking up at lower jaw) -->
+                <div class="lower-arch">
+                    <div class="lower-teeth-row">
+                        <div class="arch-quadrant right" id="lower-right"></div>
+                        <div class="arch-divider-v"></div>
+                        <div class="arch-quadrant left" id="lower-left"></div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="bite-line"><span>— Bite Line —</span></div>
-            
-            <!-- Lower Jaw -->
-            <div class="jaw-section lower">
-                <div class="tooth-numbers">
-                    <span class="q-label">8 7 6 5 4 3 2 1</span>
-                    <span class="q-label">1 2 3 4 5 6 7 8</span>
-                </div>
-                <div class="teeth-row">
-                    <div class="quadrant right" id="lower-right"></div>
-                    <div class="divider"></div>
-                    <div class="quadrant left" id="lower-left"></div>
-                </div>
-                <div class="jaw-title">LOWER</div>
             </div>
         </div>
     </div>
