@@ -83,7 +83,7 @@
         $notifications = $query->orderBy('created_at', 'desc')->paginate(10)->appends(request()->query());
     @endphp
     
-    @if($notifications->count() > 0)
+    @if($notifications->isNotEmpty())
         <div class="space-y-3">
             @foreach($notifications as $notification)
                 <div class="border border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700 
