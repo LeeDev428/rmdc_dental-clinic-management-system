@@ -23,145 +23,172 @@ class AdminAppointment extends Controller
 
     public function handleAction(Request $request, $id, $action)
 {
-    // Find the appointment by its ID
-    $appointment = Appointment::findOrFail($id);
-
-    if ($action == 'decline') {
-    $request->validate([
-        'message' => 'required|string|max:255' // Admin's reason
-    ]);
-
-    $dateTime = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
-    $reason = $request->message;
-
-    $autoMessage = "We regret to inform you that your appointment scheduled for <strong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
-
-// Try to save auto-generated message (might fail if using MongoDB for messages)
-try {
-    Message::create([
-        'user_id' => $appointment->user_id,
-        'message' => $autoMessage,
-        'is_admin' => true,
-        'status' => 'unread'
-    ]);
-} catch (\Exception $e) {
-    Log::warning('Could not save message to messages table: ' . $e->getMessage());
-}
-
-// Save decline record
-DeclinedAppointment::create([
-    'appointment_id' => $appointment->id,
-    'user_id' => $appointment->user_id,
-    'decline_reason' => $reason,
-]);
-
-// Update appointment status
-$appointment->status = 'declined';
-$appointment->start = '2003-04-28 23:59';
-$appointment->end = '2003-04-28 23:59';
-$appointment->save();
-
-// Log appointment decline
-$this->logAppointmentActivity('declined', $appointment, [
-    'declined_by' => Auth::user()->name ?? 'Admin',
-    'reason' => $reason,
-    'description' => 'Appointment declined by admin',
-]);
-
-// Optional notification
-Notification::create([
-    'user_id' => $appointment->user_id,
-    'message' => "Your appointment has been declined. You may reschedule your appointment."
-]);
-
-// Load user relationship for email
-$appointment = $appointment->fresh('user');
-
-// Send email notification
-Log::info('About to send decline email', [
-    'appointment_id' => $appointment->id,
-    'user_id' => $appointment->user_id,
-    'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
-]);
-
-try {
-    if (!$appointment->user) {
-        throw new \Exception('User relationship is null');
-    }
-    Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'declined'));
-    Log::info('Decline email sent successfully', ['appointment_id' => $appointment->id]);
-} catch (\Exception $e) {
-    Log::error('Failed to send decline email: ' . $e->getMessage(), [
-        'appointment_id' => $appointment->id,
-        'trace' => $e->getTraceAsString()
-    ]);
-}
-
-try {
-    broadcast(new AppointmentStatusChanged($appointment));
-} catch (\Exception $e) {
-    Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
-}
-
-return redirect()->back()->with('success', 'Appointment declined successfully and message sent.');
-}
-
-
-    // Handle other actions (like accept)
-    if ($action === 'accept') {
-        $appointment->status = 'accepted';
-        $message = "Your appointment has been accepted.";
-    } else {
-        return redirect()->back()->with('error', 'Invalid action.');
-    }
-
-    // Save the updated appointment status (if needed)
-    $appointment->save();
-
-    // Log appointment acceptance
-    $this->logAppointmentActivity('accepted', $appointment, [
-        'accepted_by' => Auth::user()->name ?? 'Admin',
-        'description' => 'Appointment accepted by admin',
-    ]);
-
-    // Create a notification for the user
-    Notification::create([
-        'user_id' => $appointment->user_id,
-        'message' => $message,
-    ]);
-
-    // Load user relationship for email
-    $appointment = $appointment->fresh('user');
-
-    // Send email notification
-    Log::info('About to send acceptance email', [
-        'appointment_id' => $appointment->id,
-        'user_id' => $appointment->user_id,
-        'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
-    ]);
-    
     try {
-        if (!$appointment->user) {
-            throw new \Exception('User relationship is null');
+        // Find the appointment by its ID
+        $appointment = Appointment::findOrFail($id);
+
+        if ($action == 'decline') {
+            $request->validate([
+                'message' => 'required|string|max:255' // Admin's reason
+            ]);
+
+            $dateTime = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
+            $reason = $request->message;
+
+            $autoMessage = "We regret to inform you that your appointment scheduled for <strong>{$dateTime}</strong> has been declined due to <strong>{$reason}</strong>. Thank you for your understanding. You may reschedule your appointment at your convenience.";
+
+            // Try to save auto-generated message (might fail if using MongoDB for messages)
+            try {
+                Message::create([
+                    'user_id' => $appointment->user_id,
+                    'message' => $autoMessage,
+                    'is_admin' => true,
+                    'status' => 'unread'
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Could not save message to messages table: ' . $e->getMessage());
+            }
+
+            // Save decline record
+            DeclinedAppointment::create([
+                'appointment_id' => $appointment->id,
+                'user_id' => $appointment->user_id,
+                'decline_reason' => $reason,
+            ]);
+
+            // Update appointment status
+            $appointment->status = 'declined';
+            $appointment->start = '2003-04-28 23:59';
+            $appointment->end = '2003-04-28 23:59';
+            $appointment->save();
+
+            // Log appointment decline
+            $this->logAppointmentActivity('declined', $appointment, [
+                'declined_by' => Auth::user()->name ?? 'Admin',
+                'reason' => $reason,
+                'description' => 'Appointment declined by admin',
+            ]);
+
+            // Optional notification
+            try {
+                Notification::create([
+                    'user_id' => $appointment->user_id,
+                    'message' => "Your appointment has been declined. You may reschedule your appointment."
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Could not create notification: ' . $e->getMessage());
+            }
+
+            // Load user relationship for email
+            $appointment = $appointment->fresh('user');
+
+            // Send email notification
+            Log::info('About to send decline email', [
+                'appointment_id' => $appointment->id,
+                'user_id' => $appointment->user_id,
+                'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+            ]);
+
+            try {
+                if (!$appointment->user) {
+                    throw new \Exception('User relationship is null');
+                }
+                Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'declined'));
+                Log::info('Decline email sent successfully', ['appointment_id' => $appointment->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send decline email: ' . $e->getMessage(), [
+                    'appointment_id' => $appointment->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
+            try {
+                broadcast(new AppointmentStatusChanged($appointment));
+            } catch (\Exception $e) {
+                Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment declined successfully and message sent.'
+            ]);
         }
-        Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'accepted'));
-        Log::info('Acceptance email sent successfully', ['appointment_id' => $appointment->id]);
+
+        // Handle accept action
+        if ($action === 'accept') {
+            $appointment->status = 'accepted';
+            $appointment->save();
+
+            // Log appointment acceptance
+            $this->logAppointmentActivity('accepted', $appointment, [
+                'accepted_by' => Auth::user()->name ?? 'Admin',
+                'description' => 'Appointment accepted by admin',
+            ]);
+
+            // Create a notification for the user
+            try {
+                Notification::create([
+                    'user_id' => $appointment->user_id,
+                    'message' => "Your appointment has been accepted.",
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Could not create notification: ' . $e->getMessage());
+            }
+
+            // Load user relationship for email
+            $appointment = $appointment->fresh('user');
+
+            // Send email notification
+            Log::info('About to send acceptance email', [
+                'appointment_id' => $appointment->id,
+                'user_id' => $appointment->user_id,
+                'user_email' => $appointment->user ? $appointment->user->email : 'USER IS NULL'
+            ]);
+            
+            try {
+                if (!$appointment->user) {
+                    throw new \Exception('User relationship is null');
+                }
+                Mail::to($appointment->user->email)->send(new AppointmentStatusUpdated($appointment, 'accepted'));
+                Log::info('Acceptance email sent successfully', ['appointment_id' => $appointment->id]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send acceptance email: ' . $e->getMessage(), [
+                    'appointment_id' => $appointment->id,
+                    'trace' => $e->getTraceAsString()
+                ]);
+            }
+
+            // Broadcast the status change (optional)
+            try {
+                broadcast(new AppointmentStatusChanged($appointment));
+            } catch (\Exception $e) {
+                Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Appointment has been accepted.'
+            ]);
+        }
+
+        // Invalid action
+        return response()->json([
+            'success' => false,
+            'message' => 'Invalid action.'
+        ], 400);
+
     } catch (\Exception $e) {
-        Log::error('Failed to send acceptance email: ' . $e->getMessage(), [
-            'appointment_id' => $appointment->id,
+        Log::error('Error in handleAction: ' . $e->getMessage(), [
+            'appointment_id' => $id,
+            'action' => $action,
             'trace' => $e->getTraceAsString()
         ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while processing the appointment.'
+        ], 500);
     }
-
-    // Broadcast the status change (optional)
-    try {
-        broadcast(new AppointmentStatusChanged($appointment));
-    } catch (\Exception $e) {
-        Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
-    }
-
-    // Return a success message
-    return redirect()->back()->with('success', "Appointment has been {$action}ed.");
 }
 
 
