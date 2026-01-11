@@ -513,28 +513,67 @@ public function completedAppointments(Request $request)
 /**
  * Display cancellation requests page
  */
-public function cancellationRequests()
+public function cancellationRequests(Request $request)
 {
-    // Get cancelled appointments from appointment_cancellations table
-    $cancellations = \App\Models\AppointmentCancellation::with(['user', 'appointment'])
-        ->orderBy('processed_at', 'desc')
+    $query = \App\Models\AppointmentCancellation::with(['user', 'appointment']);
+    
+    // Filter by type (cancel or reschedule)
+    $type = $request->get('type', 'cancel');
+    $query->where('type', $type);
+    
+    // Search functionality
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->whereHas('user', function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        })->orWhereHas('appointment', function($q) use ($search) {
+            $q->where('procedure', 'like', "%{$search}%");
+        });
+    }
+    
+    // Date filter
+    if ($request->filled('date_from')) {
+        $query->whereDate('processed_at', '>=', $request->date_from);
+    }
+    
+    if ($request->filled('date_to')) {
+        $query->whereDate('processed_at', '<=', $request->date_to);
+    }
+    
+    // Status filter
+    if ($request->filled('status')) {
+        $query->whereHas('appointment', function($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+    }
+    
+    // Paginate results
+    $cancellations = $query->orderBy('processed_at', 'desc')->paginate(15);
+    
+    // Get statistics for cancel type
+    $cancelStats = \App\Models\AppointmentCancellation::where('type', 'cancel')
+        ->with('appointment')
         ->get();
     
-    // Get statistics
-    $pendingCancellations = $cancellations->filter(function($c) {
-        return $c->appointment->status === 'cancelled';
+    $cancelPending = $cancelStats->filter(fn($c) => $c->appointment->status === 'cancelled')->count();
+    $cancelToday = $cancelStats->filter(fn($c) => $c->processed_at->isToday())->count();
+    $cancelWeekly = $cancelStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
+    $cancelLate = $cancelStats->filter(function($c) {
+        $appointmentTime = \Carbon\Carbon::parse($c->appointment->start);
+        $hoursNotice = $c->processed_at->diffInHours($appointmentTime, false);
+        return $hoursNotice < 48 && $hoursNotice > 0;
     })->count();
     
-    $approvedToday = $cancellations->filter(function($c) {
-        return $c->processed_at->isToday();
-    })->count();
+    // Get statistics for reschedule type
+    $rescheduleStats = \App\Models\AppointmentCancellation::where('type', 'reschedule')
+        ->with('appointment')
+        ->get();
     
-    $weeklyTotal = $cancellations->filter(function($c) {
-        return $c->processed_at->isCurrentWeek();
-    })->count();
-    
-    // Late cancellations (less than 48 hours notice)
-    $lateCancellations = $cancellations->filter(function($c) {
+    $reschedulePending = $rescheduleStats->filter(fn($c) => $c->appointment->status !== 'cancelled')->count();
+    $rescheduleToday = $rescheduleStats->filter(fn($c) => $c->processed_at->isToday())->count();
+    $rescheduleWeekly = $rescheduleStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
+    $rescheduleLate = $rescheduleStats->filter(function($c) {
         $appointmentTime = \Carbon\Carbon::parse($c->appointment->start);
         $hoursNotice = $c->processed_at->diffInHours($appointmentTime, false);
         return $hoursNotice < 48 && $hoursNotice > 0;
@@ -542,10 +581,15 @@ public function cancellationRequests()
 
     return view('admin.cancellation-requests', compact(
         'cancellations',
-        'pendingCancellations',
-        'approvedToday',
-        'weeklyTotal',
-        'lateCancellations'
+        'type',
+        'cancelPending',
+        'cancelToday',
+        'cancelWeekly',
+        'cancelLate',
+        'reschedulePending',
+        'rescheduleToday',
+        'rescheduleWeekly',
+        'rescheduleLate'
     ));
 }
 
