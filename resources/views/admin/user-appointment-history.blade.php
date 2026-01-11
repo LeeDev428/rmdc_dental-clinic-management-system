@@ -413,7 +413,7 @@
 
         <!-- Pagination -->
         <div class="pagination">
-            {{ $appointments->links() }}
+            {{ $appointments->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     @endif
 </div>
