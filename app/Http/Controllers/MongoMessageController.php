@@ -143,8 +143,24 @@ class MongoMessageController extends Controller
         
         $messages = $messages->map(function($message) use ($users) {
             $messageArray = $message->toArray();
-            $messageArray['sender'] = $users->get($message->sender_id)?->only(['id', 'name', 'avatar']);
-            $messageArray['recipient'] = $users->get($message->recipient_id)?->only(['id', 'name', 'avatar']);
+            
+            $sender = $users->get($message->sender_id);
+            $recipient = $users->get($message->recipient_id);
+            
+            $messageArray['sender'] = $sender ? [
+                'id' => $sender->id,
+                'name' => $sender->name,
+                'avatar' => $sender->avatar,
+                'avatar_url' => $sender->avatar_url
+            ] : null;
+            
+            $messageArray['recipient'] = $recipient ? [
+                'id' => $recipient->id,
+                'name' => $recipient->name,
+                'avatar' => $recipient->avatar,
+                'avatar_url' => $recipient->avatar_url
+            ] : null;
+            
             return $messageArray;
         });
 
