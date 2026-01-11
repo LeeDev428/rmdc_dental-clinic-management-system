@@ -159,66 +159,76 @@
     </div>
 
     <!-- Automatically Display Notifications and Appointment Details in One Card -->
-    <div class="py-1 max-w-7xl mx-auto sm:px-6 lg:px-8">
-    <div class="invoice-container border border-gray-300 rounded-lg p-6 dark:bg-gray bg-gray shadow-md mt-6 relative">
-<br>
-<br>
-        <!-- Fixed Centered Image -->
-        <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="Logo"
-            class="absolute top-25 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20">
-    <br>
-        <!-- Invoice Header -->
-        <div class="text-center font-semibold text-3xl text-gray-800 mt-10">
-            <span class="text-blue-600">Your</span> Appointment
+    <div class="py-6 max-w-5xl mx-auto sm:px-6 lg:px-8">
+        <!-- Appointment Section with Clean Header -->
+        <div class="text-center mb-8">
+            <div class="flex justify-center mb-4">
+                <img src="{{ asset('img/dcms_iconmini(1).png') }}" alt="Logo" class="w-20 h-20">
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800">
+                <span class="text-blue-600">Your</span> Appointment Details
+            </h1>
+            <p class="text-sm text-gray-500 mt-2">Invoice and Payment Information</p>
         </div>
 
-        <div class="border border-gray-300 rounded-lg p-6 bg-gray  dark:bg-white shadow-md mt-6" id="billing-invoice">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-lg p-8" id="billing-invoice">
 
-            <!-- Invoice Title -->
-            <div class="flex justify-between items-center border-b pb-4">
+            <!-- Invoice Header -->
+            <div class="flex justify-between items-start border-b-2 border-gray-200 pb-6 mb-6">
                 <div>
-                    <h1 class="text-xl font-bold text-gray-700">Billing Invoice</h1>
-                    <br>
-                    <p class="text-sm text-gray-500">Issued on: {{ \Carbon\Carbon::now()->format('F j, Y') }}</p>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Billing Invoice</h2>
+                    <p class="text-sm text-gray-500">Issued: {{ \Carbon\Carbon::now()->format('F j, Y') }}</p>
                 </div>
                 <div class="text-right">
-                    <h2 class="text-lg font-semibold text-gray-700">
-                        INVOICE #{{ $appointments ? str_pad($appointments->id, 6, '0', STR_PAD_LEFT) : 'N/A' }}
-                    </h2>
-                    <br>
-                    <p class="text-sm text-gray-500">
-                        Status:
-                        <span class="px-2 py-1 text-[14px] font-semibold rounded-md
+                    <div class="text-sm text-gray-500 mb-2">Invoice Number</div>
+                    <h3 class="text-xl font-bold text-gray-800">
+                        #{{ $appointments ? str_pad($appointments->id, 6, '0', STR_PAD_LEFT) : 'N/A' }}
+                    </h3>
+                    <div class="mt-3">
+                        <span class="inline-flex px-3 py-1.5 text-xs font-semibold rounded-full
                         @if($appointments && $appointments->status == 'pending')
-                            bg-yellow-100 text-yellow-600
+                            bg-yellow-100 text-yellow-700 border border-yellow-300
                         @elseif($appointments && $appointments->status == 'accepted')
-                            bg-green-100 text-green-600
+                            bg-green-100 text-green-700 border border-green-300
                         @elseif($appointments && $appointments->status == 'declined')
-                            bg-red-100 text-red-600
+                            bg-red-100 text-red-700 border border-red-300
                         @else
-                            bg-gray-100 text-gray-600
+                            bg-gray-100 text-gray-700 border border-gray-300
                         @endif">
                         {{ $appointments ? ucfirst($appointments->status) : 'N/A' }}
                     </span>
-                    </p>
+                    </div>
                 </div>
             </div>
 
             <!-- Clinic & Patient Information -->
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="font-semibold text-gray-700 text-lg mb-2">RMDC - Robles Moncayo Dental Clinic</p>
-                    <p class="text-sm text-gray-600">Unit F Medina Bldg, Niog Elementary School</p>
-                    <p class="text-sm text-gray-600">Bacoor, Cavite, Philippines</p>
-                    <p class="text-sm text-gray-600 mt-2"><strong>Email:</strong> robles_moncayo@yahoo.com</p>
-                    <p class="text-sm text-gray-600"><strong>Phone:</strong> (+63) 912-3456-789</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                    <h4 class="text-sm font-semibold text-blue-800 uppercase tracking-wide mb-3">Clinic Information</h4>
+                    <p class="font-bold text-gray-800 text-base mb-2">RMDC - Robles Moncayo Dental Clinic</p>
+                    <p class="text-sm text-gray-600 leading-relaxed">Unit F Medina Bldg, Niog Elementary School<br>
+                    Bacoor, Cavite, Philippines</p>
+                    <div class="mt-4 space-y-1">
+                        <p class="text-sm text-gray-600"><span class="font-medium">Email:</span> robles_moncayo@yahoo.com</p>
+                        <p class="text-sm text-gray-600"><span class="font-medium">Phone:</span> (+63) 912-3456-789</p>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="font-semibold text-gray-700 mb-2">Patient Information</p>
-                    <p class="text-sm text-gray-600"><strong>Name:</strong> {{ auth()->user()->name ?? 'Unknown' }}</p>
-                    <p class="text-sm text-gray-600"><strong>Email:</strong> {{ auth()->user()->email ?? 'N/A' }}</p>
-                    <p class="text-sm text-gray-600 mt-2"><strong>Attending Doctor:</strong></p>
-                    <span id="doctor-name" class="text-sm text-gray-600"></span>
+                <div class="bg-green-50 p-5 rounded-lg border border-green-100">
+                    <h4 class="text-sm font-semibold text-green-800 uppercase tracking-wide mb-3">Patient Information</h4>
+                    <div class="space-y-2">
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase tracking-wide">Patient Name</span>
+                            <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->name ?? 'Unknown' }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase tracking-wide">Email Address</span>
+                            <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->email ?? 'N/A' }}</p>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 uppercase tracking-wide">Attending Doctor</span>
+                            <p id="doctor-name" class="text-sm font-semibold text-gray-800">Loading...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <script>
