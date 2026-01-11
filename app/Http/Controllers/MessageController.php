@@ -14,13 +14,44 @@ class MessageController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            // Find first admin user (usertype = 'admin')
-            $adminUser = User::where('usertype', 'admin')->first();
+            $currentUserId = Auth::id();
+            
+            // Find the admin this patient has been talking to (last message sender/recipient who is admin)
+            $lastAdminMessage = MongoMessage::where(function($query) use ($currentUserId) {
+                $query->where('sender_id', $currentUserId)
+                      ->orWhere('recipient_id', $currentUserId);
+            })
+            ->whereIn('sender_type', ['admin'])
+            ->orWhere(function($query) use ($currentUserId) {
+                $query->where('sender_id', $currentUserId)->where('sender_type', 'user');
+            })
+            ->orderBy('created_at', 'desc')
+            ->first();
+            
+            // Determine which admin to talk to
+            if ($lastAdminMessage) {
+                // Find the admin from the last message
+                $adminId = $lastAdminMessage->sender_type === 'admin' 
+                    ? $lastAdminMessage->sender_id 
+                    : $lastAdminMessage->recipient_id;
+                $adminUser = User::find($adminId);
+            }
+            
+            // Fallback: find any admin user
+            if (!isset($adminUser) || !$adminUser) {
+                $adminUser = User::where('usertype', 'admin')->first();
+            }
             
             if (!$adminUser) {
-                // Fallback to user with ID 1 if no admin found
+                // Last fallback to user with ID 1
                 $adminUser = User::find(1);
             }
+            
+            // Debug: Log the conversation participants
+            \Log::info('Patient conversation initialized', [
+                'patient_id' => Auth::id(),
+                'admin_id' => $adminUser->id
+            ]);
             
             // Fetch messages from MongoDB - conversation between patient and admin
             $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
@@ -31,49 +62,21 @@ class MessageController extends Controller
             \Log::info('Patient messages loaded', [
                 'patient_id' => Auth::id(),
                 'admin_id' => $adminUser->id,
-                'message_count' => $messages->count()
+                'message_count' => $messages->count(),
+                'sample_messages' => $messages->take(2)->map(fn($m) => [
+                    'sender' => $m->sender_id,
+                    'recipient' => $m->recipient_id,
+                    'message' => substr($m->message, 0, 20)
+                ])
             ]);
             
             // Manually attach user data
             $currentUser = Auth::user();
             $messages = $messages->map(function($msg) use ($adminUser, $currentUser) {
-                $msgData = is_array($msg) ? $msg : $msg->toArray();
-                
-                // Attach sender info
-                if ($msgData['sender_id'] == $currentUser->id) {
-                    $msgData['sender'] = [
-                        'id' => $currentUser->id,
-                        'name' => $currentUser->name,
-                        'avatar' => $currentUser->avatar,
-                        'avatar_url' => $currentUser->avatar_url
-                    ];
-                } else {
-                    $msgData['sender'] = [
-                        'id' => $adminUser->id,
-                        'name' => $adminUser->name,
-                        'avatar' => $adminUser->avatar,
-                        'avatar_url' => $adminUser->avatar_url
-                    ];
-                }
-                
-                // Attach recipient info
-                if ($msgData['recipient_id'] == $currentUser->id) {
-                    $msgData['recipient'] = [
-                        'id' => $currentUser->id,
-                        'name' => $currentUser->name,
-                        'avatar' => $currentUser->avatar,
-                        'avatar_url' => $currentUser->avatar_url
-                    ];
-                } else {
-                    $msgData['recipient'] = [
-                        'id' => $adminUser->id,
-                        'name' => $adminUser->name,
-                        'avatar' => $adminUser->avatar,
-                        'avatar_url' => $adminUser->avatar_url
-                    ];
-                }
-                
-                return (object) $msgData;
+                // Don't convert to array, work with model instance
+                $msg->sender = $msg->sender_id == $currentUser->id ? $currentUser : $adminUser;
+                $msg->recipient = $msg->recipient_id == $currentUser->id ? $currentUser : $adminUser;
+                return $msg;
             });
             
             // Retrieve the logged-in user's details
