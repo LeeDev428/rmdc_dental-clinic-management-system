@@ -124,7 +124,7 @@
                 <script>
                     function fetchUnreadMessagesCount() {
                         $.ajax({
-                            url: "/unread-messages-count",
+                            url: "{{ route('mongo.messages.unread-count') }}",
                             type: "GET",
                             dataType: "json",
                             success: function (response) {
@@ -144,22 +144,27 @@
                     }
 
                     function markMessagesAsRead() {
-                        $.ajax({
-                            url: "/mark-messages-as-read",
-                            type: "POST",
-                            data: { _token: "{{ csrf_token() }}" },
-                            success: function () {
-                                $("#message-count").addClass("hidden");
-                                window.location.href = "{{ route('messages.index') }}";
-                            },
-                            error: function (xhr) {
-                                console.error("Error marking messages as read:", xhr);
-                            }
-                        });
+                        // Just navigate to messages page - messages will be marked as read when viewed
+                        window.location.href = "{{ route('messages.index') }}";
                     }
 
-                    $(document).ready(fetchUnreadMessagesCount);
-                    setInterval(fetchUnreadMessagesCount, 5000);
+                    $(document).ready(function() {
+                        fetchUnreadMessagesCount();
+                        
+                        // Setup Pusher real-time updates
+                        @auth
+                        if (window.Echo) {
+                            window.Echo.channel('messages.{{ Auth::id() }}')
+                                .listen('.new.message', (data) => {
+                                    console.log('📨 New message notification received');
+                                    fetchUnreadMessagesCount();
+                                });
+                        }
+                        @endauth
+                    });
+                    
+                    // Backup polling every 30 seconds
+                    setInterval(fetchUnreadMessagesCount, 30000);
                 </script>
 
 
