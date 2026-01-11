@@ -73,6 +73,13 @@ class AdminMessageController extends Controller
            ->orderBy('created_at', 'asc')
            ->get();
        
+       // Debug: Log the count
+       \Log::info('Admin messages loaded', [
+           'admin_id' => auth()->id(),
+           'patient_id' => $selectedUser->id,
+           'message_count' => $messages->count()
+       ]);
+       
        // Manually attach user data
        $currentUser = auth()->user();
        $messages = $messages->map(function($msg) use ($selectedUser, $currentUser) {
