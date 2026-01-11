@@ -4,13 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ProcedurePrice;
+use App\Models\Rating;
 
 class WelcomeController extends Controller
 {
     public function index()
     {
         $procedures = ProcedurePrice::all(); // Fetch all dental procedures
-        return view('welcome', compact('procedures'));
+        $featuredReviews = Rating::with('user')
+            ->where('featured', true)
+            ->orderBy('created_at', 'desc')
+            ->limit(6)
+            ->get();
+            
+        return view('welcome', compact('procedures', 'featuredReviews'));
     }
     
     public function getServices(Request $request)
