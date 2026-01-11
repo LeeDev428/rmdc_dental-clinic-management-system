@@ -240,113 +240,135 @@
                     .catch(error => console.error("Error fetching admin:", error));
             </script>
 
-           <!-- Responsive Table Container -->
-        <div class="overflow-x-auto mt-6">
-            <table class="w-full border-collapse border border-gray-200 min-w-[600px]">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="border border-gray-200 px-4 py-2 text-left text-sm font-semibold text-gray-600">Description</th>
-                        <th class="border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-600">Details</th>
-                        <th class="border border-gray-200 px-4 py-2 text-right text-sm font-semibold text-gray-600">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="border border-gray-200">
-                        <td class="px-4 py-3 text-sm text-gray-700">
-                            <strong>{{ $appointments->procedure ?? 'N/A' }}</strong>
-                            <p class="text-xs text-gray-500 mt-1">Dental Procedure</p>
-                        </td>
-                        <td class="px-4 py-3 text-center text-sm text-gray-600">
-                            <p><strong>Date:</strong> {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('F j, Y') : 'N/A' }}</p>
-                            <p><strong>Time:</strong> {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('h:i A') : 'N/A' }} - {{ $appointments && $appointments->end ? \Carbon\Carbon::parse($appointments->end)->format('h:i A') : 'N/A' }}</p>
-                            <p><strong>Duration:</strong> <span id="estimated-time"></span></p>
-                        </td>
-                        <td class="px-4 py-3 text-right text-sm text-gray-700">
-                            ₱<span id="procedure-price"></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Payment Information -->
-        <div class="mt-6 border-t pt-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <p class="text-sm font-semibold text-gray-700 mb-2">Payment Information</p>
-                    <div class="space-y-1">
-                        <p class="text-sm text-gray-600">
-                            <strong>Payment Method:</strong> 
-                            @if($appointments && $appointments->payment_method)
-                                <span class="uppercase">{{ $appointments->payment_method }}</span>
-                            @else
-                                <span class="text-gray-400">N/A</span>
-                            @endif
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <strong>Payment Reference:</strong> 
-                            @if($appointments && $appointments->payment_reference)
-                                <span class="font-mono text-xs">{{ $appointments->payment_reference }}</span>
-                            @else
-                                <span class="text-gray-400">N/A</span>
-                            @endif
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <strong>Payment Status:</strong>
-                            @if($appointments && $appointments->payment_status)
-                                <span class="px-2 py-1 rounded text-xs font-semibold
-                                    {{ $appointments->payment_status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ strtoupper($appointments->payment_status) }}
-                                </span>
-                            @else
-                                <span class="text-gray-400">N/A</span>
-                            @endif
-                        </p>
-                        <p class="text-sm text-gray-600">
-                            <strong>Booked:</strong> {{ $appointments && $appointments->created_at ? $appointments->created_at->format('F j, Y h:i A') : 'N/A' }}
-                        </p>
-                    </div>
+            <!-- Procedure Details -->
+            <div class="mb-8">
+                <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Appointment Details</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 border-b-2 border-gray-200">
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Schedule & Duration</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-4 py-4">
+                                    <p class="text-sm font-semibold text-gray-800">{{ $appointments->procedure ?? 'N/A' }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">Dental Procedure</p>
+                                </td>
+                                <td class="px-4 py-4 text-center">
+                                    <div class="space-y-1">
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">Date:</span> 
+                                            {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('F j, Y') : 'N/A' }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">Time:</span> 
+                                            {{ $appointments && $appointments->start ? \Carbon\Carbon::parse($appointments->start)->format('g:i A') : 'N/A' }} - 
+                                            {{ $appointments && $appointments->end ? \Carbon\Carbon::parse($appointments->end)->format('g:i A') : 'N/A' }}
+                                        </p>
+                                        <p class="text-sm text-gray-600">
+                                            <span class="font-medium">Duration:</span> <span id="estimated-time" class="text-blue-600 font-semibold"></span>
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-right">
+                                    <p class="text-lg font-bold text-gray-800">₱<span id="procedure-price"></span></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                
-                <!-- Payment Breakdown -->
-                <div class="text-right">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Total Amount:</span>
-                                <span class="font-semibold text-gray-700">₱<span id="total-price"></span></span>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="mb-8">
+                <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Payment Information</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Payment Method</span>
+                                @if($appointments && $appointments->payment_method)
+                                    <span class="text-sm font-semibold text-gray-800 uppercase">{{ $appointments->payment_method }}</span>
+                                @else
+                                    <span class="text-sm text-gray-400">Not specified</span>
+                                @endif
                             </div>
-                            <div class="flex justify-between text-sm text-green-700">
-                                <span>Down Payment (20%):</span>
-                                <span class="font-semibold">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Reference ID</span>
+                                @if($appointments && $appointments->payment_reference)
+                                    <span class="text-xs font-mono text-gray-600">{{ $appointments->payment_reference }}</span>
+                                @else
+                                    <span class="text-sm text-gray-400">N/A</span>
+                                @endif
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-gray-300">
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Status</span>
+                                @if($appointments && $appointments->payment_status)
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                        {{ $appointments->payment_status === 'paid' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-yellow-100 text-yellow-700 border border-yellow-300' }}">
+                                        {{ strtoupper($appointments->payment_status) }}
+                                    </span>
+                                @else
+                                    <span class="text-sm text-gray-400">Pending</span>
+                                @endif
+                            </div>
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Booked On</span>
+                                <span class="text-sm font-medium text-gray-800">
+                                    {{ $appointments && $appointments->created_at ? $appointments->created_at->format('M j, Y g:i A') : 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Breakdown -->
+                    <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Total Amount</span>
+                                <span class="text-lg font-bold text-gray-800">₱<span id="total-price"></span></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-gray-700">Down Payment (20%)</span>
+                                <span class="text-lg font-semibold text-green-600">
                                     @if($appointments && $appointments->down_payment)
-                                        ₱{{ number_format($appointments->down_payment, 2) }}
+                                        - ₱{{ number_format($appointments->down_payment, 2) }}
                                     @else
-                                        <span class="text-gray-400">N/A</span>
+                                        <span class="text-gray-400 text-sm">N/A</span>
                                     @endif
                                 </span>
                             </div>
-                            <div class="border-t pt-2 flex justify-between text-sm text-orange-700">
-                                <span class="font-semibold">Balance Due:</span>
-                                <span class="font-bold">₱<span id="balance-due"></span></span>
+                            <div class="flex justify-between items-center pt-3 border-t-2 border-blue-200">
+                                <span class="text-base font-bold text-gray-800">Balance Due</span>
+                                <span class="text-2xl font-bold text-blue-600">₱<span id="balance-due"></span></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Export Button -->
+            <div class="mt-8 pt-6 border-t-2 border-gray-200 flex justify-center">
+                <button onclick="exportToPDF()" 
+                    class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Export as PDF
+                </button>
+            </div>
         </div>
-        
-        <!-- Export Button -->
-        <div class="mt-6 flex justify-end border-t pt-4">
-            <button onclick="exportToPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg flex items-center gap-2 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export as PDF
-            </button>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-sm text-gray-500">
+            <p>For inquiries, contact us at <a href="mailto:robles_moncayo@yahoo.com" class="text-blue-600 hover:underline font-medium">robles_moncayo@yahoo.com</a></p>
+            <p class="mt-1">RMDC - Robles Moncayo Dental Clinic &copy; {{ date('Y') }}</p>
         </div>
     </div>
-</div>
 
 
                 <script>
