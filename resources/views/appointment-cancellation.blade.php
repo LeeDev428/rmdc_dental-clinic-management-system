@@ -5,21 +5,8 @@
         </h2>
     </x-slot>
 
-    <style>
-        @keyframes slide-in {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .animate-slide-in {
-            animation: slide-in 0.3s ease-out;
-        }
-    </style>
+    <!-- Global Toast Notification Component -->
+    <x-toast-notification />
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -345,64 +332,7 @@
         </div>
     </div>
 
-    <style>
-        @keyframes slide-in {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        .animate-slide-in {
-            animation: slide-in 0.3s ease-out;
-        }
-    </style>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed top-4 right-4 z-50 hidden">
-        <div class="bg-white rounded-lg shadow-lg p-4 flex items-center gap-3 max-w-md">
-            <div id="toast-icon" class="flex-shrink-0"></div>
-            <div class="flex-1">
-                <p id="toast-message" class="text-sm font-medium text-gray-900"></p>
-            </div>
-            <button onclick="closeToast()" class="text-gray-400 hover:text-gray-600">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
     <script>
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const toastIcon = document.getElementById('toast-icon');
-            
-            toastMessage.textContent = message;
-            
-            if (type === 'success') {
-                toastIcon.innerHTML = '<svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-            } else if (type === 'error') {
-                toastIcon.innerHTML = '<svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-            }
-            
-            toast.classList.remove('hidden');
-            toast.classList.add('animate-slide-in');
-            
-            setTimeout(() => {
-                closeToast();
-            }, 5000);
-        }
-        
-        function closeToast() {
-            const toast = document.getElementById('toast');
-            toast.classList.add('hidden');
-        }
-
         let currentAppointmentId = null;
         let currentAppointmentTitle = null;
 
