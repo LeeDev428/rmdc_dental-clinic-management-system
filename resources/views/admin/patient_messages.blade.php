@@ -262,6 +262,11 @@
         font-size: 18px;
         color: #65676b;
     }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 </style>
 
 <div class="chat-container">
@@ -316,9 +321,9 @@
             
             <div class="messages-container" id="messagesContainer">
                 @foreach ($messages as $message)
-                    <div class="message-wrapper {{ $message->is_admin ? 'sent' : 'received' }}">
-                        @if(!$message->is_admin)
-                            <img src="{{ $selectedUser->avatar_url }}" 
+                    <div class="message-wrapper {{ $message->sender_id == Auth::id() ? 'sent' : 'received' }}">
+                        @if($message->sender_id != Auth::id())
+                            <img src="{{ $selectedUser->avatar_url ?? asset('img/default-dp.jpg') }}" 
                                  alt="{{ $selectedUser->name }}"
                                  onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
                                  class="message-avatar">
@@ -327,12 +332,12 @@
                         <div class="message-bubble">
                             <p class="message-content">{{ $message->message }}</p>
                             <div class="message-time">
-                                <span>• {{ $message->created_at->format('g:i A') }}</span>
+                                <span>• {{ $message->created_at instanceof \MongoDB\BSON\UTCDateTime ? $message->created_at->toDateTime()->setTimezone(new \DateTimeZone(config('app.timezone')))->format('g:i A') : \Carbon\Carbon::parse($message->created_at)->format('g:i A') }}</span>
                             </div>
                         </div>
                         
-                        @if($message->is_admin)
-                            <img src="{{ Auth::user()->avatar_url }}" 
+                        @if($message->sender_id == Auth::id())
+                            <img src="{{ Auth::user()->avatar_url ?? asset('img/default-dp.jpg') }}" 
                                  alt="{{ Auth::user()->name }}"
                                  onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
                                  class="message-avatar">
@@ -342,17 +347,18 @@
             </div>
             
             <div class="message-input-container">
-                <form action="{{ route('admin.messages.store') }}" method="POST" id="messageForm">
+                <form id="messageForm" onsubmit="sendMessage(event)">
                     @csrf
-                    <input type="hidden" name="user_id" value="{{ $selectedUser->id }}">
+                    <input type="hidden" name="user_id" id="recipientId" value="{{ $selectedUser->id }}">
                     <div class="message-input-wrapper">
                         <input type="text" 
                                name="message" 
+                               id="messageInput"
                                class="message-input" 
                                placeholder="Type your message..." 
                                required 
                                autocomplete="off">
-                        <button type="submit" class="send-button">
+                        <button type="submit" class="send-button" id="sendButton">
                             <svg viewBox="0 0 24 24">
                                 <path d="M16.6915026,12.4744748 L3.50612381,13.2599618 C3.19218622,13.2599618 3.03521743,13.4170592 3.03521743,13.5741566 L1.15159189,20.0151496 C0.8376543,20.8006365 0.99,21.89 1.77946707,22.52 C2.41,23.01 3.50612381,23.01 4.13399899,22.52 L22.3541541,12.8338182 C22.8,12.5178016 23.03521743,12.0490137 23.03521743,11.5802258 C23.03521743,11.1114379 22.8,10.6426499 22.3541541,10.3266333 L4.13399899,0.951697 C3.50612381,0.45471905 2.41,0.45471905 1.77946707,0.951697 C0.99,1.43997686 0.8376543,2.52933424 1.15159189,3.31482114 L3.03521743,9.75581416 C3.03521743,9.91291159 3.19218622,10.0700089 3.50612381,10.0700089 L16.6915026,10.8554959 C16.6915026,10.8554959 17.1573181,10.8554959 17.1573181,11.6649767 C17.1573181,12.4744748 16.6915026,12.4744748 16.6915026,12.4744748 Z"/>
                             </svg>
@@ -368,24 +374,142 @@
     </div>
 </div>
 
+@if ($selectedUser)
 <script>
+    const currentUserId = {{ Auth::id() }};
+    const selectedUserId = {{ $selectedUser->id }};
+    
     document.addEventListener("DOMContentLoaded", function() {
         const messagesContainer = document.getElementById("messagesContainer");
         if (messagesContainer) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
         
-        // Auto-scroll on new message
-        const messageForm = document.getElementById("messageForm");
-        if (messageForm) {
-            messageForm.addEventListener("submit", function() {
-                setTimeout(() => {
-                    if (messagesContainer) {
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        // Setup Pusher real-time listening
+        if (window.Echo) {
+            console.log('✅ Setting up Pusher listeners...');
+            
+            // Listen for new messages
+            window.Echo.channel(`messages.${currentUserId}`)
+                .listen('.new.message', (data) => {
+                    console.log('📨 New message received:', data);
+                    if (data.sender_id == selectedUserId) {
+                        addMessageToUI(data);
+                        scrollToBottom();
+                        markMessagesAsRead([data.id]);
                     }
-                }, 100);
-            });
+                });
+            
+            // Listen for message read receipts
+            window.Echo.channel(`messages.${currentUserId}`)
+                .listen('.message.read', (data) => {
+                    console.log('✓✓ Message read:', data);
+                });
         }
     });
+    
+    // Add message to UI
+    function addMessageToUI(msg) {
+        const container = document.getElementById('messagesContainer');
+        const isSent = msg.sender_id == currentUserId;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-wrapper ${isSent ? 'sent' : 'received'}`;
+        messageDiv.style.animation = 'fadeIn 0.3s ease-in';
+        
+        const avatar = isSent 
+            ? '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}'
+            : '{{ $selectedUser->avatar_url ?? asset("img/default-dp.jpg") }}';
+        
+        const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+            ${!isSent ? `<img src="${avatar}" alt="Avatar" class="message-avatar" onerror="this.src='{{ asset('img/default-dp.jpg') }}'">` : ''}
+            <div class="message-bubble">
+                <p class="message-content">${escapeHtml(msg.message)}</p>
+                <div class="message-time">
+                    <span>• ${time}</span>
+                </div>
+            </div>
+            ${isSent ? `<img src="${avatar}" alt="Avatar" class="message-avatar" onerror="this.src='{{ asset('img/default-dp.jpg') }}'">` : ''}
+        `;
+        
+        container.appendChild(messageDiv);
+    }
+    
+    // Send message via AJAX to MongoDB
+    function sendMessage(event) {
+        event.preventDefault();
+        
+        const input = document.getElementById('messageInput');
+        const button = document.getElementById('sendButton');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        button.disabled = true;
+        
+        fetch('/mongo-messages/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                message: message,
+                recipient_id: selectedUserId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addMessageToUI(data.message);
+                input.value = '';
+                scrollToBottom();
+            }
+        })
+        .catch(error => {
+            console.error('Error sending message:', error);
+            alert('Failed to send message. Please try again.');
+        })
+        .finally(() => {
+            button.disabled = false;
+            input.focus();
+        });
+    }
+    
+    // Mark messages as read
+    function markMessagesAsRead(messageIds) {
+        fetch('/mongo-messages/mark-read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                message_ids: messageIds
+            })
+        })
+        .then(response => response.json())
+        .catch(error => console.error('Error marking messages as read:', error));
+    }
+    
+    // Scroll to bottom
+    function scrollToBottom() {
+        const container = document.getElementById('messagesContainer');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+    
+    // Escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 </script>
+@endif
 @endsection
