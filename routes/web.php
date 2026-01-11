@@ -248,14 +248,12 @@
         Route::post('/mark-notifications-as-read', [NotificationController::class, 'markAsRead']);
 
 
-        //chat
-        Route::get('/admin/messages', [AdminMessageController::class, 'index'])->name('admin.patient_messages');
-
+        //chat - MongoDB real-time messaging
+        Route::get('/admin/messages', [AdminMessageController::class, 'index'])->name('admin.messages');
+        Route::get('/admin/patient_messages', [AdminMessageController::class, 'index'])->name('admin.patient_messages');
+        
         // Route to store admin responses
-        Route::get('/messages/{user}', [AdminMessageController::class, 'showMessages'])->name('admin.messages.show');
-        Route::get('/admin/messages', [AdminMessageController::class, 'index1'])->name('admin.messages');
-    Route::post('/admin/messages', [AdminMessageController::class, 'store'])->name('admin.messages.store');
-    Route::get('/admin/view-messages', [AdminMessageController::class, 'index'])->name('admin.patient_messages');
+        Route::post('/admin/messages', [AdminMessageController::class, 'store'])->name('admin.messages.store');
     });
 
 
