@@ -26,6 +26,41 @@ class AdminMessageController extends Controller
 
    // Retrieve users
    $users = $query->get();
+   
+   // Attach last message from MongoDB to each user
+   $currentUserId = auth()->id();
+   $users = $users->map(function($user) use ($currentUserId) {
+       $userData = $user->toArray();
+       
+       // Get last message between admin and this user from MongoDB
+       $lastMessage = MongoMessage::where(function($query) use ($user, $currentUserId) {
+           $query->where(function($q) use ($user, $currentUserId) {
+               $q->where('sender_id', $currentUserId)
+                 ->where('recipient_id', $user->id);
+           })->orWhere(function($q) use ($user, $currentUserId) {
+               $q->where('sender_id', $user->id)
+                 ->where('recipient_id', $currentUserId);
+           });
+       })
+       ->orderBy('created_at', 'desc')
+       ->first();
+       
+       // Attach MongoDB message data
+       if ($lastMessage) {
+           $userData['last_message'] = $lastMessage->message;
+           $userData['last_message_time'] = $lastMessage->created_at;
+       } else {
+           $userData['last_message'] = null;
+           $userData['last_message_time'] = null;
+       }
+       
+       return (object) $userData;
+   });
+   
+   // Sort users by last message time
+   $users = collect($users)->sortByDesc(function($user) {
+       return $user->last_message_time ?? '1970-01-01';
+   })->values();
 
    $messages = [];
    $selectedUser = null;
