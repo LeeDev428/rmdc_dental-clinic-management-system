@@ -12,41 +12,29 @@ use App\Events\MessageRead;
 class MongoMessageController extends Controller
 {
     /**
-     * Get all messages for current user's conversation
+     * Show admin real-time messages view
      */
-    public function index(Request $request)
+    public function adminIndex(Request $request)
     {
-        $user = Auth::user();
+        $selectedUserId = $request->get('user_id');
+        $selectedUser = null;
         
-        if ($user->is_admin) {
-            // Admin view: Get user to chat with
-            $selectedUserId = $request->get('user_id');
-            
-            if ($selectedUserId) {
-                $messages = MongoMessage::conversation($user->id, $selectedUserId)
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-                    
-                $selectedUser = User::find($selectedUserId);
-            } else {
-                $messages = collect();
-                $selectedUser = null;
-            }
-            
-            // Get all users with messages
-            $users = User::where('is_admin', 0)->get();
-            
-            return view('admin.patient_messages', compact('messages', 'selectedUser', 'users'));
-        } else {
-            // Patient view: Chat with admin
-            $adminUser = User::where('is_admin', 1)->first();
-            
-            $messages = MongoMessage::conversation($user->id, $adminUser->id)
-                ->orderBy('created_at', 'asc')
-                ->get();
-                
-            return view('messages.index', compact('messages', 'selectedUser' => $adminUser));
+        if ($selectedUserId) {
+            $selectedUser = User::find($selectedUserId);
         }
+        
+        // Get all patients (non-admin users)
+        $users = User::where('is_admin', 0)->get();
+        
+        return view('admin.patient_messages_realtime', compact('selectedUser', 'users'));
+    }
+    
+    /**
+     * Show patient real-time messages view
+     */
+    public function patientIndex()
+    {
+        return view('messages.index_realtime');
     }
 
     /**
