@@ -154,11 +154,24 @@
                         // Setup Pusher real-time updates
                         @auth
                         if (window.Echo) {
-                            window.Echo.channel('messages.{{ Auth::id() }}')
-                                .listen('.new.message', (data) => {
-                                    console.log('📨 New message notification received');
-                                    fetchUnreadMessagesCount();
-                                });
+                            const channel = window.Echo.channel('messages.{{ Auth::id() }}');
+                            
+                            // Listen for new messages
+                            channel.listen('.new.message', (data) => {
+                                console.log('📨 New message notification received');
+                                fetchUnreadMessagesCount();
+                            });
+                            
+                            // Listen for unread count updates (real-time)
+                            channel.listen('.unread.count.updated', (data) => {
+                                console.log('🔔 Unread count updated:', data.unread_count);
+                                let badge = $("#message-count");
+                                if (data.unread_count > 0) {
+                                    badge.text(data.unread_count).removeClass("hidden");
+                                } else {
+                                    badge.addClass("hidden");
+                                }
+                            });
                         }
                         @endauth
                     });
