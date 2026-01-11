@@ -191,7 +191,7 @@
         
         <!-- Pagination -->
         <div class="pagination">
-            {{ $feedbacks->links() }}
+            {{ $feedbacks->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     </div>
 </div>
