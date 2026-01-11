@@ -6,8 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Appointment;
+use App\Services\InvoicePdfGenerator;
 
 class AppointmentStatusUpdated extends Mailable
 {
@@ -58,6 +60,18 @@ class AppointmentStatusUpdated extends Mailable
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
+    public function attachments(): array
+    {
+        // Only attach invoice for accepted appointments
+        if ($this->action === 'accepted') {
+            return [
+                Attachment::fromData(fn () => InvoicePdfGenerator::generateAsString($this->appointment), InvoicePdfGenerator::getFilename($this->appointment))
+                    ->withMime('application/pdf'),
+            ];
+        }
+
+        return [];
+    }
     public function attachments(): array
     {
         return [];
