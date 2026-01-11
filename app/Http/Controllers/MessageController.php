@@ -82,8 +82,8 @@ class MessageController extends Controller
             // Retrieve the logged-in user's details
             $selectedUser = Auth::user();  // Fetch the currently authenticated user (patient)
             
-            // Pass both messages and the selected user to the view
-            return view('messages.index', compact('messages', 'selectedUser'));
+            // Pass messages, selected user, and admin user to the view
+            return view('messages.index', compact('messages', 'selectedUser', 'adminUser'));
         } else {
             return redirect()->route('login')->with('error', 'Please log in to view your messages.');
         }
