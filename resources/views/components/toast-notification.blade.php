@@ -47,7 +47,7 @@
 
 <script>
     // Global Toast Notification Functions
-    window.showToast = function(message, type = 'success', duration = 5000) {
+    window.showToast = function(message, type = 'success', duration = 8000) {
         const toast = document.getElementById('toast-notification');
         const toastMessage = document.getElementById('toast-notification-message');
         const toastIcon = document.getElementById('toast-notification-icon');
