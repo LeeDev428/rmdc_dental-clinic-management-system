@@ -17,7 +17,8 @@ class NewMessage implements ShouldBroadcast
 
     public function __construct(MongoMessage $message)
     {
-        $this->message = $message->load(['sender', 'recipient']);
+        // Don't load relationships - they'll be attached by the controller
+        $this->message = $message;
     }
 
     public function broadcastOn()
