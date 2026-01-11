@@ -134,9 +134,19 @@ class MongoMessageController extends Controller
         $user = Auth::user();
         
         $messages = MongoMessage::conversation($user->id, $request->user_id)
-            ->with(['sender', 'recipient'])
             ->orderBy('created_at', 'asc')
             ->get();
+
+        // Manually attach user data for each message
+        $userIds = $messages->pluck('sender_id')->merge($messages->pluck('recipient_id'))->unique();
+        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
+        
+        $messages = $messages->map(function($message) use ($users) {
+            $messageArray = $message->toArray();
+            $messageArray['sender'] = $users->get($message->sender_id)?->only(['id', 'name', 'avatar']);
+            $messageArray['recipient'] = $users->get($message->recipient_id)?->only(['id', 'name', 'avatar']);
+            return $messageArray;
+        });
 
         return response()->json([
             'success' => true,
