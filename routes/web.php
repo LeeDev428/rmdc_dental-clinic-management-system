@@ -335,6 +335,7 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
 
     Route::get('/unread-messages-count', [MessageController::class, 'unreadMessagesCount'])->middleware('auth');
     Route::post('/mark-messages-as-read', [MessageController::class, 'markMessagesAsRead'])->middleware('auth');
+    Route::post('/ratings', [RatingController::class, 'store'])->middleware('auth')->name('ratings.store');
     Route::get('/admin/unread-messages-count', [MessageController::class, 'getUnreadMessagesCount']);
     Route::post('/admin/mark-messages-read', [MessageController::class, 'markMessagesAsReadAdmin']);
 
@@ -390,8 +391,6 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     // Facebook Required Pages
     Route::get('/privacy-policy', [PrivacyPolicyController::class, 'show'])->name('privacy.policy');
     Route::get('/user-data-deletion', [UserDataDeletionController::class, 'show'])->name('user.data.deletion');
-
-    Route::post('/ratings', [RatingController::class, 'store'])->name('ratings.store');
 
 
 
