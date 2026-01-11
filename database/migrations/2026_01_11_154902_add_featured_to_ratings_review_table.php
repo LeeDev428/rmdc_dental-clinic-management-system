@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ratings_review', function (Blueprint $table) {
-            //
+            $table->boolean('featured')->default(false)->after('message');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('ratings_review', function (Blueprint $table) {
-            //
+            $table->dropColumn('featured');
         });
     }
 };
