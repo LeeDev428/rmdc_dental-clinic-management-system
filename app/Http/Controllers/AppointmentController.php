@@ -574,4 +574,37 @@ $endTime = $startTime->copy()->addMinutes($duration);
             ->header('Content-Type', 'text/html')
             ->header('Content-Disposition', 'inline; filename="invoice-' . $appointment->id . '.html"');
     }
+
+    /**
+     * Get invoice data for PDF generation (AJAX endpoint)
+     */
+    public function getInvoiceData($id)
+    {
+        $appointment = Appointment::with('user')->findOrFail($id);
+        
+        // Verify user owns this appointment
+        if ($appointment->user_id !== Auth::id() && !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+        
+        // Get procedure details
+        $procedurePrice = ProcedurePrice::where('procedure_name', $appointment->procedure)->first();
+        
+        return response()->json([
+            'id' => $appointment->id,
+            'patient_name' => $appointment->user->name,
+            'patient_email' => $appointment->user->email,
+            'procedure' => $appointment->procedure,
+            'appointment_date' => \Carbon\Carbon::parse($appointment->start)->format('F j, Y'),
+            'appointment_time' => \Carbon\Carbon::parse($appointment->start)->format('g:i A') . ' - ' . \Carbon\Carbon::parse($appointment->end)->format('g:i A'),
+            'duration' => $procedurePrice ? $procedurePrice->duration : 'N/A',
+            'price' => $appointment->total_price ?? ($procedurePrice ? $procedurePrice->price : 0),
+            'down_payment' => $appointment->down_payment ?? 0,
+            'payment_method' => $appointment->payment_method,
+            'payment_reference' => $appointment->payment_reference,
+            'payment_status' => $appointment->payment_status,
+            'status' => $appointment->status,
+            'created_at' => $appointment->created_at->format('M j, Y g:i A'),
+        ]);
+    }
 }
