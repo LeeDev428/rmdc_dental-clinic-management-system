@@ -118,8 +118,9 @@ class AdminMessageController extends Controller
    }
    
    $pendingCount = Appointment::where('status', 'pending')->count();
+   $mongoUnavailable = !$this->isMongoAvailable();
    
-   return view('admin.patient_messages', compact('users', 'messages', 'selectedUser', 'pendingCount'));
+   return view('admin.patient_messages', compact('users', 'messages', 'selectedUser', 'pendingCount', 'mongoUnavailable'));
 }
 
     // OLD MYSQL METHODS - DEPRECATED - Use MongoDB methods above
