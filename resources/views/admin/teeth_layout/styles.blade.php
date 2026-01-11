@@ -120,8 +120,8 @@
 
 /* Divider between arches */
 .arch-divider {
-    height: 6px;
-    background: #f87171;
+    height: 20px;
+    background: transparent;
     margin: 0;
     position: relative;
 }
@@ -131,7 +131,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #fff;
+    background: #f5f5f5;
     padding: 4px 16px;
     font-size: 11px;
     color: #94a3b8;
@@ -144,13 +144,12 @@
 .arch-quadrant {
     display: flex;
     gap: 2px;
-    align-items: flex-end;
 }
 .upper-arch .arch-quadrant {
-    align-items: flex-end;
+    align-items: flex-start;
 }
 .lower-arch .arch-quadrant {
-    align-items: flex-start;
+    align-items: flex-end;
 }
 .arch-quadrant.right { 
     flex-direction: row-reverse; 
