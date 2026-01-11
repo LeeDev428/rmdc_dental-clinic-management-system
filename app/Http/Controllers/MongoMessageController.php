@@ -49,7 +49,7 @@ class MongoMessageController extends Controller
 
         $user = Auth::user();
 
-        // Create message in MongoDB
+        // Create message in MongoDB with proper timezone
         $message = MongoMessage::create([
             'sender_id' => $user->id,
             'recipient_id' => $request->recipient_id,
@@ -57,6 +57,7 @@ class MongoMessageController extends Controller
             'sender_type' => $user->usertype === 'admin' ? 'admin' : 'user',
             'is_read' => false,
             'attachments' => $request->attachments ?? [],
+            'created_at' => new \MongoDB\BSON\UTCDateTime(now()->timestamp * 1000),
         ]);
 
         // Manually attach user data (can't use Eloquent relationships across databases)
