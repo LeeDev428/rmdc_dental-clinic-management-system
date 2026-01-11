@@ -559,6 +559,7 @@ window.onclick = function(event) {
                     </div>
                 </div>
                 @endif
+                @endif
                 
                 <div id="calendar" style="max-width: 900px; margin: auto; {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'opacity: 0.5; pointer-events: none;' : '' }}"></div>
 
