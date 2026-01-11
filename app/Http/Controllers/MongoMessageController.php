@@ -86,6 +86,13 @@ class MongoMessageController extends Controller
         // Broadcast the message via Pusher
         broadcast(new NewMessage($message))->toOthers();
 
+        // Broadcast unread count update to recipient
+        $recipientUnreadCount = MongoMessage::where('recipient_id', $request->recipient_id)
+            ->where('is_read', false)
+            ->count();
+        
+        broadcast(new \App\Events\UnreadCountUpdated($request->recipient_id, $recipientUnreadCount));
+
         return response()->json([
             'success' => true,
             'message' => $messageData,
@@ -141,6 +148,9 @@ class MongoMessageController extends Controller
         $unreadCount = MongoMessage::where('recipient_id', $user->id)
             ->where('is_read', false)
             ->count();
+
+        // Broadcast unread count update
+        broadcast(new \App\Events\UnreadCountUpdated($user->id, $unreadCount));
 
         return response()->json([
             'success' => true,
