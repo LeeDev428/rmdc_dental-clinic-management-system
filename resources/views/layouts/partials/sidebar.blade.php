@@ -33,7 +33,7 @@
             </a>
             <a class="nav-link" href="{{ route('admin.cancellation.requests') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-ban"></i></div>
-                Cancel/Resched Requests
+                Cancellation Requests
                 <span id="sidebarCancellationBadge" class="badge bg-secondary ms-2">0</span>
             </a>
             <a class="nav-link" href="{{ route('admin.reschedule.requests') }}">
