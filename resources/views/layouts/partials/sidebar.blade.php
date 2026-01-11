@@ -120,11 +120,24 @@ function updateSidebarUnreadMessagesCount() {
 // Setup Pusher real-time listener for new messages
 @auth
 if (window.Echo) {
-    window.Echo.channel('messages.{{ Auth::id() }}')
-        .listen('.new.message', (data) => {
-            console.log('📨 New message notification - updating badge');
-            updateSidebarUnreadMessagesCount();
-        });
+    const channel = window.Echo.channel('messages.{{ Auth::id() }}');
+    
+    // Listen for new messages
+    channel.listen('.new.message', (data) => {
+        console.log('📨 New message notification - updating badge');
+        updateSidebarUnreadMessagesCount();
+    });
+    
+    // Listen for unread count updates (real-time)
+    channel.listen('.unread.count.updated', (data) => {
+        console.log('🔔 Admin: Unread count updated:', data.unread_count);
+        let badge = $("#sidebarUnreadMessagesBadge");
+        if (data.unread_count > 0) {
+            badge.text(data.unread_count).removeClass("bg-secondary").addClass("bg-danger");
+        } else {
+            badge.text("0").removeClass("bg-danger").addClass("bg-secondary");
+        }
+    });
 }
 @endauth
 
