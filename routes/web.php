@@ -149,6 +149,7 @@
     // Patient Dental Records
     Route::get('/my-dental-records', [PatientDentalRecordController::class, 'index'])->name('patient.dental_records');
     Route::get('/my-dental-records/{id}', [PatientDentalRecordController::class, 'show'])->name('patient.dental_record.show');
+    Route::get('/patient/teeth-chart/{patientId}', [PatientDentalRecordController::class, 'getTeethChart'])->name('patient.teeth_chart');
     
     // Appointment History
     Route::get('/appointment-history', [AppointmentHistoryController::class, 'index'])->name('appointment.history');
