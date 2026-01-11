@@ -24,7 +24,7 @@ class MongoMessageController extends Controller
         }
         
         // Get all patients (non-admin users)
-        $users = User::where('is_admin', 0)->get();
+        $users = User::where('usertype', '!=', 'admin')->get();
         
         return view('admin.patient_messages_realtime', compact('selectedUser', 'users'));
     }
@@ -54,17 +54,31 @@ class MongoMessageController extends Controller
             'sender_id' => $user->id,
             'recipient_id' => $request->recipient_id,
             'message' => $request->message,
-            'sender_type' => $user->is_admin ? 'admin' : 'user',
+            'sender_type' => $user->usertype === 'admin' ? 'admin' : 'user',
             'is_read' => false,
             'attachments' => $request->attachments ?? [],
         ]);
+
+        // Manually attach user data (can't use Eloquent relationships across databases)
+        $recipient = User::find($request->recipient_id);
+        $messageData = $message->toArray();
+        $messageData['sender'] = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'avatar' => $user->avatar,
+        ];
+        $messageData['recipient'] = [
+            'id' => $recipient->id,
+            'name' => $recipient->name,
+            'avatar' => $recipient->avatar,
+        ];
 
         // Broadcast the message via Pusher
         broadcast(new NewMessage($message))->toOthers();
 
         return response()->json([
             'success' => true,
-            'message' => $message->load(['sender', 'recipient']),
+            'message' => $messageData,
         ]);
     }
 
@@ -135,11 +149,11 @@ class MongoMessageController extends Controller
      */
     public function getUserList()
     {
-        if (!Auth::user()->is_admin) {
+        if (Auth::user()->usertype !== 'admin') {
             abort(403);
         }
 
-        $users = User::where('is_admin', 0)
+        $users = User::where('usertype', '!=', 'admin')
             ->withCount(['mongoMessages as unread_count' => function ($query) {
                 $query->where('recipient_id', Auth::id())
                       ->where('is_read', false);
