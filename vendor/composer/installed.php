@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => 'a8708af19ea0c16f9d8e97d0788672110eeff8f2',
+        'reference' => 'e6d7e322fe0dc0afa44617df5517cfae68150ac9',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -604,6 +604,12 @@
             'aliases' => array(),
             'dev_requirement' => true,
         ),
+        'jenssegers/mongodb' => array(
+            'dev_requirement' => false,
+            'replaced' => array(
+                0 => '5.1.1',
+            ),
+        ),
         'kodova/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
@@ -649,7 +655,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => 'a8708af19ea0c16f9d8e97d0788672110eeff8f2',
+            'reference' => 'e6d7e322fe0dc0afa44617df5517cfae68150ac9',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -807,6 +813,24 @@
             'install_path' => __DIR__ . '/../mockery/mockery',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'mongodb/laravel-mongodb' => array(
+            'pretty_version' => '5.1.1',
+            'version' => '5.1.1.0',
+            'reference' => 'cc7e5ffd0e8e3a9acfebd7aa5a5aabac2fc5eac4',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mongodb/laravel-mongodb',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'mongodb/mongodb' => array(
+            'pretty_version' => '1.19.1',
+            'version' => '1.19.1.0',
+            'reference' => 'afe425b629075fa597fa2d5645045cb20dc93d95',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../mongodb/mongodb',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'monolog/monolog' => array(
             'pretty_version' => '3.7.0',
@@ -1622,6 +1646,15 @@
             'reference' => '60328e362d4c2c802a54fcbf04f9d3fb892b4cf8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/polyfill-php80',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'symfony/polyfill-php81' => array(
+            'pretty_version' => 'v1.33.0',
+            'version' => '1.33.0.0',
+            'reference' => '4a4cfc2d253c21a5ad0e53071df248ed48c6ce5c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/polyfill-php81',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
