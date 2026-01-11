@@ -35,11 +35,15 @@ class NewMessage implements ShouldBroadcast
 
     public function broadcastWith()
     {
+        // Load sender data from MySQL
+        $sender = \App\Models\User::find($this->message->sender_id);
+        
         return [
             'id' => (string) $this->message->_id,
             'message' => $this->message->message,
             'sender_id' => $this->message->sender_id,
-            'sender_name' => $this->message->sender->name ?? 'Unknown',
+            'sender_name' => $sender ? $sender->name : 'Unknown',
+            'sender_avatar' => $sender ? $sender->avatar_url : null,
             'sender_type' => $this->message->sender_type,
             'is_read' => $this->message->is_read,
             'created_at' => $this->message->created_at->toIso8601String(),
