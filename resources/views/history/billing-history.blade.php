@@ -195,7 +195,7 @@
         </div>
         
         <div class="mt-6">
-            {{ $billingHistory->links() }}
+            {{ $billingHistory->appends(request()->query())->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
         
         <!-- Summary Card -->
