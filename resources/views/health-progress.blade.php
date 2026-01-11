@@ -373,7 +373,7 @@
     
     <!-- Search and Filter for Timeline -->
     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
-        <form method="GET" action="{{ route('health-progress') }}" class="flex flex-wrap gap-3">
+        <form method="GET" action="{{ route('health.progress') }}" class="flex flex-wrap gap-3">
             <input type="text" name="timeline_search" value="{{ request('timeline_search') }}" 
                    placeholder="Search treatments..." 
                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 flex-1 min-w-[200px]">
@@ -396,7 +396,7 @@
             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 <i class="fas fa-search mr-1"></i>Search
             </button>
-            <a href="{{ route('health-progress') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+            <a href="{{ route('health.progress') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
                 <i class="fas fa-redo mr-1"></i>Reset
             </a>
         </form>
