@@ -27,6 +27,17 @@
                 <div class="flex flex-col h-[calc(100vh-200px)]"> <!-- Ensuring full height with input form at the bottom -->
                     <!-- Chat Messages Container -->
                     <div id="message-container" class="flex-1 overflow-y-auto p-6 space-y-3 bg-gray-100 dark:bg-gray-800 rounded-t-lg border border-gray-300 dark:border-gray-700">
+                        
+                        <!-- Typing indicator -->
+                        <div id="typing-indicator" class="hidden flex items-center space-x-2 text-gray-600 dark:text-gray-400 text-sm mb-2">
+                            <div class="flex space-x-1">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0s;"></div>
+                                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s;"></div>
+                                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.4s;"></div>
+                            </div>
+                            <span>Admin is typing...</span>
+                        </div>
+                        
 @if($messages->isEmpty())
     <!-- Empty State -->
     <div class="flex flex-col items-center justify-center h-full text-center py-12">
@@ -110,14 +121,77 @@
             alert('Error: No admin available to chat with. Please contact support.');
         }
         
+        let typingTimer;
+        const typingTimeout = 3000; // 3 seconds
+        let isTyping = false;
+        
         document.addEventListener('DOMContentLoaded', function () {
             const messageContainer = document.getElementById('message-container');
+            const messageInput = document.getElementById('messageInput');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
             // Scroll to the bottom of the message container
             messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            // Mark all unread messages as read when page loads
+            const unreadMessages = [];
+            @foreach ($messages as $message)
+                @if($message->recipient_id == Auth::id() && !$message->is_read)
+                    unreadMessages.push('{{ $message->_id }}');
+                @endif
+            @endforeach
+            
+            if (unreadMessages.length > 0) {
+                console.log('Marking', unreadMessages.length, 'messages as read');
+                markMessagesAsRead(unreadMessages);
+            }
+            
+            // Typing indicator - send typing status
+            messageInput.addEventListener('input', function() {
+                if (!isTyping) {
+                    isTyping = true;
+                    sendTypingStatus(true);
+                }
+                
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    isTyping = false;
+                    sendTypingStatus(false);
+                }, typingTimeout);
+            });
+            
+            // Send typing status to server
+            function sendTypingStatus(typing) {
+                fetch('/mongo-messages/typing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    },
+                    body: JSON.stringify({
+                        recipient_id: adminUserId,
+                        typing: typing
+                    })
+                }).catch(err => console.error('Error sending typing status:', err));
+            }
             
             // Setup Pusher real-time listeners
             if (window.Echo) {
                 console.log('✅ Setting up Pusher listeners for patient...');
+                
+                // Listen for typing events
+                window.Echo.channel(`messages.${currentUserId}`)
+                    .listen('.user.typing', (data) => {
+                        console.log('Typing event received:', data);
+                        if (data.sender_id == adminUserId) {
+                            if (data.typing) {
+                                typingIndicator.classList.remove('hidden');
+                                messageContainer.scrollTop = messageContainer.scrollHeight;
+                            } else {
+                                typingIndicator.classList.add('hidden');
+                            }
+                        }
+                    });
                 
                 // Listen for new messages from admin
                 window.Echo.channel(`messages.${currentUserId}`)
@@ -255,6 +329,11 @@
                 })
             })
             .then(response => response.json())
+            .then(data => {
+                if (data.success && data.unread_count !== undefined) {
+                    console.log('Messages marked as read. Unread count:', data.unread_count);
+                }
+            })
             .catch(error => console.error('Error marking messages as read:', error));
         }
         
