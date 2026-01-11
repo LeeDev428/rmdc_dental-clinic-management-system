@@ -1,12 +1,89 @@
 <div class="text-gray-900 dark:text-gray-100">
     <h3 class="text-xl font-bold mb-4">Billing History</h3>
     
+    <!-- Search and Filter Section -->
+    <div class="mb-6 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600">
+        <form id="billingFilterForm" method="GET" action="{{ url()->current() }}">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Search -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Search</label>
+                    <input type="text" name="billing_search" id="billing_search" 
+                           value="{{ request('billing_search') }}" 
+                           placeholder="Invoice #, Procedure..."
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+                
+                <!-- Status Filter -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">Status</label>
+                    <select name="billing_status" id="billing_status" 
+                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option value="">All Status</option>
+                        <option value="pending" {{ request('billing_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="accepted" {{ request('billing_status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
+                        <option value="declined" {{ request('billing_status') == 'declined' ? 'selected' : '' }}>Declined</option>
+                        <option value="completed" {{ request('billing_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                    </select>
+                </div>
+                
+                <!-- Date From -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">From Date</label>
+                    <input type="date" name="billing_from" id="billing_from" 
+                           value="{{ request('billing_from') }}"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+                
+                <!-- Date To -->
+                <div>
+                    <label class="block text-sm font-medium mb-2">To Date</label>
+                    <input type="date" name="billing_to" id="billing_to" 
+                           value="{{ request('billing_to') }}"
+                           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+            </div>
+            
+            <div class="mt-4 flex gap-2">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    <i class="fas fa-search mr-2"></i>Apply Filters
+                </button>
+                <a href="{{ url()->current() }}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                    <i class="fas fa-redo mr-2"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+    
     @php
-        // Get appointments with billing information
-        $billingHistory = App\Models\Appointment::where('user_id', auth()->id())
-            ->whereNotNull('procedure')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Get appointments with billing information with filters
+        $query = App\Models\Appointment::where('user_id', auth()->id())
+            ->whereNotNull('procedure');
+            
+        // Apply search filter
+        if (request('billing_search')) {
+            $search = request('billing_search');
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhere('procedure', 'like', "%{$search}%")
+                  ->orWhere('title', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply status filter
+        if (request('billing_status')) {
+            $query->where('status', request('billing_status'));
+        }
+        
+        // Apply date range filter
+        if (request('billing_from')) {
+            $query->whereDate('created_at', '>=', request('billing_from'));
+        }
+        if (request('billing_to')) {
+            $query->whereDate('created_at', '<=', request('billing_to'));
+        }
+            
+        $billingHistory = $query->orderBy('created_at', 'desc')->paginate(10)->appends(request()->query());
     @endphp
     
     @if($billingHistory->count() > 0)
@@ -107,9 +184,11 @@
                         <p class="text-xs text-gray-500 dark:text-gray-500">
                             Issued: {{ $billing->created_at->format('M j, Y h:i A') }}
                         </p>
-                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a href="{{ route('invoice.download', $billing->id) }}" 
+                           class="text-blue-600 hover:text-blue-800 text-sm font-medium inline-flex items-center"
+                           target="_blank">
                             <i class="fas fa-download mr-1"></i>Download Invoice
-                        </button>
+                        </a>
                     </div>
                 </div>
             @endforeach
