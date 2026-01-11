@@ -27,9 +27,9 @@
                 <img src="{{ asset('img/udashboard.png') }}" alt="Description" loading="lazy">
                 <div class="flex justify-between items-center p-3 text-black-900 dark:text-black-100" style="background-color: rgb(187, 233, 233); font-size: 14px;">
                     <span>{{ __("You're logged in, ".auth()->user()->name. "!") }}</span>
-                    <button id="view-teeth-layout-btn" class="btn btn-primary" style="font-size: 14px;">
+                    {{-- <button id="view-teeth-layout-btn" class="btn btn-primary" style="font-size: 14px;">
                         View My Teeth Layout
-                    </button>
+                    </button> --}}
                 </div>
             </div>
         </div>
