@@ -147,6 +147,9 @@
     // Ask Lee AI - Gemini AI Chatbot
     Route::get('/ask-lee-ai', [GeminiController::class, 'index'])->name('ask.lee.ai');
     Route::post('/ask-gemini', [GeminiController::class, 'ask'])->name('ask.gemini');
+    
+    // Invoice Download
+    Route::get('/invoice/{id}/download', [AppointmentController::class, 'downloadInvoice'])->name('invoice.download');
     });
 
 
