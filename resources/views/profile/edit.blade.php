@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-toast-notification />
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Profile') }}
@@ -7,13 +8,6 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-
-            <!-- Flash message -->
-            @if (session('status'))
-                <div class="p-4 mb-4 text-sm text-green-800 bg-green-100 rounded-lg dark:text-green-400 dark:bg-green-900" role="alert">
-                    <span class="font-medium">{{ session('status') }}</span>
-                </div>
-            @endif
 
             <div class="flex flex-col md:flex-row justify-start gap-6 md:gap-12"> <!-- Changed justify-center to justify-start -->
 
@@ -112,6 +106,13 @@
     </div>
 
     <script>
+        // Show toast for session status
+        @if (session('status'))
+            window.addEventListener('DOMContentLoaded', function() {
+                showToast('{{ session('status') }}', 'success');
+            });
+        @endif
+
         function previewAvatar(event) {
             const preview = document.getElementById('avatar-preview');
             const file = event.target.files[0];
