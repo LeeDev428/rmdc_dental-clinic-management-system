@@ -481,19 +481,36 @@
                         }
                     });
 
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = url;
-                    form.style.display = 'none';
-
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = '_token';
-                    csrfInput.value = '{{ csrf_token() }}';
-                    form.appendChild(csrfInput);
-
-                    document.body.appendChild(form);
-                    form.submit();
+                    // Use AJAX instead of form submission
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Success!",
+                                text: response.message || "Appointment has been accepted.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            let errorMsg = "An error occurred while accepting the appointment.";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+                            Swal.fire({
+                                title: "Error!",
+                                text: errorMsg,
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                    });
                 }
             });
         });
@@ -522,21 +539,42 @@
             });
 
             const formData = new FormData(this);
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = $(this).attr('action');
-            form.style.display = 'none';
+            const url = $(this).attr('action');
 
-            for (const [key, value] of formData.entries()) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = value;
-                form.appendChild(input);
-            }
-
-            document.body.appendChild(form);
-            form.submit();
+            // Use AJAX instead of form submission
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    _token: formData.get('_token'),
+                    message: formData.get('message'),
+                    appointment_id: formData.get('appointment_id')
+                },
+                success: function(response) {
+                    $('#declineModal').modal('hide');
+                    Swal.fire({
+                        title: "Success!",
+                        text: response.message || "Appointment has been declined.",
+                        icon: "success",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function(xhr) {
+                    let errorMsg = "An error occurred while declining the appointment.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    $('#declineModal').modal('hide');
+                    Swal.fire({
+                        title: "Error!",
+                        text: errorMsg,
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    });
+                }
+            });
         });
     });
 
