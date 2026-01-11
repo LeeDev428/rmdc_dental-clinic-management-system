@@ -305,7 +305,7 @@
         
         <!-- Pagination -->
         <div class="pagination">
-            {{ $declinedAppointments->appends(request()->query())->links() }}
+            {{ $declinedAppointments->appends(request()->query())->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     </div>
 </div>
