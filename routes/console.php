@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Schedule appointment reminders to run every 15 minutes
 Schedule::command('appointments:send-reminders')->everyFifteenMinutes();
+
+// Clean up old notifications (older than 7 weeks) - runs daily at midnight
+Schedule::command('notifications:cleanup')->daily();
