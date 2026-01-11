@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Rating;
+use App\Models\Appointment;
+use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
@@ -12,12 +14,21 @@ class RatingController extends Controller
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'message' => 'nullable|string|max:255',
+            'appointment_id' => 'nullable|exists:appointments,id',
         ]);
 
         Rating::create([
             'rating' => $validated['rating'],
             'message' => $validated['message'] ?? null,
+            'user_id' => Auth::id(),
+            'appointment_id' => $validated['appointment_id'] ?? null,
         ]);
+        
+        // Mark appointment as reviewed if appointment_id is provided
+        if (isset($validated['appointment_id'])) {
+            Appointment::where('id', $validated['appointment_id'])
+                ->update(['reviewed_at' => now()]);
+        }
 
         return response()->json(['success' => true, 'message' => 'Rating saved successfully.']);
     }
