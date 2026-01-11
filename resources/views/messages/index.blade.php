@@ -21,6 +21,20 @@
 
     <div class="py-3">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            @if(isset($mongoUnavailable) && $mongoUnavailable)
+            <!-- MongoDB Unavailable Warning -->
+            <div class="mb-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-3 text-2xl"></i>
+                    <div>
+                        <p class="font-bold">Messaging Service Temporarily Unavailable</p>
+                        <p class="text-sm">The real-time messaging feature is currently undergoing maintenance. Please try again later or contact us directly.</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
 
                 <!-- Chat Section -->
@@ -110,15 +124,29 @@
     <script>
         const currentUserId = {{ Auth::id() }};
         const adminUserId = {{ isset($adminUser) && $adminUser ? $adminUser->id : 'null' }};
+        const mongoUnavailable = {{ isset($mongoUnavailable) && $mongoUnavailable ? 'true' : 'false' }};
         
         console.log('Patient messaging page loaded', {
             patientId: currentUserId,
-            talkingToAdminId: adminUserId
+            talkingToAdminId: adminUserId,
+            mongoAvailable: !mongoUnavailable
         });
         
         if (!adminUserId || adminUserId === null) {
             console.error('No admin user found! Cannot send messages.');
             alert('Error: No admin available to chat with. Please contact support.');
+        }
+        
+        if (mongoUnavailable) {
+            console.warn('MongoDB messaging service is unavailable');
+            // Disable the form
+            document.addEventListener('DOMContentLoaded', function() {
+                const messageInput = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
+                if (messageInput) messageInput.disabled = true;
+                if (sendButton) sendButton.disabled = true;
+                if (messageInput) messageInput.placeholder = 'Messaging service temporarily unavailable';
+            });
         }
         
         let typingTimer;
@@ -259,6 +287,11 @@
         // Send message via AJAX to MongoDB
         function sendMessage(event) {
             event.preventDefault();
+            
+            if (mongoUnavailable) {
+                alert('Messaging service is temporarily unavailable. Please try again later.');
+                return;
+            }
             
             const input = document.getElementById('messageInput');
             const button = document.getElementById('sendButton');
