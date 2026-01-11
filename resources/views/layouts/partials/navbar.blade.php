@@ -85,7 +85,7 @@
                          onerror="this.src='{{ asset('img/default-dp.jpg') }}'"
                          style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; border: 2px solid #fff;">
                     <!-- Display Username -->
-                    <span>{{ Auth::user()->name }}</span>
+                    {{-- <span>{{ Auth::user()->name }}</span> --}}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{{ route('admin.profile.edit') }}"><i class="fas fa-user-edit me-2"></i>Edit Profile</a></li>
