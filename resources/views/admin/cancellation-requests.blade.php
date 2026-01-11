@@ -1,18 +1,330 @@
 @extends('layouts.admin')
 
-@section('title', 'Cancellation & Reschedule Requests')
+@section('title', 'Pending Appointments')
+
+@section('content')
+<style>
+    .page-header {
+        background-color: #fff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+    }
+    
+    .content-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+    }
+    
+    .search-section {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .search-input {
+        flex: 1;
+        min-width: 250px;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #0084ff;
+    }
+    
+    .date-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+        padding: 8px 16px;
+        border: 1px solid #e0e0e0;
+        background-color: #fff;
+        color: #1a1a1a;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    
+    .filter-btn:hover {
+        background-color: #f5f5f5;
+        color: #1a1a1a;
+    }
+    
+    .filter-btn.active {
+        background-color: #0084ff;
+        color: #fff;
+        border-color: #0084ff;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-nav {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    
+    .btn-nav.info {
+        background-color: #0ea5e9;
+        color: #fff;
+    }
+    
+    .btn-nav.info:hover {
+        background-color: #0284c7;
+        color: #fff;
+    }
+    
+    .btn-nav.primary {
+        background-color: #0084ff;
+        color: #fff;
+    }
+    
+    .btn-nav.primary:hover {
+        background-color: #0073e6;
+        color: #fff;
+    }
+    
+    .btn-nav.danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+    
+    .btn-nav.danger:hover {
+        background-color: #dc2626;
+        color: #fff;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background-color: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 600;
+        font-size: 14px;
+        text-align: left;
+        padding: 12px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+        color: #4a4a4a;
+    }
+    
+    .data-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .id-image {
+        width: 60px;
+        height: 50px;
+        border-radius: 6px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 1px solid #e0e0e0;
+    }
+    
+    .action-btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .btn-accept {
+        background-color: #10b981;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-accept:hover {
+        background-color: #059669;
+    }
+    
+    .btn-decline {
+        background-color: #ef4444;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .btn-decline:hover {
+        background-color: #dc2626;
+    }
+    
+    .alert-success {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        padding: 12px 16px;
+        border-radius: 6px;
+        border-left: 4px solid #16a34a;
+        margin-bottom: 16px;
+    }
+    
+    .modal-content {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 16px 24px;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a1a;
+    }
+    
+    .modal-body {
+        padding: 24px;
+    }
+    
+    .modal-body label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .modal-body textarea {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .modal-body textarea:focus {
+        outline: none;
+        border-color: #0084ff;
+    }
+    
+    .modal-footer {
+        border-top: 1px solid #e0e0e0;
+        padding: 16px 24px;
+    }
+    
+    .modal-footer .btn {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .modal-footer .btn-secondary {
+        background-color: #f0f0f0;
+        color: #1a1a1a;
+    }
+    
+    .modal-footer .btn-secondary:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .modal-footer .btn-danger {
+        background-color: #ef4444;
+        color: #fff;
+    }
+    
+    .modal-footer .btn-danger:hover {
+        background-color: #dc2626;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-top: 24px;
+    }
+</style>
 
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div class="container-fluid">
     <!-- Page Header -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    {{-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Cancellation & Reschedule Requests</h1>
-    </div>
+    </div> --}}
     
-    <!-- Tabs Navigation -->
+  
+    <div class="page-header">
+    <h1 class="page-title">Cancellation & Rescheduled Appointments</h1>
+</div>
+  <!-- Tabs Navigation -->
     <ul class="nav nav-tabs mb-4" role="tablist">
+
+          <li class="nav-item" role="presentation">
+            <a class="nav-link {{ $type === 'reschedule' ? 'active' : '' }}" 
+               href="{{ route('admin.cancellation.requests', ['type' => 'reschedule']) }}">
+                <i class="fas fa-calendar-alt"></i> Reschedules
+                {{-- <span class="badge badge-secondary ml-2">{{ $reschedulePending }}</span> --}}
+            </a>
+        </li>
+        
         <li class="nav-item" role="presentation">
             <a class="nav-link {{ $type === 'cancel' ? 'active' : '' }}" 
                href="{{ route('admin.cancellation.requests', ['type' => 'cancel']) }}">
@@ -20,15 +332,8 @@
                 {{-- <span class="badge badge-secondary ml-2">{{ $cancelPending }}</span> --}}
             </a>
         </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link {{ $type === 'reschedule' ? 'active' : '' }}" 
-               href="{{ route('admin.cancellation.requests', ['type' => 'reschedule']) }}">
-                <i class="fas fa-calendar-alt"></i> Reschedules
-                {{-- <span class="badge badge-secondary ml-2">{{ $reschedulePending }}</span> --}}
-            </a>
-        </li>
+      
     </ul>
-    
     <!-- Statistics Grid -->
     <div class="row mb-4">
         @if($type === 'cancel')
