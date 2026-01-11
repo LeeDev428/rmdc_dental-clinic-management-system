@@ -14,7 +14,13 @@ class MessageController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            $adminUser = User::where('is_admin', 1)->first();
+            // Find first admin user (usertype = 'admin')
+            $adminUser = User::where('usertype', 'admin')->first();
+            
+            if (!$adminUser) {
+                // Fallback to user with ID 1 if no admin found
+                $adminUser = User::find(1);
+            }
             
             // Fetch messages from MongoDB
             $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
