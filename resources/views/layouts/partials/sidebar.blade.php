@@ -84,10 +84,10 @@
                 <div class="sb-nav-link-icon"><i class="fas fa-star"></i></div>
                 Reviews
             </a>
-               <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
+               {{-- <a class="nav-link" href="{{ route('admin.service.feedbacks') }}">
                 <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                 Service Feedbacks
-            </a>
+            </a> --}}
         </div>
     </div>
 
