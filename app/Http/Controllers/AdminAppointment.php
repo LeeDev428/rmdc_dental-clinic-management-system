@@ -93,7 +93,11 @@ try {
     ]);
 }
 
-broadcast(new AppointmentStatusChanged($appointment));
+try {
+    broadcast(new AppointmentStatusChanged($appointment));
+} catch (\Exception $e) {
+    Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
+}
 
 return redirect()->back()->with('success', 'Appointment declined successfully and message sent.');
 }
@@ -146,7 +150,11 @@ return redirect()->back()->with('success', 'Appointment declined successfully an
     }
 
     // Broadcast the status change (optional)
-    broadcast(new AppointmentStatusChanged($appointment));
+    try {
+        broadcast(new AppointmentStatusChanged($appointment));
+    } catch (\\Exception $e) {
+        Log::warning('Failed to broadcast appointment status change: ' . $e->getMessage());
+    }
 
     // Return a success message
     return redirect()->back()->with('success', "Appointment has been {$action}ed.");
