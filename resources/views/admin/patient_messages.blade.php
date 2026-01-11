@@ -293,15 +293,17 @@
                     <div class="user-info">
                         <p class="user-name">{{ $user->name }}</p>
                         <p class="user-preview">
-                            @if($user->messages->isNotEmpty())
-                                {{ Str::limit($user->messages->first()->message, 30, '...') }}
+                            @if(isset($user->last_message))
+                                {{ Str::limit($user->last_message, 30, '...') }}
                             @else
                                 No messages yet
                             @endif
                         </p>
                     </div>
-                    @if($user->messages->isNotEmpty())
-                        <span class="user-time">{{ $user->messages->first()->created_at->diffForHumans(null, true) }}</span>
+                    @if(isset($user->last_message_time))
+                        <span class="user-time">
+                            {{ $user->last_message_time instanceof \MongoDB\BSON\UTCDateTime ? $user->last_message_time->toDateTime()->diffForHumans(null, true) : \Carbon\Carbon::parse($user->last_message_time)->diffForHumans(null, true) }}
+                        </span>
                     @endif
                 </a>
             @endforeach
@@ -417,11 +419,12 @@
         messageDiv.className = `message-wrapper ${isSent ? 'sent' : 'received'}`;
         messageDiv.style.animation = 'fadeIn 0.3s ease-in';
         
+        // Get avatar from message data or fallback
         const avatar = isSent 
-            ? '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}'
-            : '{{ $selectedUser->avatar_url ?? asset("img/default-dp.jpg") }}';
+            ? (msg.sender && msg.sender.avatar_url ? msg.sender.avatar_url : '{{ Auth::user()->avatar_url ?? asset("img/default-dp.jpg") }}')
+            : (msg.sender && msg.sender.avatar_url ? msg.sender.avatar_url : '{{ $selectedUser->avatar_url ?? asset("img/default-dp.jpg") }}');
         
-        const time = new Date(msg.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         
         messageDiv.innerHTML = `
             ${!isSent ? `<img src="${avatar}" alt="Avatar" class="message-avatar" onerror="this.src='{{ asset('img/default-dp.jpg') }}'">` : ''}
