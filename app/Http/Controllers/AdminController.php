@@ -518,7 +518,7 @@ public function cancellationRequests(Request $request)
     $query = \App\Models\AppointmentCancellation::with(['user', 'appointment']);
     
     // Filter by type (cancel or reschedule)
-    $type = $request->get('type', 'cancel');
+    $type = $request->get('type', 'reschedule');
     $query->where('type', $type);
     
     // Search functionality
