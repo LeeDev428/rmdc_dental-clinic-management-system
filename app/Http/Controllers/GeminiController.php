@@ -53,8 +53,8 @@ class GeminiController extends Controller
         }
 
         try {
-            // Gemini API endpoint - Using Gemini 2.0 Flash (full version)
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={$apiKey}";
+            // Gemini API endpoint - Using Gemini 2.5 Flash
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
             // Prepare the request payload with comprehensive dental-focused instructions
             $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
