@@ -598,10 +598,21 @@ public function cancellationRequests(Request $request)
  */
 public function getCancellationCount()
 {
-    // Count appointments with status 'cancelled' that have pending cancellation requests
-    $count = \App\Models\Appointment::where('status', 'cancelled')
-        ->whereHas('cancellation')
-        ->count();
+    try {
+        // Check if AppointmentCancellation table exists
+        if (\Schema::hasTable('appointment_cancellations')) {
+            // Count cancellation requests that are pending
+            $count = \App\Models\AppointmentCancellation::where('type', 'cancel')
+                ->whereHas('appointment', function($query) {
+                    $query->where('status', '!=', 'cancelled');
+                })
+                ->count();
+        } else {
+            $count = 0;
+        }
+    } catch (\Exception $e) {
+        $count = 0;
+    }
     
     return response()->json(['count' => $count]);
 }
@@ -630,10 +641,21 @@ public function rescheduleRequests()
  */
 public function getRescheduleCount()
 {
-    // Count appointments that have reschedule_request = 1
-    $count = \App\Models\Appointment::where('reschedule_request', 1)
-        ->whereIn('status', ['accepted', 'pending'])
-        ->count();
+    try {
+        // Check if AppointmentCancellation table exists
+        if (\Schema::hasTable('appointment_cancellations')) {
+            // Count reschedule requests that are pending
+            $count = \App\Models\AppointmentCancellation::where('type', 'reschedule')
+                ->whereHas('appointment', function($query) {
+                    $query->whereIn('status', ['accepted', 'pending']);
+                })
+                ->count();
+        } else {
+            $count = 0;
+        }
+    } catch (\Exception $e) {
+        $count = 0;
+    }
     
     return response()->json(['count' => $count]);
 }
