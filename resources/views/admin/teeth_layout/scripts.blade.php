@@ -74,15 +74,15 @@ function renderArchChart() {
         if (el) el.innerHTML = '';
     });
     
-    // Upper Right: teeth 1-8 (displayed 8 to 1 from center outward)
+    // Upper Right: teeth 1-8 (right side, displayed 1 to 8 from left to right)
     const upperRight = document.getElementById('upper-right');
     if (upperRight) {
-        for (let i = 8; i >= 1; i--) {
+        for (let i = 1; i <= 8; i++) {
             upperRight.appendChild(createTooth(i));
         }
     }
     
-    // Upper Left: teeth 9-16 (displayed 9 to 16 from center outward)
+    // Upper Left: teeth 9-16 (left side, displayed 9 to 16 from left to right)
     const upperLeft = document.getElementById('upper-left');
     if (upperLeft) {
         for (let i = 9; i <= 16; i++) {
@@ -90,15 +90,15 @@ function renderArchChart() {
         }
     }
     
-    // Lower Left: teeth 17-24 (displayed 17 to 24 from center outward)
+    // Lower Left: teeth 24-17 (left side, displayed 24 down to 17 from left to right)
     const lowerLeft = document.getElementById('lower-left');
     if (lowerLeft) {
-        for (let i = 17; i <= 24; i++) {
+        for (let i = 24; i >= 17; i--) {
             lowerLeft.appendChild(createTooth(i));
         }
     }
     
-    // Lower Right: teeth 25-32 (displayed 32 to 25 from center outward)
+    // Lower Right: teeth 32-25 (right side, displayed 32 down to 25 from left to right)
     const lowerRight = document.getElementById('lower-right');
     if (lowerRight) {
         for (let i = 32; i >= 25; i--) {
