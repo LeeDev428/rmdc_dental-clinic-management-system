@@ -15,9 +15,9 @@ class AppointmentCancellationController extends Controller
     {
         $userId = Auth::id();
         
-        // Get user's ACCEPTED appointments (not pending - those can't be cancelled yet)
+        // Get user's ACCEPTED and PENDING appointments
         $pendingAppointments = Appointment::where('user_id', $userId)
-            ->where('status', 'accepted')
+            ->whereIn('status', ['accepted', 'pending'])
             ->orderBy('start', 'asc')
             ->get();
         
