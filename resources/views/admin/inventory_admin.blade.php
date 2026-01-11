@@ -528,7 +528,7 @@
         
         <!-- Pagination -->
         <div class="mt-4 d-flex justify-content-center">
-            {{ $inventory->links('pagination::bootstrap-4') }}
+            {{ $inventory->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     </div>
 </div>
