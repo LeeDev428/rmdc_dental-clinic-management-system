@@ -521,10 +521,11 @@ window.onclick = function(event) {
                 @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
                 @php
                     $blockingAppointment = \App\Models\Appointment::where('user_id', Auth::id())
-                        ->whereIn('status', ['pending', 'rescheduled'])
+                        ->whereIn('status', ['pending', 'accepted', 'rescheduled'])
                         ->first();
                 @endphp
-                <div class="mb-6 p-4 {{ $blockingAppointment->status === 'rescheduled' ? 'bg-blue-50 border-blue-400' : 'bg-yellow-50 border-yellow-400' }} border-l-4 {{ $blockingAppointment->status === 'rescheduled' ? 'text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' }} rounded-lg">
+                @if($blockingAppointment)
+                <div class="mb-6 p-4 {{ $blockingAppointment->status === 'rescheduled' ? 'bg-blue-50 border-blue-400' : ($blockingAppointment->status === 'accepted' ? 'bg-green-50 border-green-400' : 'bg-yellow-50 border-yellow-400') }} border-l-4 {{ $blockingAppointment->status === 'rescheduled' ? 'text-blue-800 dark:bg-blue-900 dark:text-blue-200' : ($blockingAppointment->status === 'accepted' ? 'text-green-800 dark:bg-green-900 dark:text-green-200' : 'text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200') }} rounded-lg">
                     <div class="flex items-start">
                         <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
@@ -534,11 +535,21 @@ window.onclick = function(event) {
                                 <h4 class="font-semibold text-lg">Appointment Pending Reschedule</h4>
                                 <p class="text-sm mt-1">You requested to reschedule your appointment for <strong>{{ $blockingAppointment->procedure }}</strong>. Please select a new date and time to complete the reschedule process.</p>
                                 <a href="{{ route('appointments', ['reschedule' => $blockingAppointment->id]) }}" 
-                                   class="mt-3 inline-flex items-center px-4 py-2 {{ $blockingAppointment->status === 'rescheduled' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-yellow-600 hover:bg-yellow-700' }} text-white text-sm font-medium rounded-lg transition shadow">
+                                   class="mt-3 inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition shadow">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Reschedule Now
+                                </a>
+                            @elseif($blockingAppointment->status === 'accepted')
+                                <h4 class="font-semibold text-lg">Upcoming Appointment</h4>
+                                <p class="text-sm mt-1">You have an upcoming appointment for <strong>{{ $blockingAppointment->procedure }}</strong> on <strong>{{ \Carbon\Carbon::parse($blockingAppointment->start)->format('M d, Y g:i A') }}</strong>. You cannot book a new appointment until this one is completed.</p>
+                                <a href="{{ route('appointment.cancel') }}" 
+                                   class="mt-3 inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition shadow">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    View or Manage Appointment
                                 </a>
                             @else
                                 <h4 class="font-semibold text-lg">Pending Appointment Exists</h4>
