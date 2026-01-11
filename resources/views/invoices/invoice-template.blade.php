@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice #{{ $appointment->id }}</title>
+    <title>Invoice #{{ str_pad($appointment->id, 6, '0', STR_PAD_LEFT) }}</title>
     <style>
         * {
             margin: 0;
@@ -12,160 +12,254 @@
         }
         
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             padding: 40px;
-            background: #f5f5f5;
+            background: #f5f7fa;
+            color: #1e293b;
         }
         
         .invoice-container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
-            padding: 40px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
         
+        /* Header Section */
         .invoice-header {
             display: flex;
             justify-content: space-between;
-            align-items: start;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #0084ff;
+            align-items: flex-start;
+            padding: 32px 40px;
+            border-bottom: 1px solid #e5e7eb;
         }
         
-        .clinic-info h1 {
-            color: #0084ff;
+        .invoice-title h1 {
             font-size: 28px;
-            margin-bottom: 5px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
         }
         
-        .clinic-info p {
-            color: #666;
+        .invoice-date {
+            color: #64748b;
             font-size: 14px;
-            line-height: 1.6;
         }
         
-        .invoice-meta {
+        .invoice-number-section {
             text-align: right;
         }
         
-        .invoice-meta h2 {
-            color: #333;
+        .invoice-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        
+        .invoice-number {
             font-size: 24px;
-            margin-bottom: 10px;
+            font-weight: 700;
+            color: #0f172a;
         }
         
-        .invoice-meta p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 5px;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            background: #dcfce7;
+            color: #166534;
         }
         
-        .invoice-details {
+        /* Info Grid Section */
+        .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 40px;
+            padding: 32px 40px;
+            background: #f8fafc;
         }
         
-        .detail-section h3 {
-            color: #333;
-            font-size: 14px;
+        .info-box h3 {
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 10px;
+            color: #0f172a;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-bottom: 12px;
         }
         
-        .detail-section p {
-            color: #666;
+        .info-box p {
+            color: #475569;
             font-size: 14px;
-            line-height: 1.8;
+            line-height: 1.6;
+            margin-bottom: 4px;
         }
         
-        .invoice-table {
+        .info-box strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+        
+        /* Appointment Details Section */
+        .details-section {
+            padding: 32px 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+        
+        .details-table {
             width: 100%;
-            margin-bottom: 30px;
             border-collapse: collapse;
         }
         
-        .invoice-table thead {
-            background: #f8f9fa;
+        .details-table thead {
+            background: #f1f5f9;
         }
         
-        .invoice-table th {
-            padding: 15px;
+        .details-table th {
+            padding: 12px 16px;
             text-align: left;
-            color: #333;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            border-bottom: 2px solid #e0e0e0;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e2e8f0;
         }
         
-        .invoice-table td {
-            padding: 15px;
-            color: #666;
-            font-size: 14px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .invoice-table .text-right {
+        .details-table th:last-child {
             text-align: right;
         }
         
-        .invoice-totals {
-            margin-left: auto;
-            width: 300px;
+        .details-table td {
+            padding: 16px;
+            color: #475569;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f5f9;
         }
         
-        .total-row {
+        .details-table td:last-child {
+            text-align: right;
+        }
+        
+        .procedure-name {
+            font-weight: 500;
+            color: #0f172a;
+        }
+        
+        .procedure-type {
+            font-size: 13px;
+            color: #64748b;
+        }
+        
+        /* Payment Information */
+        .payment-section {
+            padding: 0 40px 32px 40px;
+        }
+        
+        .payment-box {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .payment-box h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .payment-label {
+            color: #64748b;
+        }
+        
+        .payment-value {
+            color: #0f172a;
+            font-weight: 500;
+        }
+        
+        /* Summary Section */
+        .summary-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-left: auto;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .summary-row {
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
             font-size: 14px;
         }
         
-        .total-row.grand-total {
-            border-top: 2px solid #0084ff;
-            margin-top: 10px;
-            padding-top: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #0084ff;
+        .summary-label {
+            color: #475569;
         }
         
-        .invoice-footer {
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            text-align: center;
-            color: #999;
-            font-size: 12px;
+        .summary-value {
+            color: #0f172a;
+            font-weight: 500;
         }
         
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
+        .summary-row.deduction .summary-value {
+            color: #dc2626;
+        }
+        
+        .summary-row.total {
+            border-top: 2px solid #e2e8f0;
+            margin-top: 8px;
+            padding-top: 16px;
+        }
+        
+        .summary-row.total .summary-label {
+            font-size: 16px;
             font-weight: 600;
-            text-transform: uppercase;
+            color: #0f172a;
         }
         
-        .status-paid {
-            background: #d4edda;
-            color: #155724;
+        .summary-row.total .summary-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2563eb;
         }
         
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
+        /* Footer */
+        .invoice-footer {
+            padding: 24px 40px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
         }
         
-        .status-unpaid {
-            background: #f8d7da;
-            color: #721c24;
+        .invoice-footer p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
         }
         
         @media print {
@@ -184,20 +278,14 @@
     <div class="invoice-container">
         <!-- Header -->
         <div class="invoice-header">
-            <div class="clinic-info">
-                <h1>RMDC</h1>
-                <p>Robles Moncayo Dental Clinic</p>
-                <p>Professional Dental Services</p>
-                <p>Email: contact@rmdc.com</p>
+            <div class="invoice-title">
+                <h1>Billing Invoice</h1>
+                <p class="invoice-date">Issued: {{ $appointment->created_at->format('F d, Y') }}</p>
             </div>
-            <div class="invoice-meta">
-                <h2>INVOICE</h2>
-                <p><strong>Invoice #:</strong> {{ $appointment->id }}</p>
-                <p><strong>Date:</strong> {{ $appointment->created_at->format('M d, Y') }}</p>
-                <p><strong>Status:</strong> 
-                    <span class="status-badge status-{{ $appointment->payment_status ?? 'unpaid' }}">
-                        {{ strtoupper($appointment->payment_status ?? 'UNPAID') }}
-                    </span>
+            <div class="invoice-number-section">
+                <p class="invoice-label">Invoice Number</p>
+                <div class="invoice-number">#{{ str_pad($appointment->id, 6, '0', STR_PAD_LEFT) }}</div>
+                <span class="status-badge">{{ ucfirst($appointment->payment_status ?? 'Completed') }}</span>
                 </p>
             </div>
         </div>
