@@ -62,13 +62,6 @@ class AppointmentCancellationController extends Controller
             ], 403);
         }
         
-        // Check if appointment is accepted (only accepted appointments can be cancelled/rescheduled)
-        if ($appointment->status !== 'accepted') {
-            return response()->json([
-                'error' => 'You can only cancel accepted appointments. Pending appointments must be approved first.'
-            ], 422);
-        }
-        
         // Validate reason
         $request->validate([
             'reason' => 'required|string|min:10|max:500'
@@ -113,13 +106,6 @@ class AppointmentCancellationController extends Controller
                 return response()->json([
                     'error' => 'You can only reschedule your own appointments.'
                 ], 403);
-            }
-            
-            // Check if appointment is accepted
-            if ($appointment->status !== 'accepted') {
-                return response()->json([
-                    'error' => 'You can only reschedule accepted appointments. Pending appointments must be approved first.'
-                ], 422);
             }
             
             // Validate reason
