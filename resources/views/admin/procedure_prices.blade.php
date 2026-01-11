@@ -649,7 +649,7 @@
         
         <!-- Pagination -->
         <div class="mt-4 d-flex justify-content-center">
-            {{ $procedures->links('pagination::bootstrap-4') }}
+            {{ $procedures->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     </div>
 </div>
