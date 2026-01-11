@@ -371,7 +371,68 @@
 <div class="content-card">
     <h2 class="card-title">Treatment Timeline</h2>
     
-    @if($appointments->isEmpty())
+    <!-- Search and Filter for Timeline -->
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+        <form method="GET" action="{{ route('health-progress') }}" class="flex flex-wrap gap-3">
+            <input type="text" name="timeline_search" value="{{ request('timeline_search') }}" 
+                   placeholder="Search treatments..." 
+                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 flex-1 min-w-[200px]">
+            
+            <select name="timeline_status" 
+                    class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <option value="">All Status</option>
+                <option value="accepted" {{ request('timeline_status') == 'accepted' ? 'selected' : '' }}>Accepted</option>
+                <option value="completed" {{ request('timeline_status') == 'completed' ? 'selected' : '' }}>Completed</option>
+            </select>
+            
+            <input type="date" name="timeline_from" value="{{ request('timeline_from') }}" 
+                   placeholder="From Date"
+                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                   
+            <input type="date" name="timeline_to" value="{{ request('timeline_to') }}" 
+                   placeholder="To Date"
+                   class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                <i class="fas fa-search mr-1"></i>Search
+            </button>
+            <a href="{{ route('health-progress') }}" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">
+                <i class="fas fa-redo mr-1"></i>Reset
+            </a>
+        </form>
+    </div>
+    
+    @php
+        // Build query with filters for timeline
+        $timelineQuery = App\Models\Appointment::where('user_id', auth()->id())
+            ->whereIn('status', ['accepted', 'completed']);
+            
+        // Apply search
+        if (request('timeline_search')) {
+            $search = request('timeline_search');
+            $timelineQuery->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('procedure', 'like', "%{$search}%");
+            });
+        }
+        
+        // Apply status filter
+        if (request('timeline_status')) {
+            $timelineQuery->where('status', request('timeline_status'));
+        }
+        
+        // Apply date range
+        if (request('timeline_from')) {
+            $timelineQuery->whereDate('start', '>=', request('timeline_from'));
+        }
+        if (request('timeline_to')) {
+            $timelineQuery->whereDate('start', '<=', request('timeline_to'));
+        }
+        
+        $paginatedAppointments = $timelineQuery->orderBy('start', 'desc')->paginate(10)->appends(request()->query());
+    @endphp
+    
+    @if($paginatedAppointments->isEmpty())
         <div class="empty-state">
             <i class="fas fa-calendar-times"></i>
             <h3>No Treatment History Yet</h3>
@@ -379,7 +440,7 @@
         </div>
     @else
         <div class="appointment-timeline">
-            @foreach($appointments as $appointment)
+            @foreach($paginatedAppointments as $appointment)
                 <div class="timeline-item">
                     <div class="timeline-content">
                         <div class="timeline-date">
@@ -396,6 +457,11 @@
                     </div>
                 </div>
             @endforeach
+        </div>
+        
+        <!-- Pagination for Timeline -->
+        <div class="mt-6">
+            {{ $paginatedAppointments->links() }}
         </div>
     @endif
 </div>
