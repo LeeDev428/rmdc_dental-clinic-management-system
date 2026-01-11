@@ -45,41 +45,50 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         const textColor = [31, 41, 55];
         const grayColor = [107, 114, 128];
 
-        // Header Background
-        doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.rect(0, 0, pageWidth, 40, 'F');
+        // Header Background - Blue bar
+        doc.setFillColor(37, 99, 235);
+        doc.rect(0, 0, pageWidth, 35, 'F');
 
-        // Clinic Logo/Name
+        // Clinic Logo/Name - White text on blue
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24);
+        doc.setFontSize(22);
         doc.setFont(undefined, 'bold');
-        doc.text('RMDC', margin, yPos);
+        doc.text('RMDC', margin, yPos + 6);
         
-        doc.setFontSize(12);
-        doc.setFont(undefined, 'normal');
-        doc.text('Robles Moncayo Dental Clinic', margin, yPos + 8);
-
-        // Invoice Number (Top Right)
         doc.setFontSize(10);
-        doc.text('INVOICE', pageWidth - margin, yPos, { align: 'right' });
-        doc.setFontSize(16);
-        doc.setFont(undefined, 'bold');
-        doc.text(`#${String(data.id).padStart(6, '0')}`, pageWidth - margin, yPos + 8, { align: 'right' });
-
-        yPos = 50;
-
-        // Clinic & Patient Info Section
-        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-        doc.setFontSize(10);
-        doc.setFont(undefined, 'bold');
-        doc.text('FROM:', margin, yPos);
-        doc.text('TO:', margin + contentWidth/2, yPos);
-
-        yPos += 6;
         doc.setFont(undefined, 'normal');
+        doc.text('Robles Moncayo Dental Clinic', margin, yPos + 14);
+
+        // Invoice Number (Top Right) - White on blue
         doc.setFontSize(9);
+        doc.text('INVOICE', pageWidth - margin, yPos + 4, { align: 'right' });
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text(`#${String(data.id).padStart(6, '0')}`, pageWidth - margin, yPos + 12, { align: 'right' });
+
+        yPos = 48;
+
+        // Two-column layout with backgrounds
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        
+        // FROM section background (light gray)
+        doc.setFillColor(245, 245, 245);
+        doc.rect(margin, yPos, contentWidth/2 - 5, 35, 'F');
+        
+        // TO section background (light green)
+        doc.setFillColor(240, 253, 244);
+        doc.rect(margin + contentWidth/2 + 5, yPos, contentWidth/2 - 5, 35, 'F');
+
+        // FROM header
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(100, 100, 100);
+        doc.text('FROM:', margin + 3, yPos + 6);
 
         // Clinic Info
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         const clinicInfo = [
             'RMDC - Robles Moncayo Dental Clinic',
             'Unit F Medina Bldg, Niog Elementary School',
@@ -88,10 +97,19 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
             'Phone: (+63) 912-3456-789'
         ];
         clinicInfo.forEach((line, i) => {
-            doc.text(line, margin, yPos + (i * 5));
+            doc.text(line, margin + 3, yPos + 12 + (i * 4.5));
         });
 
+        // TO header
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(100, 100, 100);
+        doc.text('TO:', margin + contentWidth/2 + 8, yPos + 6);
+
         // Patient Info
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         const patientInfo = [
             `Patient: ${data.patient_name}`,
             `Email: ${data.patient_email}`,
@@ -100,100 +118,104 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
             `Status: ${data.status.toUpperCase()}`
         ];
         patientInfo.forEach((line, i) => {
-            doc.text(line, margin + contentWidth/2, yPos + (i * 5));
+            doc.text(line, margin + contentWidth/2 + 8, yPos + 12 + (i * 4.5));
         });
 
-        yPos += 35;
+        yPos += 42;
 
-        // Services Table Header
-        doc.setFillColor(240, 240, 240);
-        doc.rect(margin, yPos, contentWidth, 10, 'F');
+        // Services Table Header with gray background
+        doc.setFillColor(235, 235, 235);
+        doc.rect(margin, yPos, contentWidth, 8, 'F');
         
         doc.setFont(undefined, 'bold');
-        doc.setFontSize(9);
-        doc.text('DESCRIPTION', margin + 2, yPos + 6);
-        doc.text('DURATION', margin + contentWidth - 50, yPos + 6);
-        doc.text('AMOUNT', margin + contentWidth - 2, yPos + 6, { align: 'right' });
+        doc.setFontSize(8);
+        doc.setTextColor(80, 80, 80);
+        doc.text('DESCRIPTION', margin + 2, yPos + 5.5);
+        doc.text('DURATION', margin + contentWidth - 45, yPos + 5.5);
+        doc.text('AMOUNT', margin + contentWidth - 2, yPos + 5.5, { align: 'right' });
 
-        yPos += 12;
+        yPos += 10;
 
-        // Convert prices to numbers (in case they come as strings)
+        // Convert prices to numbers
         const price = parseFloat(data.price) || 0;
         const downPayment = parseFloat(data.down_payment) || 0;
         
         // Service Item
         doc.setFont(undefined, 'normal');
-        doc.text(data.procedure, margin + 2, yPos);
-        doc.text(`${data.duration} mins`, margin + contentWidth - 50, yPos);
-        doc.text(`₱${price.toFixed(2)}`, margin + contentWidth - 2, yPos, { align: 'right' });
+        doc.setFontSize(9);
+        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.text(data.procedure, margin + 2, yPos + 4);
+        doc.text(`${data.duration} hours mins`, margin + contentWidth - 45, yPos + 4);
+        doc.text(`₱ ${price.toFixed(2)}`, margin + contentWidth - 2, yPos + 4, { align: 'right' });
 
         yPos += 10;
-        doc.setDrawColor(200, 200, 200);
+        doc.setDrawColor(220, 220, 220);
+        doc.setLineWidth(0.3);
         doc.line(margin, yPos, pageWidth - margin, yPos);
 
-        // Payment Summary
-        yPos += 10;
-        doc.setFontSize(10);
+        // Payment Summary - Right aligned
+        yPos += 8;
+        doc.setFontSize(9);
         
-        const summaryItems = [
-            { label: 'Subtotal:', amount: price },
-            { label: 'Down Payment (20%):', amount: downPayment, isNegative: true },
-        ];
+        const summaryX = pageWidth - margin - 60;
+        
+        // Subtotal
+        doc.setFont(undefined, 'normal');
+        doc.text('Subtotal:', summaryX, yPos);
+        doc.text(`₱ ${price.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+        yPos += 6;
+        
+        // Down Payment
+        doc.text('Down Payment (20%):', summaryX, yPos);
+        doc.text(`- ₱ ${downPayment.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+        yPos += 8;
 
-        summaryItems.forEach(item => {
-            doc.setFont(undefined, 'normal');
-            doc.text(item.label, pageWidth - margin - 60, yPos);
-            const amountText = `${item.isNegative ? '-' : ''}₱${item.amount.toFixed(2)}`;
-            doc.text(amountText, pageWidth - margin - 2, yPos, { align: 'right' });
-            yPos += 6;
-        });
-
-        // Balance Due (Highlighted)
-        yPos += 4;
-        doc.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-        doc.rect(pageWidth - margin - 62, yPos - 4, 62, 10, 'F');
+        // Balance Due - Blue highlighted box
+        const balanceDue = price - downPayment;
+        doc.setFillColor(37, 99, 235);
+        doc.rect(summaryX - 2, yPos - 5, 62, 9, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont(undefined, 'bold');
-        doc.setFontSize(12);
-        doc.text('BALANCE DUE:', pageWidth - margin - 60, yPos + 2);
-        const balanceDue = price - downPayment;
-        doc.text(`₱${balanceDue.toFixed(2)}`, pageWidth - margin - 2, yPos + 2, { align: 'right' });
+        doc.setFontSize(10);
+        doc.text('BALANCE DUE:', summaryX, yPos);
+        doc.text(`₱ ${balanceDue.toFixed(0)}`, pageWidth - margin, yPos, { align: 'right' });
 
-        // Payment Info Box
-        yPos += 20;
-        doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+        // Payment Info Box with border
+        yPos += 16;
+        doc.setDrawColor(200, 200, 200);
         doc.setLineWidth(0.5);
-        doc.rect(margin, yPos, contentWidth, 25);
+        doc.rect(margin, yPos, contentWidth, 22);
 
         doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         doc.setFont(undefined, 'bold');
-        doc.setFontSize(10);
-        doc.text('PAYMENT INFORMATION', margin + 2, yPos + 6);
+        doc.setFontSize(9);
+        doc.text('PAYMENT INFORMATION', margin + 3, yPos + 6);
 
         doc.setFont(undefined, 'normal');
-        doc.setFontSize(9);
-        yPos += 12;
+        doc.setFontSize(8);
+        yPos += 11;
         
         const paymentInfo = [
-            `Method: ${data.payment_method || 'N/A'}`,
+            `Method: ${data.payment_method || 'gcash'}`,
             `Reference: ${data.payment_reference || 'N/A'}`,
-            `Status: ${(data.payment_status || 'pending').toUpperCase()}`
+            `Status: ${(data.payment_status || 'PAID').toUpperCase()}`
         ];
 
         paymentInfo.forEach((info, i) => {
-            doc.text(info, margin + 2, yPos + (i * 5));
+            doc.text(info, margin + 3, yPos + (i * 4.5));
         });
 
-        // Footer
-        yPos = pageHeight - 30;
+        // Footer with separator line
+        yPos = pageHeight - 25;
         doc.setLineWidth(0.3);
-        doc.setDrawColor(grayColor[0], grayColor[1], grayColor[2]);
+        doc.setDrawColor(200, 200, 200);
         doc.line(margin, yPos, pageWidth - margin, yPos);
 
-        yPos += 6;
+        yPos += 5;
         doc.setTextColor(grayColor[0], grayColor[1], grayColor[2]);
         doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
         doc.text('For inquiries, contact us at robles_moncayo@yahoo.com', pageWidth/2, yPos, { align: 'center' });
         doc.text(`RMDC - Robles Moncayo Dental Clinic © ${new Date().getFullYear()}`, pageWidth/2, yPos + 5, { align: 'center' });
 
