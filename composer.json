@@ -15,6 +15,7 @@
         "laravel/tinker": "^2.9",
         "luigel/laravel-paymongo": "^2.5",
         "mews/captcha": "^3.4",
+        "mongodb/laravel-mongodb": "^5.1",
         "predis/predis": "*",
         "pusher/pusher-php-server": "^7.2",
         "spatie/image-optimizer": "^1.8"
