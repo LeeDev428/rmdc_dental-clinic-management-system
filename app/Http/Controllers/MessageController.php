@@ -22,10 +22,17 @@ class MessageController extends Controller
                 $adminUser = User::find(1);
             }
             
-            // Fetch messages from MongoDB
+            // Fetch messages from MongoDB - conversation between patient and admin
             $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
                 ->orderBy('created_at', 'asc')
                 ->get();
+            
+            // Debug: Log the count
+            \Log::info('Patient messages loaded', [
+                'patient_id' => Auth::id(),
+                'admin_id' => $adminUser->id,
+                'message_count' => $messages->count()
+            ]);
             
             // Manually attach user data
             $currentUser = Auth::user();
