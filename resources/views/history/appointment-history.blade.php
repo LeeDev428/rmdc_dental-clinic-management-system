@@ -186,7 +186,7 @@
         </div>
         
         <div class="mt-6">
-            {{ $appointments->links() }}
+            {{ $appointments->appends(request()->query())->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     @else
         <div class="text-center py-12">
