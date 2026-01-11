@@ -11,5 +11,19 @@ class Rating extends Model
 
     protected $table = 'ratings_review'; // Updated table name
 
-    protected $fillable = ['rating', 'message', 'user_id', 'appointment_id'];
+    protected $fillable = ['rating', 'message', 'user_id', 'appointment_id', 'featured'];
+
+    protected $casts = [
+        'featured' => 'boolean',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class);
+    }
+
+    public function appointment()
+    {
+        return $this->belongsTo(\App\Models\Appointment::class);
+    }
 }
