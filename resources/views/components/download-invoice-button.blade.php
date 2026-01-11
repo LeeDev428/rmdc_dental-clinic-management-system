@@ -117,11 +117,15 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
 
         yPos += 12;
 
+        // Convert prices to numbers (in case they come as strings)
+        const price = parseFloat(data.price) || 0;
+        const downPayment = parseFloat(data.down_payment) || 0;
+        
         // Service Item
         doc.setFont(undefined, 'normal');
         doc.text(data.procedure, margin + 2, yPos);
         doc.text(`${data.duration} mins`, margin + contentWidth - 50, yPos);
-        doc.text(`₱${data.price.toFixed(2)}`, margin + contentWidth - 2, yPos, { align: 'right' });
+        doc.text(`₱${price.toFixed(2)}`, margin + contentWidth - 2, yPos, { align: 'right' });
 
         yPos += 10;
         doc.setDrawColor(200, 200, 200);
@@ -132,8 +136,8 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         doc.setFontSize(10);
         
         const summaryItems = [
-            { label: 'Subtotal:', amount: data.price },
-            { label: 'Down Payment (20%):', amount: data.down_payment, isNegative: true },
+            { label: 'Subtotal:', amount: price },
+            { label: 'Down Payment (20%):', amount: downPayment, isNegative: true },
         ];
 
         summaryItems.forEach(item => {
@@ -153,7 +157,7 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         doc.setFont(undefined, 'bold');
         doc.setFontSize(12);
         doc.text('BALANCE DUE:', pageWidth - margin - 60, yPos + 2);
-        const balanceDue = data.price - data.down_payment;
+        const balanceDue = price - downPayment;
         doc.text(`₱${balanceDue.toFixed(2)}`, pageWidth - margin - 2, yPos + 2, { align: 'right' });
 
         // Payment Info Box
