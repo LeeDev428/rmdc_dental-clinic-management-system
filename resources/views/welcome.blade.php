@@ -689,6 +689,107 @@
             line-height: 1.6;
         }
 
+        /* Reviews Section */
+        .reviews-section {
+            padding: 80px 40px;
+            background: transparent;
+        }
+
+        .reviews-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .reviews-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .reviews-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .review-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .review-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .review-stars {
+            display: flex;
+            gap: 4px;
+            color: #fbbf24;
+            font-size: 18px;
+        }
+
+        .review-stars .far {
+            color: #e0e0e0;
+        }
+
+        .review-message {
+            color: #4a4a4a;
+            font-size: 15px;
+            line-height: 1.6;
+            font-style: italic;
+            flex-grow: 1;
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00c8d7 0%, #03747c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .author-info h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .author-info p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
         /* Contact Section */
         .contact {
             padding: 60px 40px;
@@ -1271,6 +1372,42 @@
             </div>
         </div>
     </section>
+
+    <!-- Customer Reviews Section -->
+    @if($featuredReviews && $featuredReviews->count() > 0)
+    <section class="reviews-section fade-in" id="reviews">
+        <div class="reviews-container">
+            <h2 class="section-title fade-in">What Our Patients Say</h2>
+            <p class="reviews-subtitle fade-in">Real experiences from our valued patients</p>
+            
+            <div class="reviews-grid">
+                @foreach($featuredReviews as $review)
+                <div class="review-card scale-in">
+                    <div class="review-stars">
+                        @for ($i = 1; $i <= 5; $i++)
+                            @if ($i <= $review->rating)
+                                <i class="fas fa-star"></i>
+                            @else
+                                <i class="far fa-star"></i>
+                            @endif
+                        @endfor
+                    </div>
+                    <p class="review-message">"{{ $review->message ?? 'Excellent service!' }}"</p>
+                    <div class="review-author">
+                        <div class="author-avatar">
+                            {{ $review->user ? strtoupper(substr($review->user->name, 0, 1)) : '?' }}
+                        </div>
+                        <div class="author-info">
+                            <h4>{{ $review->user->name ?? 'Anonymous' }}</h4>
+                            <p>{{ $review->created_at->format('M d, Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    @endif
 
        <!-- Info Cards -->
     <section class="info-section fade-in">
