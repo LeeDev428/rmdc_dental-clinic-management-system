@@ -51,7 +51,7 @@
     position: relative;
     padding: 20px 20px 15px;
     background: linear-gradient(180deg, #fecdd3 0%, #fda4af 100%);
-    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    border-radius: 0 0 45% 45% / 0 0 60% 60%;
     border: 4px solid #f87171;
     border-top: none;
     min-height: 120px;
@@ -87,7 +87,7 @@
     position: relative;
     padding: 15px 20px 20px;
     background: linear-gradient(0deg, #fecdd3 0%, #fda4af 100%);
-    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    border-radius: 45% 45% 0 0 / 60% 60% 0 0;
     border: 4px solid #f87171;
     border-bottom: none;
     min-height: 120px;
