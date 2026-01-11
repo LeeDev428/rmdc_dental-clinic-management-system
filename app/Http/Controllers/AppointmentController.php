@@ -555,7 +555,7 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $appointment = Appointment::findOrFail($id);
         
         // Verify user owns this appointment
-        if ($appointment->user_id !== Auth::id() && !Auth::user()->is_admin) {
+        if ($appointment->user_id !== Auth::id() && Auth::user()->usertype !== 'admin') {
             abort(403, 'Unauthorized access to invoice.');
         }
         
@@ -583,7 +583,7 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $appointment = Appointment::with('user')->findOrFail($id);
         
         // Verify user owns this appointment
-        if ($appointment->user_id !== Auth::id() && !Auth::user()->is_admin) {
+        if ($appointment->user_id !== Auth::id() && Auth::user()->usertype !== 'admin') {
             abort(403, 'Unauthorized access to invoice.');
         }
         
