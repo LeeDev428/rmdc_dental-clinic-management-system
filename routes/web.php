@@ -339,6 +339,16 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::get('/admin/unread-messages-count', [MessageController::class, 'getUnreadMessagesCount']);
     Route::post('/admin/mark-messages-read', [MessageController::class, 'markMessagesAsReadAdmin']);
 
+    // MongoDB Real-time Messaging Routes
+    use App\Http\Controllers\MongoMessageController;
+    Route::middleware('auth')->prefix('mongo-messages')->group(function () {
+        Route::post('/send', [MongoMessageController::class, 'store'])->name('mongo.messages.send');
+        Route::post('/mark-read', [MongoMessageController::class, 'markAsRead'])->name('mongo.messages.mark-read');
+        Route::get('/unread-count', [MongoMessageController::class, 'unreadCount'])->name('mongo.messages.unread-count');
+        Route::get('/conversation', [MongoMessageController::class, 'getMessages'])->name('mongo.messages.conversation');
+        Route::get('/users', [MongoMessageController::class, 'getUserList'])->name('mongo.messages.users');
+    });
+
 
 
 
