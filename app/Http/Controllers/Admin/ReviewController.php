@@ -39,7 +39,7 @@ class ReviewController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
-        $reviews = $query->paginate(15)->withQueryString();
+        $reviews = $query->paginate(15)->appends($request->all());
         $featuredCount = Rating::where('featured', true)->count();
 
         return view('admin.reviews.index', compact('reviews', 'featuredCount'));
