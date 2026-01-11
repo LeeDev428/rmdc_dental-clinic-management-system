@@ -34,10 +34,8 @@
     <button class="btn btn-link btn-sm sidebar-toggle-btn" id="sidebarToggle" href="#!">
         <i class="fas fa-bars"></i>
     </button>
-    <!-- Spacer to push profile dropdown to right -->
-    <div class="ms-auto"></div>
     <!-- Navbar-->
-    <ul class="navbar-nav me-3 me-lg-4">
+    <ul class="navbar-nav ms-auto me-3 me-lg-4">
             <!-- Notification Bell
             <li class="nav-item">
                 <a class="nav-link notification-bell" href="{{ route('admin.upcoming_appointments') }}">
