@@ -110,13 +110,30 @@ body.dark .fc-col-header-cell-cushion { /* Day names */
         /* Landscape Booking Modal */
         .booking-modal-landscape {
             max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .booking-modal-landscape > form {
             overflow-y: auto;
+            flex: 1;
+            padding-right: 10px;
+            margin-bottom: 20px;
         }
 
         .booking-modal-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 40px;
+        }
+        
+        .booking-modal-buttons {
+            flex-shrink: 0;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+            margin-top: 0;
+            background: white;
         }
 
         .booking-column {
@@ -808,6 +825,22 @@ window.onclick = function(event) {
                                                     <strong>Note:</strong> No additional payment required. Your payment will be transferred to the new appointment date.
                                                 </p>
                                             </div>
+                                            
+                                            <!-- Form Action Buttons for Reschedule -->
+                                            <div class="flex justify-end gap-3 mt-6">
+                                                <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                                    Cancel
+                                                </button>
+                                                
+                                                <button type="submit" 
+                                                        id="submit-booking-btn"
+                                                        class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span id="submit-btn-text">Confirm Reschedule</span>
+                                                </button>
+                                            </div>
                                         </div>
                                         @else
                                         <div class="payment-section">
@@ -880,7 +913,6 @@ window.onclick = function(event) {
                                                     </div>
                                                 </label>
                                             </div>
-                                        @endif
 
                                             <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
                                                 <div class="flex items-start">
@@ -894,6 +926,34 @@ window.onclick = function(event) {
                                                     </div>
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Form Action Buttons for Booking -->
+                                            <div class="flex justify-end gap-3 mt-6">
+                                                <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                                    Cancel
+                                                </button>
+                                                
+                                                <button id="delete-appointment" type="button" class="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
+                                                    Delete Appointment
+                                                </button>
+                                                
+                                                <button type="submit" 
+                                                        id="submit-booking-btn"
+                                                        class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                                        {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'disabled' : '' }}>
+                                                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                    <span id="submit-btn-text">
+                                                        @if(isset($hasPendingAppointment) && $hasPendingAppointment)
+                                                            Booking Disabled
+                                                        @else
+                                                            Book Appointment & Pay
+                                                        @endif
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        @endif
                                         </div>
                                     </div>
                                 </div>
@@ -933,78 +993,54 @@ window.onclick = function(event) {
                                         };
                                     }
                                 </script>
-                                <!-- Form Action Buttons -->
-                                <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
-                                    <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                        Cancel
-                                    </button>
-                                    
-                                    <button id="delete-appointment" type="button" class="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
-                                        Delete Appointment
-                                    </button>
-                                    
-                                    <button type="submit" 
-                                            id="submit-booking-btn"
-                                            class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'disabled' : '' }}>
-                                        <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                        <span id="submit-btn-text">
-                                            @if(isset($reschedulingAppointment) && $reschedulingAppointment)
-                                                Confirm Reschedule
-                                            @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
-                                                Booking Disabled
-                                            @else
-                                                Book Appointment & Pay
-                                            @endif
-                                        </span>
-                                    </button>
-                                </div>
-                            </form>
-
-                            <script>
-                                // Payment Calculation
-                                document.getElementById('operation-type').addEventListener('change', function() {
-                                    const selectedOption = this.options[this.selectedIndex];
-                                    const price = parseFloat(selectedOption.dataset.price) || 0;
-                                    const duration = selectedOption.dataset.duration || '';
-                                    
-                                    // Calculate payments
-                                    const downPayment = price * 0.20;
-                                    const balance = price - downPayment;
-                                    
-                                    // Update display fields
-                                    document.getElementById('display-total-price').textContent = '₱' + price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                    document.getElementById('display-down-payment').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                    document.getElementById('display-balance').textContent = '₱' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                    document.getElementById('display-amount-to-pay').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                                    
-                                    // Update hidden fields
-                                    document.getElementById('total-price-hidden').value = price.toFixed(2);
-                                    document.getElementById('down-payment-hidden').value = downPayment.toFixed(2);
-                                    
-                                    // Update duration
-                                    document.getElementById('estimated-time').value = duration ? duration + ' minutes' : '';
-                                });
-
-                                // Terms checkbox localStorage
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    const termsCheckbox = document.getElementById('terms-checkbox');
-                                    const termsAccepted = localStorage.getItem('termsAccepted');
-
-                                    if (termsAccepted === 'true') {
-                                        termsCheckbox.checked = true;
-                                    }
-
-                                    termsCheckbox.addEventListener('change', function () {
-                                        localStorage.setItem('termsAccepted', termsCheckbox.checked);
-                                    });
-                                });
-                            </script>
+                            </div>
+                        </form>
                         </div>
                     </div>
                 </div>
+
+                <script>
+                    // Payment Calculation - only for booking mode (not reschedule)
+                    const operationType = document.getElementById('operation-type');
+                    if (operationType) {
+                        operationType.addEventListener('change', function() {
+                            const selectedOption = this.options[this.selectedIndex];
+                            const price = parseFloat(selectedOption.dataset.price) || 0;
+                            const duration = selectedOption.dataset.duration || '';
+                            
+                            // Calculate payments
+                            const downPayment = price * 0.20;
+                            const balance = price - downPayment;
+                            
+                            // Update display fields
+                            document.getElementById('display-total-price').textContent = '₱' + price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            document.getElementById('display-down-payment').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            document.getElementById('display-balance').textContent = '₱' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            document.getElementById('display-amount-to-pay').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        
+                            // Update hidden fields
+                            document.getElementById('total-price-hidden').value = price.toFixed(2);
+                            document.getElementById('down-payment-hidden').value = downPayment.toFixed(2);
+                            
+                            // Update duration
+                            document.getElementById('estimated-time').value = duration ? duration + ' minutes' : '';
+                        });
+                    }
+
+                    // Terms checkbox localStorage
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const termsCheckbox = document.getElementById('terms-checkbox');
+                        const termsAccepted = localStorage.getItem('termsAccepted');
+
+                        if (termsAccepted === 'true') {
+                            termsCheckbox.checked = true;
+                        }
+
+                        termsCheckbox.addEventListener('change', function () {
+                            localStorage.setItem('termsAccepted', termsCheckbox.checked);
+                        });
+                    });
+                </script>
 
 
                 <!-- Success or Failure Popup -->
@@ -1288,7 +1324,7 @@ window.onclick = function(event) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
             submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            submitBtnText.innerHTML = '<svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Book Appointment & Pay';
+            submitBtnText.textContent = 'Book Appointment & Pay';
         }
 
         // Close rating modal
