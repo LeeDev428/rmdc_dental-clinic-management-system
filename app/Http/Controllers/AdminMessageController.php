@@ -35,9 +35,50 @@ class AdminMessageController extends Controller
        
        // Fetch messages from MongoDB
        $messages = MongoMessage::conversation(auth()->id(), $selectedUser->id)
-           ->with(['sender', 'recipient'])
            ->orderBy('created_at', 'asc')
            ->get();
+       
+       // Manually attach user data
+       $currentUser = auth()->user();
+       $messages = $messages->map(function($msg) use ($selectedUser, $currentUser) {
+           $msgData = is_array($msg) ? $msg : $msg->toArray();
+           
+           // Attach sender info
+           if ($msgData['sender_id'] == $currentUser->id) {
+               $msgData['sender'] = [
+                   'id' => $currentUser->id,
+                   'name' => $currentUser->name,
+                   'avatar' => $currentUser->avatar,
+                   'avatar_url' => $currentUser->avatar_url
+               ];
+           } else {
+               $msgData['sender'] = [
+                   'id' => $selectedUser->id,
+                   'name' => $selectedUser->name,
+                   'avatar' => $selectedUser->avatar,
+                   'avatar_url' => $selectedUser->avatar_url
+               ];
+           }
+           
+           // Attach recipient info
+           if ($msgData['recipient_id'] == $currentUser->id) {
+               $msgData['recipient'] = [
+                   'id' => $currentUser->id,
+                   'name' => $currentUser->name,
+                   'avatar' => $currentUser->avatar,
+                   'avatar_url' => $currentUser->avatar_url
+               ];
+           } else {
+               $msgData['recipient'] = [
+                   'id' => $selectedUser->id,
+                   'name' => $selectedUser->name,
+                   'avatar' => $selectedUser->avatar,
+                   'avatar_url' => $selectedUser->avatar_url
+               ];
+           }
+           
+           return (object) $msgData;
+       });
    }
    $pendingCount = Appointment::where('status', 'pending')->count();
    
