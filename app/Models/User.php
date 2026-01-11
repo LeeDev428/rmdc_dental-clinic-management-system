@@ -112,4 +112,24 @@ class User extends Authenticatable implements MustVerifyEmail
         {
             return $this->hasMany(Appointment::class);
         }
+        
+        /**
+         * Check if user is admin
+         * 
+         * @return bool
+         */
+        public function isAdmin(): bool
+        {
+            return $this->usertype === 'admin';
+        }
+        
+        /**
+         * Get is_admin attribute for backward compatibility
+         * 
+         * @return bool
+         */
+        public function getIsAdminAttribute(): bool
+        {
+            return $this->usertype === 'admin';
+        }
 }
