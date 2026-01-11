@@ -50,10 +50,16 @@ class MongoMessage extends Model
     // Scope for conversation between two users
     public function scopeConversation($query, $userId1, $userId2)
     {
+        // Cast to integers to ensure type matching
+        $userId1 = (int)$userId1;
+        $userId2 = (int)$userId2;
+        
         return $query->where(function ($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId1)->where('recipient_id', $userId2);
-        })->orWhere(function ($q) use ($userId1, $userId2) {
-            $q->where('sender_id', $userId2)->where('recipient_id', $userId1);
+            $q->where(function ($q2) use ($userId1, $userId2) {
+                $q2->where('sender_id', $userId1)->where('recipient_id', $userId2);
+            })->orWhere(function ($q2) use ($userId1, $userId2) {
+                $q2->where('sender_id', $userId2)->where('recipient_id', $userId1);
+            });
         });
     }
 }
