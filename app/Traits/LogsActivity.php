@@ -91,16 +91,27 @@ trait LogsActivity
      */
     protected function logPaymentActivity($action, $payment, $additionalData = [])
     {
-        $data = array_merge([
-            'payment_id' => $payment->id,
-            'amount' => $payment->amount,
-            'payment_method' => $payment->payment_method ?? null,
-            'patient_name' => $payment->appointment->user->name ?? 'Unknown',
-        ], $additionalData);
+        $baseData = [];
+        
+        // Only access payment properties if payment object exists
+        if ($payment) {
+            $baseData = [
+                'payment_id' => $payment->id,
+                'amount' => $payment->amount,
+                'payment_method' => $payment->payment_method ?? null,
+                'patient_name' => $payment->appointment->user->name ?? 'Unknown',
+            ];
+        }
+        
+        $data = array_merge($baseData, $additionalData);
+
+        // Build description based on available data
+        $amount = $payment ? $payment->amount : ($additionalData['amount'] ?? 0);
+        $description = ucfirst($action) . ' payment of ₱' . number_format($amount, 2);
 
         $this->logActivity(
             'payment_' . $action,
-            ucfirst($action) . ' payment of ₱' . number_format($payment->amount, 2),
+            $description,
             $data
         );
     }
