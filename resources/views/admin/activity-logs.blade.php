@@ -150,6 +150,59 @@
         color: #6b7280;
     }
     
+    /* Ultra-specific pagination overrides for Bootstrap */
+    div.logs-table-container nav[aria-label="Page navigation"] ul.pagination,
+    div.logs-table-container .pagination {
+        display: flex !important;
+        gap: 4px !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+    
+    div.logs-table-container .pagination li,
+    div.logs-table-container .pagination .page-item {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    div.logs-table-container .pagination li a,
+    div.logs-table-container .pagination li span,
+    div.logs-table-container .pagination .page-item .page-link {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+        border-radius: 4px !important;
+        border: 1px solid #d1d5db !important;
+        color: #374151 !important;
+        min-width: 30px !important;
+        height: 30px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        margin: 0 2px !important;
+        text-decoration: none !important;
+        background: white !important;
+    }
+    
+    div.logs-table-container .pagination li.active a,
+    div.logs-table-container .pagination li.active span,
+    div.logs-table-container .pagination .page-item.active .page-link {
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: white !important;
+    }
+    
+    div.logs-table-container .pagination li.disabled a,
+    div.logs-table-container .pagination li.disabled span,
+    div.logs-table-container .pagination .page-item.disabled .page-link {
+        color: #9ca3af !important;
+        background: #f3f4f6 !important;
+        cursor: not-allowed !important;
+    }
+    }
+    
     .empty-state i {
         font-size: 48px;
         margin-bottom: 16px;
@@ -235,8 +288,8 @@
                 </tbody>
             </table>
             
-            <div style="margin-top: 24px;">
-                {{ $logs->links() }}
+            <div id="pagination-wrapper" style="margin-top: 24px;">
+                {{ $logs->links('vendor.pagination.compact-bootstrap-5') }}
             </div>
         @else
             <div class="empty-state">
