@@ -29,9 +29,7 @@ class AdminMessageController extends Controller
    
    // Attach last message from MongoDB to each user
    $currentUserId = auth()->id();
-   $users = $users->map(function($user) use ($currentUserId) {
-       $userData = $user->toArray();
-       
+   foreach ($users as $user) {
        // Get last message between admin and this user from MongoDB
        $lastMessage = MongoMessage::where(function($query) use ($user, $currentUserId) {
            $query->where(function($q) use ($user, $currentUserId) {
@@ -45,20 +43,18 @@ class AdminMessageController extends Controller
        ->orderBy('created_at', 'desc')
        ->first();
        
-       // Attach MongoDB message data
+       // Attach MongoDB message data as properties
        if ($lastMessage) {
-           $userData['last_message'] = $lastMessage->message;
-           $userData['last_message_time'] = $lastMessage->created_at;
+           $user->last_message = $lastMessage->message;
+           $user->last_message_time = $lastMessage->created_at;
        } else {
-           $userData['last_message'] = null;
-           $userData['last_message_time'] = null;
+           $user->last_message = null;
+           $user->last_message_time = null;
        }
-       
-       return (object) $userData;
-   });
+   }
    
    // Sort users by last message time
-   $users = collect($users)->sortByDesc(function($user) {
+   $users = $users->sortByDesc(function($user) {
        return $user->last_message_time ?? '1970-01-01';
    })->values();
 
@@ -67,6 +63,12 @@ class AdminMessageController extends Controller
 
    if ($request->has('user_id')) {
        $selectedUser = User::find($request->user_id);
+       
+       // Debug: Log the conversation participants
+       \Log::info('Admin conversation initialized', [
+           'admin_id' => auth()->id(),
+           'patient_id' => $selectedUser->id
+       ]);
        
        // Fetch messages from MongoDB
        $messages = MongoMessage::conversation(auth()->id(), $selectedUser->id)
@@ -77,49 +79,21 @@ class AdminMessageController extends Controller
        \Log::info('Admin messages loaded', [
            'admin_id' => auth()->id(),
            'patient_id' => $selectedUser->id,
-           'message_count' => $messages->count()
+           'message_count' => $messages->count(),
+           'sample_messages' => $messages->take(2)->map(fn($m) => [
+               'sender' => $m->sender_id,
+               'recipient' => $m->recipient_id,
+               'message' => substr($m->message, 0, 20)
+           ])
        ]);
        
        // Manually attach user data
        $currentUser = auth()->user();
        $messages = $messages->map(function($msg) use ($selectedUser, $currentUser) {
-           $msgData = is_array($msg) ? $msg : $msg->toArray();
-           
-           // Attach sender info
-           if ($msgData['sender_id'] == $currentUser->id) {
-               $msgData['sender'] = [
-                   'id' => $currentUser->id,
-                   'name' => $currentUser->name,
-                   'avatar' => $currentUser->avatar,
-                   'avatar_url' => $currentUser->avatar_url
-               ];
-           } else {
-               $msgData['sender'] = [
-                   'id' => $selectedUser->id,
-                   'name' => $selectedUser->name,
-                   'avatar' => $selectedUser->avatar,
-                   'avatar_url' => $selectedUser->avatar_url
-               ];
-           }
-           
-           // Attach recipient info
-           if ($msgData['recipient_id'] == $currentUser->id) {
-               $msgData['recipient'] = [
-                   'id' => $currentUser->id,
-                   'name' => $currentUser->name,
-                   'avatar' => $currentUser->avatar,
-                   'avatar_url' => $currentUser->avatar_url
-               ];
-           } else {
-               $msgData['recipient'] = [
-                   'id' => $selectedUser->id,
-                   'name' => $selectedUser->name,
-                   'avatar' => $selectedUser->avatar,
-                   'avatar_url' => $selectedUser->avatar_url
-               ];
-           }
-           
-           return (object) $msgData;
+           // Don't convert to array, work with the model instance
+           $msg->sender = $msg->sender_id == $currentUser->id ? $currentUser : $selectedUser;
+           $msg->recipient = $msg->recipient_id == $currentUser->id ? $currentUser : $selectedUser;
+           return $msg;
        });
    }
    $pendingCount = Appointment::where('status', 'pending')->count();
