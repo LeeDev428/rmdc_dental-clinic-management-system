@@ -546,4 +546,32 @@ $endTime = $startTime->copy()->addMinutes($duration);
             'cleared_count' => $clearedCount
         ]);
     }
+    
+    /**
+     * Download invoice for an appointment
+     */
+    public function downloadInvoice($id)
+    {
+        $appointment = Appointment::findOrFail($id);
+        
+        // Verify user owns this appointment
+        if ($appointment->user_id !== Auth::id() && !Auth::user()->is_admin) {
+            abort(403, 'Unauthorized access to invoice.');
+        }
+        
+        // Get procedure price
+        $procedurePrice = ProcedurePrice::where('procedure_name', $appointment->procedure)->first();
+        $amount = $appointment->total_price ?? ($procedurePrice ? $procedurePrice->price : 0);
+        
+        // Generate simple HTML invoice
+        $html = view('invoices.invoice-template', [
+            'appointment' => $appointment,
+            'amount' => $amount
+        ])->render();
+        
+        // Return HTML response (can be enhanced with PDF generation later)
+        return response($html)
+            ->header('Content-Type', 'text/html')
+            ->header('Content-Disposition', 'inline; filename="invoice-' . $appointment->id . '.html"');
+    }
 }
