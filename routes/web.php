@@ -126,6 +126,10 @@
     // History Settings
     Route::get('/history-settings', [HistorySettingsController::class, 'index'])->name('history.settings');
     
+    // Invoice Routes
+    Route::get('/invoice/{id}/download', [AppointmentController::class, 'downloadInvoice'])->name('invoice.download');
+    Route::get('/invoice/{id}/data', [AppointmentController::class, 'getInvoiceData'])->name('invoice.data');
+    
     // Health Progress
     Route::get('/health-progress', [HealthProgressController::class, 'index'])->name('health.progress');
     
