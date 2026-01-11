@@ -305,23 +305,15 @@
             <div class="info-box clinic">
                 <h3>Clinic Information</h3>
                 <p><strong>RMDC - Robles Moncayo Dental Clinic</strong></p>
-                <p>Unit F Medina Bldg, Niog Elementary School</p>
-                <p>Bacoor, Cavite, Philippines</p>
-                <p><br></p>
-                <p>Email: robles_moncayo@yahoo.com</p>
-                <p>Phone: (+63) 912-3456-789</p>
+                <p>Unit F Medina Bldg, Niog Elementary School, Bacoor, Cavite</p>
+                <p>Email: robles_moncayo@yahoo.com | Phone: (+63) 912-3456-789</p>
             </div>
             
             <div class="info-box patient">
                 <h3>Patient Information</h3>
-                <p><strong>Patient Name</strong></p>
-                <p>{{ $appointment->user->name }}</p>
-                <p><br></p>
-                <p><strong>Email Address</strong></p>
+                <p><strong>{{ $appointment->user->name }}</strong></p>
                 <p>{{ $appointment->user->email }}</p>
-                <p><br></p>
-                <p><strong>Attending Doctor</strong></p>
-                <p>Admin User</p>
+                <p>Attending Doctor: Admin User</p>
             </div>
         </div>
         
@@ -344,11 +336,11 @@
                             <div class="procedure-type">Dental Procedure</div>
                         </td>
                         <td>
-                            <div>Date: {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('F d, Y') }}</div>
-                            <div>Time: {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }} - {{ \Carbon\Carbon::parse($appointment->appointment_time)->addMinutes($appointment->duration ?? 60)->format('g:i A') }}</div>
-                            <div>Duration: {{ $appointment->duration ?? '1.5 hours' }} minutes</div>
+                            <div>Date: {{ \Carbon\Carbon::parse($appointment->start)->format('F d, Y') }}</div>
+                            <div>Time: {{ \Carbon\Carbon::parse($appointment->start)->format('g:i A') }}</div>
+                            <div>Duration: {{ $appointment->duration ?? 60 }} minutes</div>
                         </td>
-                        <td>₱{{ number_format($appointment->price, 2) }}</td>
+                        <td>PHP {{ number_format($appointment->total_price ?? 0, 2) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -356,38 +348,40 @@
         
         <!-- Payment Information & Summary -->
         <div class="payment-section">
-            <div class="payment-box">
-                <h4>Payment Information</h4>
-                <div class="payment-row">
-                    <span class="payment-label">Payment Method</span>
-                    <span class="payment-value">{{ strtoupper($appointment->payment_method ?? 'GCASH') }}</span>
+            <div class="payment-grid">
+                <div class="payment-box">
+                    <h4>Payment Information</h4>
+                    <div class="payment-row">
+                        <span class="payment-label">Payment Method</span>
+                        <span class="payment-value">{{ strtoupper($appointment->payment_method ?? 'GCASH') }}</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Reference ID</span>
+                        <span class="payment-value">{{ $appointment->payment_reference ?? 'N/A' }}</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Status</span>
+                        <span class="payment-value">{{ strtoupper($appointment->payment_status ?? 'PAID') }}</span>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Booked On</span>
+                        <span class="payment-value">{{ $appointment->created_at->format('M d, Y g:i A') }}</span>
+                    </div>
                 </div>
-                <div class="payment-row">
-                    <span class="payment-label">Reference ID</span>
-                    <span class="payment-value">{{ $appointment->payment_reference ?? 'pay_7z?Qw?qPADVNwV4F1jLQsb?q' }}</span>
-                </div>
-                <div class="payment-row">
-                    <span class="payment-label">Status</span>
-                    <span class="payment-value">{{ strtoupper($appointment->payment_status ?? 'PAID') }}</span>
-                </div>
-                <div class="payment-row">
-                    <span class="payment-label">Booked On</span>
-                    <span class="payment-value">{{ $appointment->created_at->format('M d, Y g:i A') }}</span>
-                </div>
-            </div>
-            
-            <div class="summary-box">
-                <div class="summary-row">
-                    <span class="summary-label">Total Amount</span>
-                    <span class="summary-value">₱{{ number_format($appointment->price, 2) }}</span>
-                </div>
-                <div class="summary-row deduction">
-                    <span class="summary-label">Down Payment (20%)</span>
-                    <span class="summary-value">- ₱{{ number_format($appointment->down_payment ?? ($appointment->price * 0.2), 2) }}</span>
-                </div>
-                <div class="summary-row total">
-                    <span class="summary-label">Balance Due</span>
-                    <span class="summary-value">₱{{ number_format($appointment->price - ($appointment->down_payment ?? ($appointment->price * 0.2)), 2) }}</span>
+                
+                <div class="summary-box">
+                    <div class="summary-row">
+                        <span class="summary-label">Total Amount</span>
+                        <span class="summary-value">PHP {{ number_format($appointment->total_price ?? 0, 2) }}</span>
+                    </div>
+                    <div class="summary-row deduction">
+                        <span class="summary-label">Down Payment (20%)</span>
+                        <span class="summary-value">-PHP {{ number_format($appointment->down_payment ?? 0, 2) }}</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span class="summary-label">Balance Due</span>
+                        <span class="summary-value">PHP {{ number_format(($appointment->total_price ?? 0) - ($appointment->down_payment ?? 0), 2) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
