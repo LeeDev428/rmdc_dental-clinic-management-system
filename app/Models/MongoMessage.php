@@ -30,12 +30,12 @@ class MongoMessage extends Model
     // Relationships
     public function sender()
     {
-        return $this->belongsTo(User::class, 'sender_id');
+        return $this->belongsTo(User::class, 'sender_id', 'id', 'sender');
     }
 
     public function recipient()
     {
-        return $this->belongsTo(User::class, 'recipient_id');
+        return $this->belongsTo(User::class, 'recipient_id', 'id', 'recipient');
     }
 
     // Mark as read
