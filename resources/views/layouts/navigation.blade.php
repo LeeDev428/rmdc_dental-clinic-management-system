@@ -58,7 +58,7 @@
                                 <span class="text-gray-300 dark:text-gray-600">|</span>
                                 <x-nav-link :href="route('appointment.cancel')" :active="request()->routeIs('appointment.cancel')" 
                                             class="text-sm font-medium px-4 py-2 whitespace-nowrap">
-                                    <i class="fas fa-times-circle mr-2"></i>Cancel Appointment
+                                    <i class="fas fa-times-circle mr-2"></i>Cancel/Resched Appointment
                                 </x-nav-link>
                             </div>
                             
@@ -391,7 +391,7 @@ function formatDate(dateString) {
   {{-- <x-dropdown-link :href="route('profile.edit')" class="text-gray-700 dark:text-white">{{ __('Profile') }}</x-dropdown-link>  --}}
         <x-dropdown-link :href="route('appointments')" class="text-gray-700 dark:text-white">{{ __('Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('appointment.history')" class="text-gray-700 dark:text-white">{{ __('Appointment History') }}</x-dropdown-link>
-        <x-dropdown-link :href="route('appointment.cancel')" class="text-gray-700 dark:text-white">{{ __('Cancel Appointment') }}</x-dropdown-link>
+        <x-dropdown-link :href="route('appointment.cancel')" class="text-gray-700 dark:text-white">{{ __('Cancel/Resched Appointment') }}</x-dropdown-link>
         <x-dropdown-link :href="route('patient.dental_records')" class="text-gray-700 dark:text-white">{{ __('Dental Records') }}</x-dropdown-link>
         <x-dropdown-link :href="route('health.progress')" class="text-gray-700 dark:text-white">{{ __('Health Progress') }}</x-dropdown-link>
         <x-dropdown-link :href="route('dashboard')" class="text-gray-700 dark:text-white">{{ __('Dashboard') }}</x-dropdown-link>
