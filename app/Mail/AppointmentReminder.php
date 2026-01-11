@@ -6,8 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Appointment;
+use App\Services\InvoicePdfGenerator;
 
 class AppointmentReminder extends Mailable
 {
@@ -54,6 +56,9 @@ class AppointmentReminder extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromData(fn () => InvoicePdfGenerator::generateAsString($this->appointment), InvoicePdfGenerator::getFilename($this->appointment))
+                ->withMime('application/pdf'),
+        ];
     }
 }
