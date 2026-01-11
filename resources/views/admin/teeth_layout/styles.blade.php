@@ -46,68 +46,76 @@
 .arch-chart { padding:30px 20px; background:linear-gradient(180deg,#fafafa 0%,#f5f5f5 100%); position:relative; }
 .mouth-container { max-width:420px; margin:0 auto; position:relative; }
 
-/* Upper Arch - Real U-shape */
+/* Upper Arch - Real U-shape (inverted U for upper) */
 .upper-arch { 
     position: relative;
-    padding: 50px 15px 20px;
+    padding: 20px 20px 15px;
     background: linear-gradient(180deg, #fecdd3 0%, #fda4af 100%);
-    border-radius: 180px 180px 0 0;
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
     border: 4px solid #f87171;
-    border-bottom: none;
-    min-height: 140px;
+    border-top: none;
+    min-height: 120px;
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     justify-content: center;
 }
 .upper-arch::before {
     content: 'UPPER';
     position: absolute;
-    top: 12px;
+    top: -28px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
     font-weight: 700;
     color: #dc2626;
     letter-spacing: 3px;
+    background: #f5f5f5;
+    padding: 4px 12px;
+    border-radius: 4px;
 }
 .upper-teeth-row {
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 2px;
     position: relative;
+    padding-top: 10px;
 }
 
-/* Lower Arch - Inverted U-shape */
+/* Lower Arch - U-shape */
 .lower-arch { 
     position: relative;
-    padding: 20px 15px 50px;
+    padding: 15px 20px 20px;
     background: linear-gradient(0deg, #fecdd3 0%, #fda4af 100%);
-    border-radius: 0 0 180px 180px;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     border: 4px solid #f87171;
-    border-top: none;
-    min-height: 140px;
+    border-bottom: none;
+    min-height: 120px;
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     justify-content: center;
 }
 .lower-arch::after {
     content: 'LOWER';
     position: absolute;
-    bottom: 12px;
+    bottom: -28px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 11px;
     font-weight: 700;
     color: #dc2626;
     letter-spacing: 3px;
+    background: #f5f5f5;
+    padding: 4px 12px;
+    border-radius: 4px;
 }
 .lower-teeth-row {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: flex-end;
     gap: 2px;
     position: relative;
+    padding-bottom: 10px;
 }
 
 /* Divider between arches */
@@ -155,25 +163,25 @@
     border-radius: 2px;
 }
 
-/* Tooth with curved positioning - Upper arch teeth curve up at ends */
-.upper-arch .arch-quadrant .tooth:nth-child(1) { margin-bottom: 22px; }
-.upper-arch .arch-quadrant .tooth:nth-child(2) { margin-bottom: 16px; }
-.upper-arch .arch-quadrant .tooth:nth-child(3) { margin-bottom: 11px; }
-.upper-arch .arch-quadrant .tooth:nth-child(4) { margin-bottom: 7px; }
-.upper-arch .arch-quadrant .tooth:nth-child(5) { margin-bottom: 4px; }
-.upper-arch .arch-quadrant .tooth:nth-child(6) { margin-bottom: 2px; }
-.upper-arch .arch-quadrant .tooth:nth-child(7) { margin-bottom: 1px; }
-.upper-arch .arch-quadrant .tooth:nth-child(8) { margin-bottom: 0px; }
+/* Tooth with curved positioning - Upper arch teeth curve DOWN into mouth (molars higher) */
+.upper-arch .arch-quadrant .tooth:nth-child(1) { margin-top: 22px; }
+.upper-arch .arch-quadrant .tooth:nth-child(2) { margin-top: 16px; }
+.upper-arch .arch-quadrant .tooth:nth-child(3) { margin-top: 11px; }
+.upper-arch .arch-quadrant .tooth:nth-child(4) { margin-top: 7px; }
+.upper-arch .arch-quadrant .tooth:nth-child(5) { margin-top: 4px; }
+.upper-arch .arch-quadrant .tooth:nth-child(6) { margin-top: 2px; }
+.upper-arch .arch-quadrant .tooth:nth-child(7) { margin-top: 1px; }
+.upper-arch .arch-quadrant .tooth:nth-child(8) { margin-top: 0px; }
 
-/* Lower arch teeth curve down at ends */
-.lower-arch .arch-quadrant .tooth:nth-child(1) { margin-top: 22px; }
-.lower-arch .arch-quadrant .tooth:nth-child(2) { margin-top: 16px; }
-.lower-arch .arch-quadrant .tooth:nth-child(3) { margin-top: 11px; }
-.lower-arch .arch-quadrant .tooth:nth-child(4) { margin-top: 7px; }
-.lower-arch .arch-quadrant .tooth:nth-child(5) { margin-top: 4px; }
-.lower-arch .arch-quadrant .tooth:nth-child(6) { margin-top: 2px; }
-.lower-arch .arch-quadrant .tooth:nth-child(7) { margin-top: 1px; }
-.lower-arch .arch-quadrant .tooth:nth-child(8) { margin-top: 0px; }
+/* Lower arch teeth curve UP into mouth (molars lower) */
+.lower-arch .arch-quadrant .tooth:nth-child(1) { margin-bottom: 22px; }
+.lower-arch .arch-quadrant .tooth:nth-child(2) { margin-bottom: 16px; }
+.lower-arch .arch-quadrant .tooth:nth-child(3) { margin-bottom: 11px; }
+.lower-arch .arch-quadrant .tooth:nth-child(4) { margin-bottom: 7px; }
+.lower-arch .arch-quadrant .tooth:nth-child(5) { margin-bottom: 4px; }
+.lower-arch .arch-quadrant .tooth:nth-child(6) { margin-bottom: 2px; }
+.lower-arch .arch-quadrant .tooth:nth-child(7) { margin-bottom: 1px; }
+.lower-arch .arch-quadrant .tooth:nth-child(8) { margin-bottom: 0px; }
 
 /* Tooth with realistic shape */
 .tooth { 
