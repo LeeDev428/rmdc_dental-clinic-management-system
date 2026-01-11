@@ -348,6 +348,12 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
         Route::get('/conversation', [MongoMessageController::class, 'getMessages'])->name('mongo.messages.conversation');
         Route::get('/users', [MongoMessageController::class, 'getUserList'])->name('mongo.messages.users');
     });
+    
+    // Real-time Messaging Views
+    Route::middleware('auth')->group(function () {
+        Route::get('/realtime-messages', [MongoMessageController::class, 'patientIndex'])->name('realtime.messages');
+        Route::get('/admin/realtime-messages', [MongoMessageController::class, 'adminIndex'])->name('admin.realtime.messages');
+    });
 
 
 
