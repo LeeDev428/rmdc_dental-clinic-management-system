@@ -709,9 +709,16 @@
 
         .reviews-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
             margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .reviews-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -723,71 +730,76 @@
 
         .review-card {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #f0f0f0;
+            transition: all 0.2s;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .review-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #e0e0e0;
         }
 
         .review-stars {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             color: #fbbf24;
-            font-size: 18px;
+            font-size: 14px;
         }
 
         .review-stars .far {
-            color: #e0e0e0;
+            color: #e5e7eb;
         }
 
         .review-message {
-            color: #4a4a4a;
-            font-size: 15px;
+            color: #6b7280;
+            font-size: 14px;
             line-height: 1.6;
-            font-style: italic;
             flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .review-author {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding-top: 15px;
-            border-top: 1px solid #e0e0e0;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px solid #f3f4f6;
         }
 
         .author-avatar {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #00c8d7 0%, #03747c 100%);
+            background: #f3f4f6;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 14px;
         }
 
         .author-info h4 {
             margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
         }
 
         .author-info p {
-            margin: 4px 0 0 0;
-            font-size: 13px;
-            color: #6b7280;
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: #9ca3af;
         }
 
         /* Contact Section */
@@ -1375,6 +1387,19 @@
 
     <!-- Customer Reviews Section -->
     @if($featuredReviews && $featuredReviews->count() > 0)
+    @php
+        function anonymizeName($name) {
+            if (!$name) return 'Anonymous';
+            $parts = explode(' ', $name);
+            $anonymized = [];
+            foreach ($parts as $part) {
+                if (strlen($part) > 0) {
+                    $anonymized[] = strtoupper(substr($part, 0, 1)) . str_repeat('*', strlen($part) - 1);
+                }
+            }
+            return implode(' ', $anonymized);
+        }
+    @endphp
     <section class="reviews-section fade-in" id="reviews">
         <div class="reviews-container">
             <h2 class="section-title fade-in">What Our Patients Say</h2>
@@ -1392,13 +1417,13 @@
                             @endif
                         @endfor
                     </div>
-                    <p class="review-message">"{{ $review->message ?? 'Excellent service!' }}"</p>
+                    <p class="review-message">{{ $review->message ?? 'Excellent service!' }}</p>
                     <div class="review-author">
                         <div class="author-avatar">
                             {{ $review->user ? strtoupper(substr($review->user->name, 0, 1)) : '?' }}
                         </div>
                         <div class="author-info">
-                            <h4>{{ $review->user->name ?? 'Anonymous' }}</h4>
+                            <h4>{{ anonymizeName($review->user->name ?? 'Anonymous') }}</h4>
                             <p>{{ $review->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>
