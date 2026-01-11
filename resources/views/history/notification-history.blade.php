@@ -109,7 +109,7 @@
         </div>
         
         <div class="mt-6">
-            {{ $notifications->links() }}
+            {{ $notifications->appends(request()->query())->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     @else
         <div class="text-center py-12">
