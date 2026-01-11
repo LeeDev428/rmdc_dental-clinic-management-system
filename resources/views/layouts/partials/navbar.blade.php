@@ -25,6 +25,17 @@
         border-radius: 50%;
         padding: 3px 6px;
     }
+    
+    /* Profile dropdown styling */
+    .nav-link.dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .nav-link.dropdown-toggle::after {
+        margin-left: 0;
+    }
 </style>
 
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
