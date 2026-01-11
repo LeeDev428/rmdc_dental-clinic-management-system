@@ -1176,7 +1176,9 @@ window.onclick = function(event) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     rating: selectedRating,
@@ -1184,23 +1186,38 @@ window.onclick = function(event) {
                     appointment_id: appointmentId
                 })
             })
-            .then(response => {
+            .then(async response => {
+                const contentType = response.headers.get('content-type');
                 if (!response.ok) {
                     console.error('Response status:', response.status);
-                    return response.json().then(err => {
+                    // Try to parse error message
+                    if (contentType && contentType.includes('application/json')) {
+                        const err = await response.json();
                         throw new Error(err.message || 'Failed to submit rating.');
-                    });
+                    } else {
+                        // Server returned HTML error page
+                        throw new Error(`Server error (${response.status}). Please check if you are logged in.`);
+                    }
                 }
-                return response.json();
+                // Ensure response is JSON
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    throw new Error('Server returned invalid response format.');
+                }
             })
             .then(data => {
                 console.log('Rating submitted:', data);
                 showToast('Thank you for your feedback!', 'success');
                 ratingModal.classList.add('hidden');
+                // Reset form
+                selectedRating = null;
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('text-yellow-400'));
+                document.getElementById('rating-message').value = '';
             })
             .catch(error => {
                 console.error('Error submitting rating:', error);
-                showToast('An error occurred while submitting your rating. Please try again.', 'error');
+                showToast(error.message || 'An error occurred while submitting your rating. Please try again.', 'error');
             });
         });
 
