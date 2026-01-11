@@ -24,9 +24,50 @@ class MessageController extends Controller
             
             // Fetch messages from MongoDB
             $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
-                ->with(['sender', 'recipient'])
                 ->orderBy('created_at', 'asc')
                 ->get();
+            
+            // Manually attach user data
+            $currentUser = Auth::user();
+            $messages = $messages->map(function($msg) use ($adminUser, $currentUser) {
+                $msgData = is_array($msg) ? $msg : $msg->toArray();
+                
+                // Attach sender info
+                if ($msgData['sender_id'] == $currentUser->id) {
+                    $msgData['sender'] = [
+                        'id' => $currentUser->id,
+                        'name' => $currentUser->name,
+                        'avatar' => $currentUser->avatar,
+                        'avatar_url' => $currentUser->avatar_url
+                    ];
+                } else {
+                    $msgData['sender'] = [
+                        'id' => $adminUser->id,
+                        'name' => $adminUser->name,
+                        'avatar' => $adminUser->avatar,
+                        'avatar_url' => $adminUser->avatar_url
+                    ];
+                }
+                
+                // Attach recipient info
+                if ($msgData['recipient_id'] == $currentUser->id) {
+                    $msgData['recipient'] = [
+                        'id' => $currentUser->id,
+                        'name' => $currentUser->name,
+                        'avatar' => $currentUser->avatar,
+                        'avatar_url' => $currentUser->avatar_url
+                    ];
+                } else {
+                    $msgData['recipient'] = [
+                        'id' => $adminUser->id,
+                        'name' => $adminUser->name,
+                        'avatar' => $adminUser->avatar,
+                        'avatar_url' => $adminUser->avatar_url
+                    ];
+                }
+                
+                return (object) $msgData;
+            });
             
             // Retrieve the logged-in user's details
             $selectedUser = Auth::user();  // Fetch the currently authenticated user (patient)
