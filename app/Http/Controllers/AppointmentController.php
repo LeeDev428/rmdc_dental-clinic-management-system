@@ -24,6 +24,18 @@ class AppointmentController extends Controller
             ->whereIn('status', ['pending', 'rescheduled'])
             ->exists();
         
+        // Check for completed appointments that haven't been reviewed
+        $completedWithoutReview = Appointment::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->whereNull('reviewed_at')
+            ->first();
+        
+        // If there's a completed appointment without review, set session flag
+        if ($completedWithoutReview) {
+            session()->flash('show_review_modal', true);
+            session()->flash('review_appointment_id', $completedWithoutReview->id);
+        }
+        
         $appointments = Appointment::all();
         $procedurePrices = ProcedurePrice::all(); // Fetch procedure prices from the database
         $selectedDate = $request->input('date', now()->toDateString());
@@ -33,7 +45,7 @@ class AppointmentController extends Controller
         $reschedulingAppointment = null;
         
         if ($reschedulingAppointmentId) {
-            $reschedulingAppointment = Appointment::find($reschedulingAppointmentId);
+            $reschedulingAppointment = Appointment::with('latestPayment')->find($reschedulingAppointmentId);
             
             // Verify ownership
             if ($reschedulingAppointment && $reschedulingAppointment->user_id != $user->id) {
