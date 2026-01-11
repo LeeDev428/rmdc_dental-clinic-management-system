@@ -1,76 +1,72 @@
 <div id="teeth-layout-container" class="d-none">
-    <div class="patient-info">
-        <div class="patient-name" id="patient-name">Patient Name</div>
-        <div class="patient-id" id="patient-id">Patient ID: #000</div>
+    <!-- Patient Header -->
+    <div class="patient-header">
+        <div class="patient-info-left">
+            <h3 id="patient-name">Patient Name</h3>
+            <span id="patient-id">ID: #000</span>
+        </div>
+        <button class="btn btn-success btn-sm" onclick="initializeDefaultLayout()">
+            <i class="fas fa-plus"></i> Initialize 32 Teeth
+        </button>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value" id="stat-total">32</div>
-            <div class="stat-label">Total Teeth</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="stat-healthy" style="color: #10b981;">0</div>
-            <div class="stat-label">Healthy</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-value" id="stat-treatment" style="color: #ef4444;">0</div>
-            <div class="stat-label">Need Treatment</div>
-        </div>
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-box"><span id="stat-total" class="stat-num">0</span><small>Total</small></div>
+        <div class="stat-box good"><span id="stat-healthy" class="stat-num">0</span><small>Healthy</small></div>
+        <div class="stat-box bad"><span id="stat-treatment" class="stat-num">0</span><small>Treatment</small></div>
     </div>
 
-    <div class="legend-section">
-        <div class="legend-title">Condition Legend</div>
-        <div class="legend-grid">
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #10b981;"></div>
-                <span>Healthy</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #fbbf24;"></div>
-                <span>Watch</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #f59e0b;"></div>
-                <span>Cavity</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ef4444;"></div>
-                <span>Treatment</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #8b5cf6;"></div>
-                <span>Crown</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #3b82f6;"></div>
-                <span>Implant</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ec4899;"></div>
-                <span>Root Canal</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #6b7280;"></div>
-                <span>Missing</span>
-            </div>
-        </div>
+    <!-- Legend -->
+    <div class="legend-bar">
+        <span class="legend-item"><i class="dot" style="background:#10b981"></i> Healthy</span>
+        <span class="legend-item"><i class="dot" style="background:#fbbf24"></i> Watch</span>
+        <span class="legend-item"><i class="dot" style="background:#f59e0b"></i> Cavity</span>
+        <span class="legend-item"><i class="dot" style="background:#ef4444"></i> Treatment</span>
+        <span class="legend-item"><i class="dot" style="background:#8b5cf6"></i> Crown</span>
+        <span class="legend-item"><i class="dot" style="background:#3b82f6"></i> Filling</span>
+        <span class="legend-item"><i class="dot" style="background:#ec4899"></i> Root Canal</span>
+        <span class="legend-item"><i class="dot" style="background:#6b7280"></i> Missing</span>
     </div>
 
-    <div class="content-card">
-        <div class="chart-title">Interactive Dental Chart</div>
-        <div class="dental-chart">
-            <svg id="teeth-chart" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 600px;">
-                <line x1="400" y1="50" x2="400" y2="550" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
-                <line x1="100" y1="300" x2="700" y2="300" stroke="#d1d5db" stroke-width="1" stroke-dasharray="5,5"/>
-                <text x="250" y="80" class="quadrant-label">Upper Right (1-8)</text>
-                <text x="480" y="80" class="quadrant-label">Upper Left (9-16)</text>
-                <text x="480" y="540" class="quadrant-label">Lower Left (17-24)</text>
-                <text x="230" y="540" class="quadrant-label">Lower Right (25-32)</text>
-            </svg>
+    <!-- Simple Dental Chart -->
+    <div class="dental-chart-card">
+        <div class="chart-header">
+            <span><i class="fas fa-tooth"></i> Dental Chart</span>
+            <small>Click any tooth to edit</small>
         </div>
-        <div class="action-buttons">
-            <button type="button" class="btn btn-success" onclick="initializeDefaultLayout()">Initialize Default Layout</button>
+        
+        <div class="simple-chart">
+            <!-- Upper Jaw -->
+            <div class="jaw-section upper">
+                <div class="jaw-title">UPPER</div>
+                <div class="teeth-row">
+                    <div class="quadrant right" id="upper-right"></div>
+                    <div class="divider"></div>
+                    <div class="quadrant left" id="upper-left"></div>
+                </div>
+                <div class="tooth-numbers">
+                    <span class="q-label">8 7 6 5 4 3 2 1</span>
+                    <span class="q-label">1 2 3 4 5 6 7 8</span>
+                </div>
+            </div>
+            
+            <div class="bite-line"><span>— Bite Line —</span></div>
+            
+            <!-- Lower Jaw -->
+            <div class="jaw-section lower">
+                <div class="tooth-numbers">
+                    <span class="q-label">8 7 6 5 4 3 2 1</span>
+                    <span class="q-label">1 2 3 4 5 6 7 8</span>
+                </div>
+                <div class="teeth-row">
+                    <div class="quadrant right" id="lower-right"></div>
+                    <div class="divider"></div>
+                    <div class="quadrant left" id="lower-left"></div>
+                </div>
+                <div class="jaw-title">LOWER</div>
+            </div>
         </div>
     </div>
 </div>
+
