@@ -44,7 +44,21 @@
     use App\Http\Middleware\AdminMiddleware;
     use App\Http\Middleware\UserMiddleware; // Import UserMiddleware
 
-
+    // DEBUG ROUTE - Remove after testing
+    Route::get('/debug-messages/{userId1}/{userId2}', function($userId1, $userId2) {
+        $messages = MongoMessage::conversation($userId1, $userId2)->get();
+        return response()->json([
+            'query' => "Conversation between {$userId1} and {$userId2}",
+            'count' => $messages->count(),
+            'messages' => $messages->map(fn($m) => [
+                'id' => $m->_id,
+                'from' => $m->sender_id,
+                'to' => $m->recipient_id,
+                'message' => $m->message,
+                'created' => $m->created_at
+            ])
+        ]);
+    });
 
     //default 8080
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
