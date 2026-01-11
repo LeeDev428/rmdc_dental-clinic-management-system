@@ -19,9 +19,9 @@ class AppointmentController extends Controller
     {
         $user = Auth::user();
         
-        // Check if user has any pending or rescheduled appointments
+        // Check if user has any pending, accepted, or rescheduled appointments
         $hasPendingAppointment = Appointment::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'rescheduled'])
+            ->whereIn('status', ['pending', 'accepted', 'rescheduled'])
             ->exists();
         
         // Check for completed appointments that haven't been reviewed
