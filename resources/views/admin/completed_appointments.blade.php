@@ -369,7 +369,7 @@
 
         <!-- Pagination -->
         <div class="pagination">
-            {{ $completedAppointments->links() }}
+            {{ $completedAppointments->links('vendor.pagination.compact-bootstrap-5') }}
         </div>
     @else
         <div class="empty-state">
