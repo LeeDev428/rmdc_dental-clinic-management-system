@@ -145,8 +145,8 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         doc.setFontSize(9);
         doc.setTextColor(textColor[0], textColor[1], textColor[2]);
         doc.text(data.procedure, margin + 2, yPos + 4);
-        doc.text(`${data.duration} hours mins`, margin + contentWidth - 45, yPos + 4);
-        doc.text(`₱ ${price.toFixed(2)}`, margin + contentWidth - 2, yPos + 4, { align: 'right' });
+        doc.text(`${data.duration}`, margin + contentWidth - 45, yPos + 4);
+        doc.text(`PHP ${price.toFixed(2)}`, margin + contentWidth - 2, yPos + 4, { align: 'right' });
 
         yPos += 10;
         doc.setDrawColor(220, 220, 220);
@@ -162,24 +162,24 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         // Subtotal
         doc.setFont(undefined, 'normal');
         doc.text('Subtotal:', summaryX, yPos);
-        doc.text(`₱ ${price.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+        doc.text(`PHP ${price.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
         yPos += 6;
         
         // Down Payment
         doc.text('Down Payment (20%):', summaryX, yPos);
-        doc.text(`- ₱ ${downPayment.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+        doc.text(`- PHP ${downPayment.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
         yPos += 8;
 
         // Balance Due - Blue highlighted box
         const balanceDue = price - downPayment;
         doc.setFillColor(37, 99, 235);
-        doc.rect(summaryX - 2, yPos - 5, 62, 9, 'F');
+        doc.rect(summaryX - 2, yPos - 5, 72, 9, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont(undefined, 'bold');
         doc.setFontSize(10);
         doc.text('BALANCE DUE:', summaryX, yPos);
-        doc.text(`₱ ${balanceDue.toFixed(0)}`, pageWidth - margin, yPos, { align: 'right' });
+        doc.text(`PHP ${balanceDue.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
 
         // Payment Info Box with border
         yPos += 16;
