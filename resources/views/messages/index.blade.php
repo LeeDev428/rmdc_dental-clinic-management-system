@@ -48,7 +48,7 @@
             <div class="ml-auto p-3 bg-blue-600 text-white rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Patient's Profile Image -->
-                    <img src="{{ is_array($message->sender) ? ($message->sender['avatar_url'] ?? asset('img/default-dp.jpg')) : ($message->sender->avatar_url ?? Auth::user()->avatar_url ?? asset('img/default-dp.jpg')) }}"
+                    <img src="{{ $message->sender->avatar_url ?? Auth::user()->avatar_url ?? asset('img/default-dp.jpg') }}"
                          alt="Patient Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-200 hover:text-gray-100 cursor-pointer">
@@ -62,7 +62,7 @@
             <div class="mr-auto p-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg max-w-full">
                 <div class="flex items-center space-x-2 mb-2">
                     <!-- Admin's Profile Image -->
-                    <img src="{{ is_array($message->sender) ? ($message->sender['avatar_url'] ?? asset('img/default-dp.jpg')) : ($message->sender->avatar_url ?? asset('img/default-dp.jpg')) }}"
+                    <img src="{{ $message->sender->avatar_url ?? asset('img/default-dp.jpg') }}"
                          alt="Admin Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
                     <!-- Message Time -->
                     <div class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -98,7 +98,12 @@
 
     <script>
         const currentUserId = {{ Auth::id() }};
-        const adminUserId = 1; // Default admin user ID
+        const adminUserId = {{ isset($adminUser) && $adminUser ? $adminUser->id : 1 }};
+        
+        console.log('Patient messaging page loaded', {
+            patientId: currentUserId,
+            talkingToAdminId: adminUserId
+        });
         
         document.addEventListener('DOMContentLoaded', function () {
             const messageContainer = document.getElementById('message-container');
