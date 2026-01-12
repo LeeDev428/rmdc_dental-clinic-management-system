@@ -1,10 +1,19 @@
 <?php
 // Quick fix script to add missing columns to ratings_review table
+// SECURITY: Add basic protection
+$secret = 'fix2026'; // You need to pass ?key=fix2026 in URL
+
+if (!isset($_GET['key']) || $_GET['key'] !== $secret) {
+    die('Access denied');
+}
+
 require __DIR__.'/../vendor/autoload.php';
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
+
+header('Content-Type: text/plain');
 
 try {
     echo "Checking ratings_review table...\n";
