@@ -21,7 +21,7 @@
                 </a>
                 <div class="relative group">
                     <i class="fa-solid fa-circle-question text-gray-500 hover:text-gray-700 cursor-help text-lg transition-colors"></i>
-                    <div class="absolute right-0 top-full mt-2 hidden group-hover:block w-80 bg-gray-900 text-white text-xs rounded-lg p-4 shadow-xl z-50">
+                    <div class="absolute left-1/2 -translate-x-1/2 top-full mt-2 hidden group-hover:block w-80 bg-gray-900 text-white text-xs rounded-lg p-4 shadow-xl z-[9999]">
                         <div class="space-y-2">
                             <div class="flex items-center gap-2 mb-2">
                                 <i class="fa-solid fa-shield-halved text-green-400 text-base"></i>
@@ -53,7 +53,7 @@
                                 <p class="text-gray-400 text-xs">✨ Quick, secure, and hassle-free login!</p>
                             </div>
                         </div>
-                        <div class="absolute right-4 bottom-full w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-900"></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-900"></div>
                     </div>
                 </div>
             </div>
