@@ -16,12 +16,18 @@ class Payment extends Model
         'paymongo_payment_id',
         'paymongo_source_id',
         'payment_details',
-        'paid_at'
+        'paid_at',
+        'refund_amount',
+        'refund_status',
+        'paymongo_refund_id',
+        'refund_reason',
+        'refunded_at'
     ];
 
     protected $casts = [
         'payment_details' => 'array',
-        'paid_at' => 'datetime'
+        'paid_at' => 'datetime',
+        'refunded_at' => 'datetime'
     ];
 
     // Relationship to Appointment
