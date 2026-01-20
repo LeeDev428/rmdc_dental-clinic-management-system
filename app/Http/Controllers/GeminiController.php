@@ -53,8 +53,8 @@ class GeminiController extends Controller
         }
 
         try {
-            // Gemini API endpoint - Using Gemini 2.5 Flash
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
+            // Gemini API endpoint - Using Gemini 1.5 Flash (Mini Model)
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
 
             // Prepare the request payload with comprehensive dental-focused instructions
             $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
@@ -154,10 +154,14 @@ Now, answer this dental question professionally and empathetically: {$question}"
                     'status' => $response->status(),
                     'body' => $response->body()
                 ]);
+                
+                // Parse error message from API response
+                $errorBody = $response->json();
+                $errorMessage = $errorBody['error']['message'] ?? 'Failed to get response from AI. Please try again later.';
 
                 return response()->json([
-                    'error' => 'Failed to get response from AI. Please try again later.',
-                    'details' => $response->body()
+                    'success' => false,
+                    'error' => $errorMessage
                 ], $response->status());
             }
         } catch (\Exception $e) {
