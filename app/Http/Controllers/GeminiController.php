@@ -33,6 +33,13 @@ class GeminiController extends Controller
         $question = $request->input('question');
         $apiKey = config('gemini.api_key');
 
+        // Log the API key being used (first 20 chars for debugging)
+        Log::info('Gemini API Request', [
+            'question' => $question,
+            'api_key_prefix' => substr($apiKey, 0, 20) . '...',
+            'api_key_length' => strlen($apiKey)
+        ]);
+
         // Check if API key is configured
         if (!$apiKey) {
             return response()->json([
@@ -54,7 +61,7 @@ class GeminiController extends Controller
 
         try {
             // Gemini API endpoint - Using Gemini 1.5 Flash (Mini Model)
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}";
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
             // Prepare the request payload with comprehensive dental-focused instructions
             $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
