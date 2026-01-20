@@ -32,7 +32,9 @@
         </div>
         
         <form id="{{ $type === 'public' ? 'publicChatForm' : 'protectedChatForm' }}" class="chatbot-input-form-lee">
-            @csrf
+            @if($type !== 'public')
+                @csrf
+            @endif
             <div class="chatbot-input-wrapper-lee">
                 <input 
                     type="text" 
