@@ -122,12 +122,25 @@ function initLeeAIChatbot(type, apiEndpoint) {
         showTypingIndicator();
         
         try {
+            // Get CSRF token from meta tag or form input
+            let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (!csrfToken) {
+                csrfToken = document.querySelector('input[name="_token"]')?.value;
+            }
+            
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            // Only add CSRF token if it exists
+            if (csrfToken) {
+                headers['X-CSRF-TOKEN'] = csrfToken;
+            }
+            
             const response = await fetch(apiEndpoint, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
+                headers: headers,
                 body: JSON.stringify({ question: question })
             });
             
@@ -144,7 +157,7 @@ function initLeeAIChatbot(type, apiEndpoint) {
             } else if (data.error) {
                 addMessage(`⚠️ ${data.error}`, false);
             } else {
-                addMessage('Sorry, I encountered an error. Please try again!', false);
+                addMessage('⚠️ **Oops!** I encountered an error processing your request. Please try again in a moment.', false);
             }
         } catch (error) {
             console.error('Lee AI Error:', error);
