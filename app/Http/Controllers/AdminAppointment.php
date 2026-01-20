@@ -62,11 +62,32 @@ class AdminAppointment extends Controller
             $appointment->end = '2003-04-28 23:59';
             $appointment->save();
 
+            // Process refund (20% of total price)
+            $refundService = new \App\Services\RefundService();
+            $refundResult = $refundService->processRefund($appointment, "Admin declined: {$reason}");
+            
+            if ($refundResult['success']) {
+                Log::info('Refund processed for declined appointment', [
+                    'appointment_id' => $appointment->id,
+                    'refund_amount' => $refundResult['refund_amount'] ?? 0,
+                    'cancellation_fee' => $refundResult['cancellation_fee'] ?? 0
+                ]);
+                $refundMessage = " A refund of ₱" . number_format($refundResult['refund_amount'], 2) . " will be processed (5% cancellation fee applies).";
+            } else {
+                Log::warning('Refund processing issue', [
+                    'appointment_id' => $appointment->id,
+                    'message' => $refundResult['message'] ?? 'Unknown error'
+                ]);
+                $refundMessage = " Refund will be processed manually.";
+            }
+
             // Log appointment decline
             $this->logAppointmentActivity('declined', $appointment, [
                 'declined_by' => Auth::user()->name ?? 'Admin',
                 'reason' => $reason,
-                'description' => 'Appointment declined by admin',
+                'refund_status' => $refundResult['success'] ? 'processed' : 'pending',
+                'refund_amount' => $refundResult['refund_amount'] ?? 0,
+                'description' => 'Appointment declined by admin with refund',
             ]);
 
             // Optional notification
@@ -110,7 +131,7 @@ class AdminAppointment extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment declined successfully and message sent.'
+                'message' => 'Appointment declined successfully and message sent.' . ($refundMessage ?? '')
             ]);
         }
 
