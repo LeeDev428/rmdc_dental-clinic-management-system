@@ -157,7 +157,8 @@
     <div id="alert-container"></div>
 
     <div class="backup-actions">
-        <h3 style="margin-top: 0;">Create New Backup</h3>
+        <h3 style="margin-top: 0;">Manually Create New Backup/ Automatic Backup at 12 Midnight</h3>
+        <br>
         <button id="createBackupBtn" class="btn btn-primary" onclick="createBackup()">
             <i class="fas fa-plus-circle"></i> Create Backup Now
         </button>
@@ -190,9 +191,9 @@
                            class="btn btn-success">
                             <i class="fas fa-download"></i> Download
                         </a>
-                        <button class="btn btn-danger" onclick="deleteBackup('{{ $backup['filename'] }}')">
+                        {{-- <button class="btn btn-danger" onclick="deleteBackup('{{ $backup['filename'] }}')">
                             <i class="fas fa-trash"></i> Delete
-                        </button>
+                        </button> --}}
                     </div>
                 </div>
                 @endforeach
