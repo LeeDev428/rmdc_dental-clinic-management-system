@@ -4,7 +4,7 @@
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <div class="bg-white rounded-lg shadow-lg flex flex-col md:flex-row w-full max-w-4xl mx-auto mt-6 overflow-hidden">
+    <div class="bg-white rounded-lg shadow-lg flex flex-col md:flex-row w-full max-w-4xl mx-auto mt-6">
 
         <!-- Left Side: Login Form -->
         <div class="w-full md:w-3/5 p-6 md:p-10">
@@ -12,14 +12,50 @@
             <p class="text-center text-gray-600 mt-2">Login using social networks</p>
 
             <!-- Social Media Buttons -->
-            <div class="flex justify-center gap-3 mt-4">
+            <div class="flex justify-center items-center gap-3 mt-4 relative">
                 <a href="{{ route('facebook.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white text-lg">
                     <i class="fa-brands fa-facebook-f"></i>
                 </a>
                 <a href="{{ route('google.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
                     <i class="fa-brands fa-google"></i>
                 </a>
-                
+                <div class="relative group">
+                    <i class="fa-solid fa-circle-question text-gray-500 hover:text-gray-700 cursor-help text-lg transition-colors"></i>
+                    <div class="absolute right-0 top-full mt-2 hidden group-hover:block w-80 bg-gray-900 text-white text-xs rounded-lg p-4 shadow-xl z-50">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-shield-halved text-green-400 text-base"></i>
+                                <p class="font-bold text-sm text-green-400">OAuth Login - 100% Safe & Secure</p>
+                            </div>
+                            <div class="space-y-1.5 text-gray-200">
+                                <p class="flex items-start gap-2">
+                                    <i class="fa-solid fa-check-circle text-green-400 mt-0.5"></i>
+                                    <span><strong>Industry Standard:</strong> OAuth 2.0 is the gold standard for secure authentication used by millions worldwide.</span>
+                                </p>
+                                <p class="flex items-start gap-2">
+                                    <i class="fa-solid fa-lock text-green-400 mt-0.5"></i>
+                                    <span><strong>No Password Sharing:</strong> We never see or store your Google/Facebook password. Ever.</span>
+                                </p>
+                                <p class="flex items-start gap-2">
+                                    <i class="fa-solid fa-user-shield text-green-400 mt-0.5"></i>
+                                    <span><strong>Limited Access:</strong> We only access your basic profile info (name, email, photo) - nothing else.</span>
+                                </p>
+                                <p class="flex items-start gap-2">
+                                    <i class="fa-solid fa-database text-green-400 mt-0.5"></i>
+                                    <span><strong>Protected Data:</strong> Your information is encrypted and stored securely in our database, used exclusively for this dental clinic app.</span>
+                                </p>
+                                <p class="flex items-start gap-2">
+                                    <i class="fa-solid fa-power-off text-green-400 mt-0.5"></i>
+                                    <span><strong>Full Control:</strong> You can revoke access anytime from your Google/Facebook account settings.</span>
+                                </p>
+                            </div>
+                            <div class="mt-3 pt-2 border-t border-gray-700 text-center">
+                                <p class="text-gray-400 text-xs">✨ Quick, secure, and hassle-free login!</p>
+                            </div>
+                        </div>
+                        <div class="absolute right-4 bottom-full w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-900"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- OR Divider -->
