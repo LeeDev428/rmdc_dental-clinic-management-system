@@ -199,7 +199,11 @@
                     <ul>
                         <li><strong>Book a new appointment</strong> - Select a different date or time that may be available</li>
                         <li><strong>Contact us</strong> - Call or email us to discuss alternative arrangements</li>
-                        <li><strong>Your payment</strong> - If you paid a down payment, please contact us regarding refund procedures</li>
+                        @if($appointment->total_price && $appointment->down_payment)
+                            <li><strong>Refund Information</strong> - You will receive a refund of <strong>₱{{ number_format($appointment->total_price * 0.20, 2) }}</strong> (20% of total price). A 5% cancellation fee applies. The refund will be processed within 5-7 business days to your original payment method.</li>
+                        @else
+                            <li><strong>Your payment</strong> - If you paid a down payment, a refund will be processed within 5-7 business days</li>
+                        @endif
                     </ul>
                 </div>
             @endif
