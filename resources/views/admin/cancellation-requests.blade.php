@@ -312,38 +312,17 @@
     
   
     <div class="page-header">
-    <h1 class="page-title">Cancellation & Rescheduled Appointments</h1>
+    <h1 class="page-title">Cancellation Requests</h1>
 </div>
-  <!-- Tabs Navigation -->
-    <ul class="nav nav-tabs mb-4" role="tablist">
-
-          <li class="nav-item" role="presentation">
-            <a class="nav-link {{ $type === 'reschedule' ? 'active' : '' }}" 
-               href="{{ route('admin.cancellation.requests', ['type' => 'reschedule']) }}">
-                <i class="fas fa-calendar-alt"></i> Reschedules
-                {{-- <span class="badge badge-secondary ml-2">{{ $reschedulePending }}</span> --}}
-            </a>
-        </li>
-        
-        <li class="nav-item" role="presentation">
-            <a class="nav-link {{ $type === 'cancel' ? 'active' : '' }}" 
-               href="{{ route('admin.cancellation.requests', ['type' => 'cancel']) }}">
-                <i class="fas fa-ban"></i> Cancellations
-                {{-- <span class="badge badge-secondary ml-2">{{ $cancelPending }}</span> --}}
-            </a>
-        </li>
-      
-    </ul>
     <!-- Statistics Grid -->
     <div class="row mb-4">
-        @if($type === 'cancel')
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-danger shadow h-100 py-2">
                     <div class="card-body">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Cancelled</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $cancelPending }}</div>
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Cancellations</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $cancelTotal }}</div>
                             </div>
                             <div class="col-auto">
                                 <i class="fas fa-ban fa-2x text-gray-300"></i>
@@ -397,7 +376,7 @@
                     </div>
                 </div>
             </div>
-        @else
+        {{-- placeholder to keep find unique --}}
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card border-left-primary shadow h-100 py-2">
                     <div class="card-body">
