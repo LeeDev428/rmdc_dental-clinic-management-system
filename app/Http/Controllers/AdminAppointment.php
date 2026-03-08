@@ -90,11 +90,23 @@ class AdminAppointment extends Controller
                 'description' => 'Appointment declined by admin with refund',
             ]);
 
-            // Optional notification
+            // Notification with refund details
             try {
+                $procedure  = $appointment->procedure ?? 'your appointment';
+                $dateTime   = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
+
+                if ($refundResult['success'] && isset($refundResult['refund_amount'])) {
+                    $notifMsg = "Your appointment for {$procedure} on {$dateTime} has been declined by the admin due to: {$reason}. "
+                              . "A 20% refund of ₱" . number_format($refundResult['refund_amount'], 2)
+                              . " has been processed and will reflect within 3-5 business days.";
+                } else {
+                    $notifMsg = "Your appointment for {$procedure} on {$dateTime} has been declined by the admin due to: {$reason}. "
+                              . "A 20% refund will be processed manually. Please contact us for assistance.";
+                }
+
                 Notification::create([
                     'user_id' => $appointment->user_id,
-                    'message' => "Your appointment has been declined. You may reschedule your appointment."
+                    'message' => $notifMsg,
                 ]);
             } catch (\Exception $e) {
                 Log::warning('Could not create notification: ' . $e->getMessage());
