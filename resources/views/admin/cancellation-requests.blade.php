@@ -438,7 +438,7 @@
                             <button type="submit" class="btn btn-primary btn-sm mr-2">
                                 <i class="fas fa-search"></i> Filter
                             </button>
-                            <a href="{{ route('admin.cancellation.requests', ['type' => $type]) }}" class="btn btn-secondary btn-sm">
+                            <a href="{{ route('admin.cancellation.requests') }}" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-redo"></i> Reset
                             </a>
                         </div>
@@ -451,7 +451,7 @@
     <!-- Table Card -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">{{ $type === 'cancel' ? 'Cancellation' : 'Reschedule' }} Requests</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Cancellation Requests</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -531,8 +531,8 @@
                         <tr>
                             <td colspan="9" class="text-center py-5">
                                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p class="font-weight-bold">No {{ $type === 'cancel' ? 'cancellation' : 'reschedule' }} requests found</p>
-                                <p class="text-muted">{{ $type === 'cancel' ? 'Cancelled' : 'Rescheduled' }} appointments will appear here</p>
+                                <p class="font-weight-bold">No cancellation requests found</p>
+                                <p class="text-muted">Cancelled appointments will appear here</p>
                             </td>
                         </tr>
                         @endforelse
