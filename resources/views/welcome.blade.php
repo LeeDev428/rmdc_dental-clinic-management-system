@@ -1681,17 +1681,14 @@
                         }
                         
                         const fullDescription = procedure.description || 'No description available.';
-                        const needsExpand = procedure.description && procedure.description.length > 120;
-                        const readMoreBtn = needsExpand
-                            ? `<button class="read-more-btn" onclick="toggleDescription(this)">Read more</button>`
-                            : '';
+                        const hasDescription = !!procedure.description;
                         
                         card.innerHTML = `
                             ${imageHtml}
                             <div class="service-content">
                                 <h3>${procedure.procedure_name}</h3>
                                 <p class="service-description">${fullDescription}</p>
-                                ${readMoreBtn}
+                                ${hasDescription ? `<button class="read-more-btn" onclick="toggleDescription(this)" style="display:none">Read more</button>` : ''}
                                 <div class="service-meta">
                                     <p><strong>Estimated Time:</strong> ${procedure.duration} Minutes</p>
                                     <p><strong>Price:</strong> ₱${Number(procedure.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
@@ -1701,8 +1698,16 @@
                         
                         grid.appendChild(card);
                     });
-                    
-                  
+
+                    // Show Read more buttons only when description text is actually truncated
+                    grid.querySelectorAll('.service-description').forEach(function(p) {
+                        if (p.scrollHeight > p.clientHeight) {
+                            var btn = p.nextElementSibling;
+                            if (btn && btn.classList.contains('read-more-btn')) {
+                                btn.style.display = 'inline';
+                            }
+                        }
+                    });
                     
                     currentPage = data.current_page;
                     totalPages = data.last_page;
