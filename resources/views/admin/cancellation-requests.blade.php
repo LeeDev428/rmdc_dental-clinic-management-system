@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Pending Appointments')
 
@@ -496,10 +496,10 @@
                                     <div class="font-weight-bold">{{ $daysUntil }} days</div>
                                     <small class="text-muted">({{ $hoursNotice }} hours)</small>
                                     @if($hoursNotice < 48)
-                                        <br><span class="badge badge-warning">Late</span>
+                                        <br><span class="badge bg-warning text-dark">Late</span>
                                     @endif
                                 @else
-                                    <span class="badge badge-danger">Past Due</span>
+                                    <span class="badge bg-danger text-white">Past Due</span>
                                 @endif
                             </td>
                             <td>
@@ -510,13 +510,13 @@
                             </td>
                             <td>
                                 @if($cancellation->appointment->status === 'cancelled')
-                                    <span class="badge badge-danger">Cancelled</span>
+                                    <span class="badge bg-danger text-white">Cancelled</span>
                                 @elseif($cancellation->appointment->status === 'completed')
-                                    <span class="badge badge-success">Completed</span>
+                                    <span class="badge bg-success text-white">Completed</span>
                                 @elseif($cancellation->appointment->status === 'accepted')
-                                    <span class="badge badge-info">Accepted</span>
+                                    <span class="badge bg-info text-white">Accepted</span>
                                 @else
-                                    <span class="badge badge-secondary">{{ ucfirst($cancellation->appointment->status) }}</span>
+                                    <span class="badge bg-secondary text-white">{{ ucfirst($cancellation->appointment->status) }}</span>
                                 @endif
                             </td>
                             <td>
@@ -649,16 +649,16 @@ function viewDetails(cancellation) {
         minute: '2-digit'
     });
     document.getElementById('modalNotice').innerHTML = diffDays >= 0 
-        ? `<strong>${diffDays} days</strong> (${diffHours} hours) ${diffHours < 48 ? '<span class="badge badge-warning">Late Notice</span>' : ''}`
-        : '<span class="badge badge-danger">Past Due</span>';
+        ? `<strong>${diffDays} days</strong> (${diffHours} hours) ${diffHours < 48 ? '<span class="badge bg-warning text-dark">Late Notice</span>' : ''}`
+        : '<span class="badge bg-danger text-white">Past Due</span>';
     document.getElementById('modalReason').textContent = cancellation.reason;
     
     // Type badge
     const typeElement = document.getElementById('modalType');
     if (cancellation.type === 'reschedule') {
-        typeElement.innerHTML = '<span class="badge badge-info">Reschedule Request</span>';
+        typeElement.innerHTML = '<span class="badge bg-info text-white">Reschedule Request</span>';
     } else {
-        typeElement.innerHTML = '<span class="badge badge-danger">Cancellation</span>';
+        typeElement.innerHTML = '<span class="badge bg-danger text-white">Cancellation</span>';
     }
     
     // Status badge
@@ -667,13 +667,13 @@ function viewDetails(cancellation) {
     let statusBadge = '';
     
     if (status === 'cancelled') {
-        statusBadge = '<span class="badge badge-danger">Cancelled</span>';
+        statusBadge = '<span class="badge bg-danger text-white">Cancelled</span>';
     } else if (status === 'completed') {
-        statusBadge = '<span class="badge badge-success">Completed</span>';
+        statusBadge = '<span class="badge bg-success text-white">Completed</span>';
     } else if (status === 'accepted') {
-        statusBadge = '<span class="badge badge-info">Accepted</span>';
+        statusBadge = '<span class="badge bg-info text-white">Accepted</span>';
     } else {
-        statusBadge = `<span class="badge badge-secondary">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+        statusBadge = `<span class="badge bg-secondary text-white">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
     }
     statusElement.innerHTML = statusBadge;
     
@@ -682,3 +682,5 @@ function viewDetails(cancellation) {
 }
 </script>
 @endsection
+
+
