@@ -1717,6 +1717,17 @@
                 .catch(error => console.error('Error loading services:', error));
         }
 
+        function toggleDescription(btn) {
+            const p = btn.previousElementSibling;
+            if (p.classList.contains('expanded')) {
+                p.classList.remove('expanded');
+                btn.textContent = 'Read more';
+            } else {
+                p.classList.add('expanded');
+                btn.textContent = 'Show less';
+            }
+        }
+
         function changePage(direction) {
             if (direction === 'prev' && currentPage > 1) {
                 loadServices(currentPage - 1);
