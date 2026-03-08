@@ -558,9 +558,7 @@
                 <h5 class="modal-title" id="detailsModalLabel">
                     <i class="fas fa-info-circle"></i> Request Details
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -603,7 +601,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -678,7 +676,7 @@ function viewDetails(cancellation) {
     statusElement.innerHTML = statusBadge;
     
     // Show modal using Bootstrap
-    $('#detailsModal').modal('show');
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('detailsModal')).show();
 }
 </script>
 @endsection
