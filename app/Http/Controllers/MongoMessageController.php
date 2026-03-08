@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -214,100 +214,5 @@ class MongoMessageController extends Controller
         $users = collect($users)->sortByDesc('unread_count')->values();
 
         return response()->json(['success' => true, 'users' => $users]);
-    }
-}
-
-            ->where('is_read', false)
-            ->count();
-
-        return response()->json(['count' => $count]);
-    }
-
-    /**
-     * Get all messages for a conversation (AJAX)
-     */
-    public function getMessages(Request $request)
-    {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['error' => 'Messaging service is currently unavailable', 'messages' => []], 503);
-        }
-
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        $user = Auth::user();
-        
-        $messages = MongoMessage::conversation($user->id, $request->user_id)
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        // Manually attach user data for each message
-        $userIds = $messages->pluck('sender_id')->merge($messages->pluck('recipient_id'))->unique();
-        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
-        
-        $messages = $messages->map(function($message) use ($users) {
-            $messageArray = $message->toArray();
-            
-            $sender = $users->get($message->sender_id);
-            $recipient = $users->get($message->recipient_id);
-            
-            $messageArray['sender'] = $sender ? [
-                'id' => $sender->id,
-                'name' => $sender->name,
-                'avatar' => $sender->avatar,
-                'avatar_url' => $sender->avatar_url
-            ] : null;
-            
-            $messageArray['recipient'] = $recipient ? [
-                'id' => $recipient->id,
-                'name' => $recipient->name,
-                'avatar' => $recipient->avatar,
-                'avatar_url' => $recipient->avatar_url
-            ] : null;
-            
-            return $messageArray;
-        });
-
-        return response()->json([
-            'success' => true,
-            'messages' => $messages,
-        ]);
-    }
-
-    /**
-     * Get list of users for admin
-     */
-    public function getUserList()
-    {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['error' => 'Messaging service is currently unavailable', 'users' => []], 503);
-        }
-
-        if (Auth::user()->usertype !== 'admin') {
-            abort(403);
-        }
-
-        $users = User::where('usertype', '!=', 'admin')->get();
-        
-        // Manually add unread count from MongoDB
-        $users = $users->map(function($user) {
-            $unreadCount = MongoMessage::where('sender_id', $user->id)
-                ->where('recipient_id', Auth::id())
-                ->where('is_read', false)
-                ->count();
-            
-            $userData = $user->toArray();
-            $userData['unread_count'] = $unreadCount;
-            return $userData;
-        });
-        
-        // Sort by unread count
-        $users = collect($users)->sortByDesc('unread_count')->values();
-
-        return response()->json([
-            'success' => true,
-            'users' => $users,
-        ]);
     }
 }
