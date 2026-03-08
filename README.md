@@ -55,38 +55,39 @@
 ## ✨ Features
 
 ### 👥 Patient Features
-- ✅ User registration and authentication
+- ✅ User registration and authentication (email + Google/Facebook OAuth)
 - ✅ Online appointment booking with calendar view
-- ✅ 20% down payment system (GCash, PayMaya, Card)
+- ✅ 25% down payment system (GCash, PayMaya, Card) via PayMongo
+- ✅ 20% refund if appointment is declined by admin
+- ✅ Double-booking prevention (one pending/accepted appointment at a time)
 - ✅ Real-time appointment status tracking
 - ✅ Digital teeth layout visualization
 - ✅ Dental records management
 - ✅ Service feedback and ratings
-- ✅ In-app messaging with admin
-- ✅ Push notifications via Firebase
-- ✅ Appointment history and cancellation
+- ✅ In-app messaging with admin (MongoDB-backed)
+- ✅ Notification bell with refund and status updates
+- ✅ Appointment history, cancellation, and reschedule requests
 
 ### 🏥 Admin Features
 - ✅ Comprehensive admin dashboard
-- ✅ Appointment management (Accept/Decline/View Details)
+- ✅ Appointment management (Accept/Decline with automatic refund)
+- ✅ Separate Cancellation Requests page and Reschedule Requests page
 - ✅ Patient records management
 - ✅ Inventory tracking system
 - ✅ Procedure pricing management
 - ✅ Revenue and analytics reports
-- ✅ Decline reason management
-- ✅ Bulk operations on appointments
-- ✅ Real-time notifications
+- ✅ Real-time notifications via Pusher
 - ✅ Review and feedback moderation
 
 ### 🎨 UI/UX Features
 - ✅ Modern minimalist design
 - ✅ Responsive layout (mobile, tablet, desktop)
 - ✅ Smooth scroll animations
-- ✅ Interactive maps (Leaflet.js)
+- ✅ Interactive service cards with expandable descriptions
+- ✅ Click-toggled OAuth security tooltip on login
 - ✅ Modal-based interactions
 - ✅ AJAX pagination
 - ✅ Real-time search and filters
-- ✅ Dark mode support
 
 ---
 
@@ -111,10 +112,12 @@
 - **Fonts**: Google Fonts (Poppins)
 
 ### Third-Party Services
-- **Payment**: PayMongo API
-- **Push Notifications**: Firebase Cloud Messaging
-- **OAuth**: Google Login (Laravel Socialite)
-- **Captcha**: reCAPTCHA / mews/captcha
+- **Payment**: PayMongo API (GCash, PayMaya, Card)
+- **AI Chatbot**: Groq API (llama-3.3-70b-versatile)
+- **Messaging**: MongoDB Atlas (messages only)
+- **Real-time**: Pusher (appointment status & messaging)
+- **OAuth**: Google + Facebook Login (Laravel Socialite)
+- **Captcha**: mews/captcha
 - **Image Processing**: Intervention Image
 
 ---
