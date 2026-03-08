@@ -1680,16 +1680,18 @@
                             imageHtml = '<div class="service-image"></div>';
                         }
                         
-                        const description = procedure.description ? 
-                            (procedure.description.length > 80 ? procedure.description.substring(0, 80) + '...' : procedure.description) : '';
-                        
                         const fullDescription = procedure.description || 'No description available.';
+                        const needsExpand = procedure.description && procedure.description.length > 120;
+                        const readMoreBtn = needsExpand
+                            ? `<button class="read-more-btn" onclick="toggleDescription(this)">Read more</button>`
+                            : '';
                         
                         card.innerHTML = `
                             ${imageHtml}
                             <div class="service-content">
                                 <h3>${procedure.procedure_name}</h3>
-                                <p>${fullDescription}</p>
+                                <p class="service-description">${fullDescription}</p>
+                                ${readMoreBtn}
                                 <div class="service-meta">
                                     <p><strong>Estimated Time:</strong> ${procedure.duration} Minutes</p>
                                     <p><strong>Price:</strong> ₱${Number(procedure.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
