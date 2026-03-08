@@ -515,20 +515,19 @@ public function completedAppointments(Request $request)
  */
 public function cancellationRequests(Request $request)
 {
-    $query = \App\Models\AppointmentCancellation::with(['user', 'appointment']);
-    
-    // Filter by type (cancel or reschedule)
-    $type = $request->get('type', 'reschedule');
-    $query->where('type', $type);
+    $query = \App\Models\AppointmentCancellation::with(['user', 'appointment'])
+        ->where('type', 'cancel');
     
     // Search functionality
     if ($request->filled('search')) {
         $search = $request->search;
-        $query->whereHas('user', function($q) use ($search) {
-            $q->where('name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        })->orWhereHas('appointment', function($q) use ($search) {
-            $q->where('procedure', 'like', "%{$search}%");
+        $query->where(function($q) use ($search) {
+            $q->whereHas('user', function($uq) use ($search) {
+                $uq->where('name', 'like', "%{$search}%")
+                   ->orWhere('email', 'like', "%{$search}%");
+            })->orWhereHas('appointment', function($aq) use ($search) {
+                $aq->where('procedure', 'like', "%{$search}%");
+            });
         });
     }
     
@@ -548,48 +547,29 @@ public function cancellationRequests(Request $request)
         });
     }
     
-    // Paginate results
     $cancellations = $query->orderBy('processed_at', 'desc')->paginate(15);
     
-    // Get statistics for cancel type
+    // Statistics for cancellations
     $cancelStats = \App\Models\AppointmentCancellation::where('type', 'cancel')
         ->with('appointment')
         ->get();
     
-    $cancelPending = $cancelStats->filter(fn($c) => $c->appointment->status === 'cancelled')->count();
-    $cancelToday = $cancelStats->filter(fn($c) => $c->processed_at->isToday())->count();
-    $cancelWeekly = $cancelStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
-    $cancelLate = $cancelStats->filter(function($c) {
-        $appointmentTime = \Carbon\Carbon::parse($c->appointment->start);
-        $hoursNotice = $c->processed_at->diffInHours($appointmentTime, false);
-        return $hoursNotice < 48 && $hoursNotice > 0;
-    })->count();
-    
-    // Get statistics for reschedule type
-    $rescheduleStats = \App\Models\AppointmentCancellation::where('type', 'reschedule')
-        ->with('appointment')
-        ->get();
-    
-    $reschedulePending = $rescheduleStats->filter(fn($c) => $c->appointment->status !== 'cancelled')->count();
-    $rescheduleToday = $rescheduleStats->filter(fn($c) => $c->processed_at->isToday())->count();
-    $rescheduleWeekly = $rescheduleStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
-    $rescheduleLate = $rescheduleStats->filter(function($c) {
-        $appointmentTime = \Carbon\Carbon::parse($c->appointment->start);
-        $hoursNotice = $c->processed_at->diffInHours($appointmentTime, false);
+    $cancelTotal   = $cancelStats->count();
+    $cancelToday   = $cancelStats->filter(fn($c) => $c->processed_at->isToday())->count();
+    $cancelWeekly  = $cancelStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
+    $cancelLate    = $cancelStats->filter(function($c) {
+        $hoursNotice = $c->processed_at->diffInHours(
+            \Carbon\Carbon::parse($c->appointment->start), false
+        );
         return $hoursNotice < 48 && $hoursNotice > 0;
     })->count();
 
     return view('admin.cancellation-requests', compact(
         'cancellations',
-        'type',
-        'cancelPending',
+        'cancelTotal',
         'cancelToday',
         'cancelWeekly',
-        'cancelLate',
-        'reschedulePending',
-        'rescheduleToday',
-        'rescheduleWeekly',
-        'rescheduleLate'
+        'cancelLate'
     ));
 }
 
@@ -620,19 +600,62 @@ public function getCancellationCount()
 /**
  * Display reschedule requests page
  */
-public function rescheduleRequests()
+public function rescheduleRequests(Request $request)
 {
-    // Get statistics
-    $pendingReschedules = 0; // Placeholder - implement when reschedule tracking is added
-    $approvedToday = 0;
-    $weeklyTotal = 0;
-    $lateRequests = 0;
+    $query = \App\Models\AppointmentCancellation::with(['user', 'appointment'])
+        ->where('type', 'reschedule');
+
+    // Search functionality
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->whereHas('user', function($uq) use ($search) {
+                $uq->where('name', 'like', "%{$search}%")
+                   ->orWhere('email', 'like', "%{$search}%");
+            })->orWhereHas('appointment', function($aq) use ($search) {
+                $aq->where('procedure', 'like', "%{$search}%");
+            });
+        });
+    }
+
+    // Date filter
+    if ($request->filled('date_from')) {
+        $query->whereDate('processed_at', '>=', $request->date_from);
+    }
+    if ($request->filled('date_to')) {
+        $query->whereDate('processed_at', '<=', $request->date_to);
+    }
+
+    // Status filter
+    if ($request->filled('status')) {
+        $query->whereHas('appointment', function($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+    }
+
+    $reschedules = $query->orderBy('processed_at', 'desc')->paginate(15);
+
+    // Statistics for reschedules
+    $rescheduleStats = \App\Models\AppointmentCancellation::where('type', 'reschedule')
+        ->with('appointment')
+        ->get();
+
+    $rescheduleTotal  = $rescheduleStats->count();
+    $rescheduleToday  = $rescheduleStats->filter(fn($c) => $c->processed_at->isToday())->count();
+    $rescheduleWeekly = $rescheduleStats->filter(fn($c) => $c->processed_at->isCurrentWeek())->count();
+    $rescheduleLate   = $rescheduleStats->filter(function($c) {
+        $hoursNotice = $c->processed_at->diffInHours(
+            \Carbon\Carbon::parse($c->appointment->start), false
+        );
+        return $hoursNotice < 48 && $hoursNotice > 0;
+    })->count();
 
     return view('admin.reschedule-requests', compact(
-        'pendingReschedules',
-        'approvedToday',
-        'weeklyTotal',
-        'lateRequests'
+        'reschedules',
+        'rescheduleTotal',
+        'rescheduleToday',
+        'rescheduleWeekly',
+        'rescheduleLate'
     ));
 }
 
