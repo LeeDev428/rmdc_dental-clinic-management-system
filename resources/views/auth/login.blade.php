@@ -19,13 +19,16 @@
                 <a href="{{ route('google.login') }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white text-lg">
                     <i class="fa-brands fa-google"></i>
                 </a>
-                <div class="relative group">
+                <style>
+                .oauth-wrap:hover .oauth-tip { display: block !important; }
+                </style>
+                <div class="relative oauth-wrap">
                     <button type="button"
                             class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors focus:outline-none"
                             aria-label="OAuth security information">
                         <i class="fa-solid fa-circle-question text-gray-500 text-lg"></i>
                     </button>
-                    <div class="hidden group-hover:block absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-gray-900 text-white text-xs rounded-lg p-4 shadow-xl z-[9999] w-[540px] max-w-[min(540px,90vw)]">
+                    <div class="oauth-tip" style="display:none;position:absolute;left:50%;transform:translateX(-50%);top:100%;margin-top:8px;background:#111827;color:#fff;font-size:12px;border-radius:8px;padding:16px;box-shadow:0 10px 25px rgba(0,0,0,0.4);z-index:9999;width:540px;max-width:min(540px,90vw)">
                         <div class="flex items-center gap-2 mb-3">
                             <i class="fa-solid fa-shield-halved text-green-400 text-base flex-shrink-0"></i>
                             <p class="font-bold text-sm text-green-400">OAuth Login - 100% Safe &amp; Secure</p>
@@ -55,7 +58,7 @@
                         <div class="mt-3 pt-2 border-t border-gray-700 text-center">
                             <p class="text-gray-400 text-xs">✨ Quick, secure, and hassle-free login!</p>
                         </div>
-                        <div class="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-gray-900"></div>
+                        <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:100%;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:8px solid #111827;"></div>
                     </div>
                 </div>
             </div>
