@@ -36,44 +36,12 @@
     use Laravel\Socialite\Facades\Socialite;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Auth;
-    use App\Models\Message;
-    use App\Models\MongoMessage;
 
     use Illuminate\Support\Facades\Route;
 
     use App\Http\Middleware\AdminMiddleware;
     use App\Http\Middleware\UserMiddleware; // Import UserMiddleware
 
-    // DEBUG ROUTE - Remove after testing
-    Route::get('/debug-messages/{userId1}/{userId2}', function($userId1, $userId2) {
-        try {
-            // Test direct queries
-            $directQuery1 = MongoMessage::where('sender_id', (int)$userId1)
-                ->where('recipient_id', (int)$userId2)
-                ->get();
-            
-            $directQuery2 = MongoMessage::where('sender_id', (int)$userId2)
-                ->where('recipient_id', (int)$userId1)
-                ->get();
-            
-            $messages = MongoMessage::conversation($userId1, $userId2)->get();
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'MongoDB not available', 'message' => $e->getMessage()], 503);
-        }
-        return response()->json([
-            'query' => "Conversation between {$userId1} and {$userId2}",
-            'direct_1' => "{$userId1} to {$userId2}: {$directQuery1->count()} messages",
-            'direct_2' => "{$userId2} to {$userId1}: {$directQuery2->count()} messages",
-            'scope_count' => $messages->count(),
-            'messages' => $messages->map(fn($m) => [
-                'id' => $m->_id,
-                'from' => $m->sender_id,
-                'to' => $m->recipient_id,
-                'message' => $m->message,
-                'created' => $m->created_at
-            ])
-        ]);
-    });
 
     //default 8080
     Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
