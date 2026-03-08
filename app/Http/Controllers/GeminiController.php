@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 namespace App\Http\Controllers;
 
@@ -18,57 +18,41 @@ class GeminiController extends Controller
     }
 
     /**
-     * Send question to Gemini AI and get response
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Send question to Groq AI and get response
      */
     public function ask(Request $request)
     {
-        // Validate the incoming request
         $request->validate([
             'question' => 'required|string|max:1000'
         ]);
 
         $question = $request->input('question');
-        $apiKey = config('gemini.api_key');
+        $apiKey   = config('groq.api_key');
+        $model    = config('groq.model', 'llama-3.3-70b-versatile');
 
-        // Log the API key being used (first 20 chars for debugging)
-        Log::info('Gemini API Request', [
-            'question' => $question,
-            'api_key_prefix' => substr($apiKey, 0, 20) . '...',
-            'api_key_length' => strlen($apiKey)
-        ]);
-
-        // Check if API key is configured
         if (!$apiKey) {
             return response()->json([
-                'error' => 'Gemini API key is not configured. Please add GEMINI_API_KEY to your .env file.'
+                'error' => 'AI service is not configured. Please contact the administrator.'
             ], 500);
         }
 
-        // Check cache for frequently asked questions (cache for 1 hour)
-        $cacheKey = 'gemini_response_' . md5(strtolower(trim($question)));
+        // Cache frequently asked questions for 1 hour
+        $cacheKey       = 'groq_response_' . md5(strtolower(trim($question)));
         $cachedResponse = Cache::get($cacheKey);
-        
+
         if ($cachedResponse) {
             return response()->json([
-                'success' => true,
+                'success'  => true,
                 'response' => $cachedResponse,
-                'cached' => true
+                'cached'   => true,
             ]);
         }
 
-        try {
-            // Gemini API endpoint - Using Gemini 1.5 Flash (Mini Model)
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={$apiKey}";
-
-            // Prepare the request payload with comprehensive dental-focused instructions
-            $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
+        $systemPrompt = "You are Lee AI, a professional dental assistant chatbot for Dr. Cristina Moncayo's RMDC Dental Clinic.
 
 STRICT RULES:
 1. ONLY answer questions related to dental health, oral care, dentistry, teeth, gums, orthodontics, our clinic services, or information about Dr. Cristina Moncayo and Lee Torres (the creator).
-2. If asked about non-dental topics (politics, sports, cooking, general programming, etc.), politely redirect: 'I'm Lee AI, specialized in dental health only. I can help you with questions about teeth, oral care, or our clinic services. How can I assist you with your dental health today?'
+2. If asked about non-dental topics (politics, sports, cooking, general programming, etc.), politely redirect: 'I''m Lee AI, specialized in dental health only. I can help you with questions about teeth, oral care, or our clinic services. How can I assist you with your dental health today?'
 3. Be professional, empathetic, and provide accurate dental information.
 4. For medical emergencies, advise to visit the clinic or seek immediate medical attention.
 
@@ -77,7 +61,6 @@ FORMATTING GUIDELINES:
 - Use * for bullet points to create organized lists
 - Add blank lines between sections for better readability
 - Keep paragraphs concise (2-3 sentences max)
-- Use proper spacing and structure
 
 CLINIC INFORMATION:
 - Dentist: Dr. Cristina Moncayo
@@ -87,132 +70,90 @@ CLINIC INFORMATION:
 - Clinic 2: Marigold corner Hyacinth Sts, F E De Castro Village, Bacoor, Philippines
   Hours: 3:00 PM to 8:00 PM (Monday to Saturday), 1:00 PM to 8:00 PM (Sunday)
 
-WEBSITE & AI CREATOR INFORMATION:
+CREATOR INFORMATION:
 - Creator: Lee Rafael Torres
-- Title: Software Engineer 
-- Description: An Experienced Software Engineer from Laguna, Philippines. I am passionate about programming. I enjoy coding and continuously strive to improve my skills in developing applications, websites, mobile apps, and systems. I do software engineering principles such as clean code, design patterns, and best practices to deliver high-quality software solutions.
-- Age: 21
-- Phone: +63 977 334 8124
-- Email: grafrafraftorres28@gmail.com
-- Location: Calauan, Laguna, Philippines
+- Title: Software Engineer
+- Age: 21 | Location: Calauan, Laguna, Philippines
 - Education: PUP Calauan Campus, Laguna
-- Social Media Links:
-  * Facebook: https://www.facebook.com/lee.torres.5496683/
-  * GitHub: https://github.com/LeeDev428
-  * LinkedIn: https://www.linkedin.com/in/lee-torres-361168333/
-  * Personal Website: https://leedev.vercel.app/
+- Social: Facebook: https://www.facebook.com/lee.torres.5496683/ | GitHub: https://github.com/LeeDev428 | LinkedIn: https://www.linkedin.com/in/lee-torres-361168333/ | Website: https://leedev.vercel.app/";
 
-Now, answer this dental question professionally and empathetically: {$question}";
-
-            $payload = [
-                'contents' => [
-                    [
-                        'parts' => [
-                            [
-                                'text' => $systemPrompt
-                            ]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 500,
-                    'topP' => 0.8,
-                    'topK' => 40
-                ]
-            ];
-
-            // Send POST request to Gemini API
+        try {
             $response = Http::timeout(30)
                 ->withHeaders([
-                    'Content-Type' => 'application/json'
+                    'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type'  => 'application/json',
                 ])
-                ->post($url, $payload);
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model'       => $model,
+                    'messages'    => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user',   'content' => $question],
+                    ],
+                    'temperature' => 0.7,
+                    'max_tokens'  => 500,
+                    'top_p'       => 0.8,
+                ]);
 
-            // Check if request was successful
             if ($response->successful()) {
-                $data = $response->json();
-                
-                // Extract the AI response text
-                $aiResponse = $data['candidates'][0]['content']['parts'][0]['text'] ?? 'Sorry, I could not generate a response.';
-                
-                // Format the response for better display
+                $data       = $response->json();
+                $aiResponse = $data['choices'][0]['message']['content'] ?? 'Sorry, I could not generate a response.';
+
                 $formattedResponse = $this->formatAIResponse($aiResponse);
-                
-                // Cache the response for 1 hour to reduce API calls
                 Cache::put($cacheKey, $formattedResponse, 3600);
-                
-                return response()->json([
-                    'success' => true,
-                    'response' => $formattedResponse,
-                    'cached' => false
-                ]);
-            } else {
-                // Check for rate limit error (429)
-                if ($response->status() === 429) {
-                    return response()->json([
-                        'error' => 'Too many requests. Please wait a moment before asking another question.',
-                        'rate_limit' => true
-                    ], 429);
-                }
-                
-                // Log the error for debugging
-                Log::error('Gemini API Error', [
-                    'status' => $response->status(),
-                    'body' => $response->body()
-                ]);
-                
-                // Parse error message from API response
-                $errorBody = $response->json();
-                $errorMessage = $errorBody['error']['message'] ?? 'Failed to get response from AI. Please try again later.';
 
                 return response()->json([
-                    'success' => false,
-                    'error' => $errorMessage
-                ], $response->status());
+                    'success'  => true,
+                    'response' => $formattedResponse,
+                    'cached'   => false,
+                ]);
             }
-        } catch (\Exception $e) {
-            // Log the exception
-            Log::error('Gemini API Exception', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+
+            if ($response->status() === 429) {
+                return response()->json([
+                    'error'      => 'Too many requests. Please wait a moment before asking another question.',
+                    'rate_limit' => true,
+                ], 429);
+            }
+
+            Log::error('Groq API Error', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
             ]);
 
+            $errorBody    = $response->json();
+            $errorMessage = $errorBody['error']['message'] ?? 'Failed to get response from AI. Please try again later.';
+
             return response()->json([
-                'error' => 'An error occurred while processing your request.',
-                'message' => $e->getMessage()
+                'success' => false,
+                'error'   => $errorMessage,
+            ], $response->status());
+
+        } catch (\Exception $e) {
+            Log::error('Groq API Exception', ['message' => $e->getMessage()]);
+
+            return response()->json([
+                'error'   => 'An error occurred while processing your request.',
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 
     /**
-     * Format AI response for better display
-     * Converts markdown-style formatting to HTML
-     * 
-     * @param string $text
-     * @return string
+     * Format AI response - converts markdown-style text to HTML
      */
-    private function formatAIResponse($text)
+    private function formatAIResponse(string $text): string
     {
-        // Preserve line breaks and format for HTML display
-        
         // Convert **bold** to <strong>
-        $text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
-        
-        // Convert *italic* to <em>
-        $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
-        
-        // Convert bullet points (*, -, •) to proper list items
-        // First, detect list blocks
-        $lines = explode("\n", $text);
-        $inList = false;
+        $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $text);
+
+        $lines          = explode("\n", $text);
+        $inList         = false;
         $formattedLines = [];
-        
+
         foreach ($lines as $line) {
             $trimmedLine = trim($line);
-            
-            // Check if line starts with bullet point
-            if (preg_match('/^[\*\-\•]\s+(.+)$/', $trimmedLine, $matches)) {
+
+            if (preg_match('/^[\*\-\x{2022}]\s+(.+)$/u', $trimmedLine, $matches)) {
                 if (!$inList) {
                     $formattedLines[] = '<ul class="ai-list">';
                     $inList = true;
@@ -223,8 +164,6 @@ Now, answer this dental question professionally and empathetically: {$question}"
                     $formattedLines[] = '</ul>';
                     $inList = false;
                 }
-                
-                // Add paragraph tags for non-empty lines
                 if (!empty($trimmedLine)) {
                     $formattedLines[] = '<p>' . $trimmedLine . '</p>';
                 } else {
@@ -232,21 +171,20 @@ Now, answer this dental question professionally and empathetically: {$question}"
                 }
             }
         }
-        
-        // Close list if still open
+
         if ($inList) {
             $formattedLines[] = '</ul>';
         }
-        
+
         $formatted = implode("\n", $formattedLines);
-        
-        // Convert URLs to clickable links
+
+        // Convert URLs to clickable links (safe regex - no user input in pattern)
         $formatted = preg_replace(
-            '/(https?:\/\/[^\s<]+)/',
-            '<a href="$1" target="_blank" class="ai-link">$1</a>',
+            '/(https?:\/\/[^\s<"]+)/',
+            '<a href="$1" target="_blank" rel="noopener noreferrer" class="ai-link">$1</a>',
             $formatted
         );
-        
+
         return $formatted;
     }
 }
