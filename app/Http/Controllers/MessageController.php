@@ -4,187 +4,129 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Message;
 use App\Models\MongoMessage;
-use App\Models\User;  // Import the User model
-use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class MessageController extends Controller
 {
-    /**
-     * Check if MongoDB is available
-     */
-    private function isMongoAvailable()
-    {
-        return extension_loaded('mongodb') && !empty(config('database.connections.mongodb.dsn'));
-    }
-
     public function index()
     {
-        if (!$this->isMongoAvailable()) {
-            return view('messages.index', [
-                'messages' => collect([]),
-                'adminUser' => User::where('usertype', 'admin')->first() ?? User::find(1),
-                'mongoUnavailable' => true
-            ]);
-        }
-
-        if (Auth::check()) {
-            $currentUserId = Auth::id();
-            
-            // Find the admin this patient has been talking to (last message sender/recipient who is admin)
-            $lastAdminMessage = MongoMessage::where(function($query) use ($currentUserId) {
-                $query->where('sender_id', $currentUserId)
-                      ->orWhere('recipient_id', $currentUserId);
-            })
-            ->whereIn('sender_type', ['admin'])
-            ->orWhere(function($query) use ($currentUserId) {
-                $query->where('sender_id', $currentUserId)->where('sender_type', 'user');
-            })
-            ->orderBy('created_at', 'desc')
-            ->first();
-            
-            // Determine which admin to talk to
-            if ($lastAdminMessage) {
-                // Find the admin from the last message
-                $adminId = $lastAdminMessage->sender_type === 'admin' 
-                    ? $lastAdminMessage->sender_id 
-                    : $lastAdminMessage->recipient_id;
-                $adminUser = User::find($adminId);
-            }
-            
-            // Fallback: find any admin user
-            if (!isset($adminUser) || !$adminUser) {
-                $adminUser = User::where('usertype', 'admin')->first();
-            }
-            
-            if (!$adminUser) {
-                // Last fallback to user with ID 1
-                $adminUser = User::find(1);
-            }
-            
-            // Debug: Log the conversation participants
-            \Log::info('Patient conversation initialized', [
-                'patient_id' => Auth::id(),
-                'admin_id' => $adminUser->id
-            ]);
-            
-            // Fetch messages from MongoDB - conversation between patient and admin
-            $messages = MongoMessage::conversation(Auth::id(), $adminUser->id)
-                ->orderBy('created_at', 'asc')
-                ->get();
-            
-            // Debug: Log the count
-            \Log::info('Patient messages loaded', [
-                'patient_id' => Auth::id(),
-                'admin_id' => $adminUser->id,
-                'message_count' => $messages->count(),
-                'sample_messages' => $messages->take(2)->map(fn($m) => [
-                    'sender' => $m->sender_id,
-                    'recipient' => $m->recipient_id,
-                    'message' => substr($m->message, 0, 20)
-                ])
-            ]);
-            
-            // Manually attach user data
-            $currentUser = Auth::user();
-            $messages = $messages->map(function($msg) use ($adminUser, $currentUser) {
-                // Don't convert to array, work with model instance
-                $msg->sender = $msg->sender_id == $currentUser->id ? $currentUser : $adminUser;
-                $msg->recipient = $msg->recipient_id == $currentUser->id ? $currentUser : $adminUser;
-                return $msg;
-            });
-            
-            // Retrieve the logged-in user's details
-            $selectedUser = Auth::user();  // Fetch the currently authenticated user (patient)
-            
-            // Pass messages, selected user, and admin user to the view
-            return view('messages.index', compact('messages', 'selectedUser', 'adminUser'));
-        } else {
+        if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Please log in to view your messages.');
         }
+
+        $currentUserId = Auth::id();
+
+        // Find the admin this patient has been talking to (last message where sender_type is admin)
+        $lastAdminMessage = MongoMessage::where(function ($query) use ($currentUserId) {
+            $query->where('sender_id', $currentUserId)
+                  ->orWhere('recipient_id', $currentUserId);
+        })
+        ->where('sender_type', 'admin')
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+        if ($lastAdminMessage) {
+            $adminId = $lastAdminMessage->sender_id == $currentUserId
+                ? $lastAdminMessage->recipient_id
+                : $lastAdminMessage->sender_id;
+            $adminUser = User::find($adminId);
+        }
+
+        if (empty($adminUser)) {
+            $adminUser = User::where('usertype', 'admin')->first() ?? User::find(1);
+        }
+
+        $messages = MongoMessage::conversation($currentUserId, $adminUser->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $currentUser = Auth::user();
+        $messages = $messages->map(function ($msg) use ($adminUser, $currentUser) {
+            $msg->sender    = $msg->sender_id == $currentUser->id ? $currentUser : $adminUser;
+            $msg->recipient = $msg->recipient_id == $currentUser->id ? $currentUser : $adminUser;
+            return $msg;
+        });
+
+        $selectedUser = $currentUser;
+
+        return view('messages.index', compact('messages', 'selectedUser', 'adminUser'));
     }
 
     public function store(Request $request)
     {
-        // Validate message input
         $request->validate([
-            'message' => 'required|string|max:255',
+            'message'      => 'required|string|max:1000',
+            'recipient_id' => 'required|exists:users,id',
         ]);
 
-        // Store the message in the database
-        Message::create([
-            'user_id' => Auth::id(),
-            'message' => $request->message,
-            'status' => 'unread'  // Ensure status is set when the message is created
+        $user = Auth::user();
+
+        MongoMessage::create([
+            'sender_id'    => $user->id,
+            'recipient_id' => (int) $request->recipient_id,
+            'message'      => $request->message,
+            'sender_type'  => $user->usertype === 'admin' ? 'admin' : 'user',
+            'is_read'      => false,
+            'attachments'  => [],
+            'created_at'   => new \MongoDB\BSON\UTCDateTime(now()->timestamp * 1000),
         ]);
 
         return back()->with('success', 'Message sent successfully.');
     }
 
-    // Send a reply
-    public function reply(Request $request)
+    /**
+     * Unread count for the logged-in patient (messages from admins that are unread).
+     */
+    public function unreadMessagesCount()
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'message' => 'required|string',
-        ]);
+        $userId = Auth::id();
 
-        // Save the admin's reply
-        Message::create([
-            'user_id' => $request->user_id,
-            'message' => $request->message,
-            'is_admin' => true,
-            'status' => 'unread',
-        ]);
+        $count = MongoMessage::where('recipient_id', $userId)
+            ->where('sender_type', 'admin')
+            ->where('is_read', false)
+            ->count();
 
-        return redirect()->back()->with('success', 'Reply sent successfully!');
+        return response()->json(['count' => $count]);
     }
 
- 
+    /**
+     * Mark all admin messages to the logged-in patient as read.
+     */
+    public function markMessagesAsRead()
+    {
+        $userId = Auth::id();
 
-public function unreadMessagesCount()
-{
-    $userId = auth::id(); // Get the logged-in user's ID
+        MongoMessage::where('recipient_id', $userId)
+            ->where('is_read', false)
+            ->get()
+            ->each(fn ($msg) => $msg->markAsRead());
 
-    $count = DB::table('messages')
-        ->where('status', 'unread')  // Count only unread messages
-        ->where('is_admin', 1)       // Only messages sent by the admin
-        ->where('user_id', $userId) // Include only messages received by the logged-in user
-        ->count();
+        return response()->json(['success' => true]);
+    }
 
-    return response()->json(['count' => $count]);
-}
+    /**
+     * Unread count for admin (messages from patients that are unread).
+     */
+    public function getUnreadMessagesCount()
+    {
+        $count = MongoMessage::where('sender_type', 'user')
+            ->where('is_read', false)
+            ->count();
 
+        return response()->json(['count' => $count]);
+    }
 
-public function markMessagesAsRead()
-{
-    Message::where('user_id', Auth::id())
-        ->where('status', 'unread')
-        ->update(['status' => 'read']);
+    /**
+     * Mark all patient messages as read (admin action).
+     */
+    public function markMessagesAsReadAdmin()
+    {
+        MongoMessage::where('sender_type', 'user')
+            ->where('is_read', false)
+            ->get()
+            ->each(fn ($msg) => $msg->markAsRead());
 
-    return response()->json(['success' => true]);
-}
-
-public function getUnreadMessagesCount()
-{
-    $unreadMessagesCount = DB::table('messages')
-        ->where('is_admin', 0) // Messages from patients
-        ->where('status', 'unread') // Only count unread messages
-        ->count();
-
-    return response()->json(['count' => $unreadMessagesCount]);
-}
-
-public function markMessagesAsReadAdmin()
-{
-    DB::table('messages')
-        ->where('is_admin', 0) // Messages from patients
-        ->where('status', 'unread')
-        ->update(['status' => 'read']);
-
-    return response()->json(['success' => true]);
-}
-
-
+        return response()->json(['success' => true]);
+    }
 }
