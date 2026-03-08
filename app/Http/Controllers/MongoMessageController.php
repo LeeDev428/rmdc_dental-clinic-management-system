@@ -12,44 +12,22 @@ use App\Events\MessageRead;
 class MongoMessageController extends Controller
 {
     /**
-     * Check if MongoDB is available
-     */
-    private function isMongoAvailable()
-    {
-        return extension_loaded('mongodb') && !empty(config('database.connections.mongodb.dsn'));
-    }
-
-    /**
      * Show admin real-time messages view
      */
     public function adminIndex(Request $request)
     {
-        if (!$this->isMongoAvailable()) {
-            return redirect()->back()->with('error', 'Real-time messaging is currently unavailable. Please contact support.');
-        }
-
         $selectedUserId = $request->get('user_id');
-        $selectedUser = null;
-        
-        if ($selectedUserId) {
-            $selectedUser = User::find($selectedUserId);
-        }
-        
-        // Get all patients (non-admin users)
-        $users = User::where('usertype', '!=', 'admin')->get();
-        
+        $selectedUser   = $selectedUserId ? User::find($selectedUserId) : null;
+        $users          = User::where('usertype', '!=', 'admin')->get();
+
         return view('admin.patient_messages_realtime', compact('selectedUser', 'users'));
     }
-    
+
     /**
      * Show patient real-time messages view
      */
     public function patientIndex()
     {
-        if (!$this->isMongoAvailable()) {
-            return redirect()->back()->with('error', 'Real-time messaging is currently unavailable. Please contact support.');
-        }
-
         return view('messages.index_realtime');
     }
 
@@ -58,65 +36,50 @@ class MongoMessageController extends Controller
      */
     public function store(Request $request)
     {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
-        }
-
         $request->validate([
-            'message' => 'required|string|max:1000',
+            'message'      => 'required|string|max:1000',
             'recipient_id' => 'required|exists:users,id',
         ]);
 
         $user = Auth::user();
 
-        // Create message in MongoDB with proper timezone
         $message = MongoMessage::create([
-            'sender_id' => $user->id,
+            'sender_id'    => $user->id,
             'recipient_id' => $request->recipient_id,
-            'message' => $request->message,
-            'sender_type' => $user->usertype === 'admin' ? 'admin' : 'user',
-            'is_read' => false,
-            'attachments' => $request->attachments ?? [],
-            'created_at' => new \MongoDB\BSON\UTCDateTime(now()->timestamp * 1000),
+            'message'      => $request->message,
+            'sender_type'  => $user->usertype === 'admin' ? 'admin' : 'user',
+            'is_read'      => false,
+            'attachments'  => $request->attachments ?? [],
+            'created_at'   => new \MongoDB\BSON\UTCDateTime(now()->timestamp * 1000),
         ]);
 
-        // Manually attach user data (can't use Eloquent relationships across databases)
-        $recipient = User::find($request->recipient_id);
+        $recipient   = User::find($request->recipient_id);
         $messageData = $message->toArray();
         $messageData['sender'] = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'avatar' => $user->avatar,
+            'id'         => $user->id,
+            'name'       => $user->name,
+            'avatar'     => $user->avatar,
             'avatar_url' => $user->avatar_url,
         ];
         $messageData['recipient'] = [
-            'id' => $recipient->id,
-            'name' => $recipient->name,
-            'avatar' => $recipient->avatar,
+            'id'         => $recipient->id,
+            'name'       => $recipient->name,
+            'avatar'     => $recipient->avatar,
             'avatar_url' => $recipient->avatar_url,
         ];
-        
-        // Format created_at for JavaScript
-        if (isset($messageData['created_at'])) {
-            if ($messageData['created_at'] instanceof \MongoDB\BSON\UTCDateTime) {
-                $messageData['created_at'] = $messageData['created_at']->toDateTime()->format('Y-m-d H:i:s');
-            }
+
+        if (isset($messageData['created_at']) && $messageData['created_at'] instanceof \MongoDB\BSON\UTCDateTime) {
+            $messageData['created_at'] = $messageData['created_at']->toDateTime()->format('Y-m-d H:i:s');
         }
 
-        // Broadcast the message via Pusher
         broadcast(new NewMessage($message))->toOthers();
 
-        // Broadcast unread count update to recipient
         $recipientUnreadCount = MongoMessage::where('recipient_id', $request->recipient_id)
             ->where('is_read', false)
             ->count();
-        
         broadcast(new \App\Events\UnreadCountUpdated($request->recipient_id, $recipientUnreadCount));
 
-        return response()->json([
-            'success' => true,
-            'message' => $messageData,
-        ]);
+        return response()->json(['success' => true, 'message' => $messageData]);
     }
 
     /**
@@ -124,22 +87,17 @@ class MongoMessageController extends Controller
      */
     public function typing(Request $request)
     {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
-        }
-
         $request->validate([
             'recipient_id' => 'required|exists:users,id',
-            'typing' => 'required|boolean',
+            'typing'       => 'required|boolean',
         ]);
 
         $user = Auth::user();
 
-        // Broadcast typing status to the recipient
         broadcast(new \App\Events\UserTyping([
-            'sender_id' => $user->id,
+            'sender_id'    => $user->id,
             'recipient_id' => $request->recipient_id,
-            'typing' => $request->typing,
+            'typing'       => $request->typing,
         ]))->toOthers();
 
         return response()->json(['success' => true]);
@@ -150,12 +108,8 @@ class MongoMessageController extends Controller
      */
     public function markAsRead(Request $request)
     {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['error' => 'Messaging service is currently unavailable'], 503);
-        }
-
         $request->validate([
-            'message_ids' => 'required|array',
+            'message_ids'   => 'required|array',
             'message_ids.*' => 'required|string',
         ]);
 
@@ -163,27 +117,20 @@ class MongoMessageController extends Controller
 
         foreach ($request->message_ids as $messageId) {
             $message = MongoMessage::find($messageId);
-            
+
             if ($message && $message->recipient_id == $user->id) {
                 $message->markAsRead();
-                
-                // Broadcast read receipt
                 broadcast(new MessageRead($messageId, $message->sender_id))->toOthers();
             }
         }
 
-        // Get updated unread count
         $unreadCount = MongoMessage::where('recipient_id', $user->id)
             ->where('is_read', false)
             ->count();
 
-        // Broadcast unread count update
         broadcast(new \App\Events\UnreadCountUpdated($user->id, $unreadCount));
 
-        return response()->json([
-            'success' => true,
-            'unread_count' => $unreadCount
-        ]);
+        return response()->json(['success' => true, 'unread_count' => $unreadCount]);
     }
 
     /**
@@ -191,13 +138,85 @@ class MongoMessageController extends Controller
      */
     public function unreadCount()
     {
-        if (!$this->isMongoAvailable()) {
-            return response()->json(['count' => 0]);
+        $user  = Auth::user();
+        $count = MongoMessage::where('recipient_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json(['count' => $count]);
+    }
+
+    /**
+     * Get all messages for a conversation (AJAX)
+     */
+    public function getMessages(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $user     = Auth::user();
+        $messages = MongoMessage::conversation($user->id, $request->user_id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $userIds = $messages->pluck('sender_id')->merge($messages->pluck('recipient_id'))->unique();
+        $users   = User::whereIn('id', $userIds)->get()->keyBy('id');
+
+        $messages = $messages->map(function ($message) use ($users) {
+            $messageArray = $message->toArray();
+
+            $sender    = $users->get($message->sender_id);
+            $recipient = $users->get($message->recipient_id);
+
+            $messageArray['sender'] = $sender ? [
+                'id'         => $sender->id,
+                'name'       => $sender->name,
+                'avatar'     => $sender->avatar,
+                'avatar_url' => $sender->avatar_url,
+            ] : null;
+
+            $messageArray['recipient'] = $recipient ? [
+                'id'         => $recipient->id,
+                'name'       => $recipient->name,
+                'avatar'     => $recipient->avatar,
+                'avatar_url' => $recipient->avatar_url,
+            ] : null;
+
+            return $messageArray;
+        });
+
+        return response()->json(['success' => true, 'messages' => $messages]);
+    }
+
+    /**
+     * Get list of users for admin
+     */
+    public function getUserList()
+    {
+        if (Auth::user()->usertype !== 'admin') {
+            abort(403);
         }
 
-        $user = Auth::user();
-        
-        $count = MongoMessage::where('recipient_id', $user->id)
+        $users = User::where('usertype', '!=', 'admin')->get();
+
+        $users = $users->map(function ($user) {
+            $unreadCount = MongoMessage::where('sender_id', $user->id)
+                ->where('recipient_id', Auth::id())
+                ->where('is_read', false)
+                ->count();
+
+            $userData                  = $user->toArray();
+            $userData['unread_count']  = $unreadCount;
+            return $userData;
+        });
+
+        $users = collect($users)->sortByDesc('unread_count')->values();
+
+        return response()->json(['success' => true, 'users' => $users]);
+    }
+}
+
             ->where('is_read', false)
             ->count();
 
