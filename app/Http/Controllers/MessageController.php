@@ -69,7 +69,6 @@ class MessageController extends Controller
             'sender_type'  => $user->usertype === 'admin' ? 'admin' : 'user',
             'is_read'      => false,
             'attachments'  => [],
-            'created_at'   => new \MongoDB\BSON\UTCDateTime(now()->timestamp * 1000),
         ]);
 
         return back()->with('success', 'Message sent successfully.');
