@@ -453,10 +453,35 @@
             font-size: 14px;
             margin-bottom: 16px;
             line-height: 1.5;
+        }
+
+        .service-description {
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .service-description.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+            overflow: visible;
+        }
+
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: #00b4d8;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 8px;
+        }
+
+        .read-more-btn:hover {
+            color: #03828b;
+            text-decoration: underline;
         }
 
         .service-meta {
