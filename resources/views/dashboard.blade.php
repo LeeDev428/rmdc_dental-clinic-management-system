@@ -169,7 +169,7 @@
             <h1 class="text-3xl font-bold text-gray-800">
                 <span class="text-blue-600">Your</span> Appointment Details
             </h1>
-            <p class="text-sm text-gray-500 mt-2">Invoice and Payment Information</p>
+            <p class="text-sm text-gray-500 mt-2">Invoice and Appointment Information</p>
         </div>
 
         <div class="bg-white border border-gray-200 rounded-xl shadow-lg p-8" id="billing-invoice">
@@ -284,38 +284,15 @@
                 </div>
             </div>
 
-            <!-- Payment Information -->
+            <!-- Payment Arrangement -->
             <div class="mb-8">
-                <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Payment Information</h4>
+                <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Payment Arrangement</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
                         <div class="space-y-3">
                             <div class="flex justify-between items-start">
-                                <span class="text-xs text-gray-500 uppercase tracking-wide">Payment Method</span>
-                                @if($appointments && $appointments->payment_method)
-                                    <span class="text-sm font-semibold text-gray-800 uppercase">{{ $appointments->payment_method }}</span>
-                                @else
-                                    <span class="text-sm text-gray-400">Not specified</span>
-                                @endif
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <span class="text-xs text-gray-500 uppercase tracking-wide">Reference ID</span>
-                                @if($appointments && $appointments->payment_reference)
-                                    <span class="text-xs font-mono text-gray-600">{{ $appointments->payment_reference }}</span>
-                                @else
-                                    <span class="text-sm text-gray-400">N/A</span>
-                                @endif
-                            </div>
-                            <div class="flex justify-between items-center pt-2 border-t border-gray-300">
-                                <span class="text-xs text-gray-500 uppercase tracking-wide">Status</span>
-                                @if($appointments && $appointments->payment_status)
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                        {{ $appointments->payment_status === 'paid' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-yellow-100 text-yellow-700 border border-yellow-300' }}">
-                                        {{ strtoupper($appointments->payment_status) }}
-                                    </span>
-                                @else
-                                    <span class="text-sm text-gray-400">Pending</span>
-                                @endif
+                                <span class="text-xs text-gray-500 uppercase tracking-wide">Payment Mode</span>
+                                <span class="text-sm font-semibold text-gray-800 uppercase">Physical at Clinic</span>
                             </div>
                             <div class="flex justify-between items-start">
                                 <span class="text-xs text-gray-500 uppercase tracking-wide">Booked On</span>
@@ -334,17 +311,11 @@
                                 <span class="text-lg font-bold text-gray-800">₱<span id="total-price"></span></span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-sm font-medium text-gray-700">Down Payment (20%)</span>
-                                <span class="text-lg font-semibold text-green-600">
-                                    @if($appointments && $appointments->down_payment)
-                                        - ₱{{ number_format($appointments->down_payment, 2) }}
-                                    @else
-                                        <span class="text-gray-400 text-sm">N/A</span>
-                                    @endif
-                                </span>
+                                <span class="text-sm font-medium text-gray-700">Collection Method</span>
+                                <span class="text-lg font-semibold text-green-600">Pay at Clinic</span>
                             </div>
                             <div class="flex justify-between items-center pt-3 border-t-2 border-blue-200">
-                                <span class="text-base font-bold text-gray-800">Balance Due</span>
+                                <span class="text-base font-bold text-gray-800">Amount Due at Visit</span>
                                 <span class="text-2xl font-bold text-blue-600">₱<span id="balance-due"></span></span>
                             </div>
                         </div>
@@ -380,7 +351,6 @@
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
                         let procedureName = "{{ $appointments->procedure ?? '' }}";
-                        let downPayment = {{ $appointments->down_payment ?? 0 }};
 
                         if (procedureName) {
                             fetch(`/get-procedure-details?procedure=${encodeURIComponent(procedureName)}`)
@@ -392,10 +362,9 @@
                                     document.getElementById("estimated-time").textContent = duration + " minutes";
                                     document.getElementById("procedure-price").textContent = price.toFixed(2);
                                     document.getElementById("total-price").textContent = price.toFixed(2);
-                                    
-                                    // Calculate balance
-                                    let balance = price - downPayment;
-                                    document.getElementById("balance-due").textContent = balance.toFixed(2);
+
+                                    // Full amount is settled physically at the clinic
+                                    document.getElementById("balance-due").textContent = price.toFixed(2);
                                 })
                                 .catch(error => console.error("Error fetching procedure details:", error));
                         }
