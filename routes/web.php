@@ -30,7 +30,6 @@
     use App\Http\Controllers\AppointmentCancellationController;
     use App\Http\Controllers\ServiceFeedbackController;
     use App\Http\Controllers\GeminiController;
-    use App\Http\Controllers\PaymentController;
 
     use Illuminate\Http\Request;
     use Laravel\Socialite\Facades\Socialite;
@@ -141,11 +140,6 @@
     // Service Feedback
     Route::get('/check-pending-feedback', [ServiceFeedbackController::class, 'checkPendingFeedback'])->name('feedback.check');
     Route::post('/service-feedback', [ServiceFeedbackController::class, 'store'])->name('feedback.store');
-    
-    // Payment Routes - PayMongo Checkout Sessions API (session-based, no appointment created until payment succeeds)
-    Route::get('/payment/create', [PaymentController::class, 'createPayment'])->name('payment.create');
-    Route::get('/payment/success', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-    Route::get('/payment/failed', [PaymentController::class, 'paymentFailed'])->name('payment.failed');
     
     // Ask Lee AI - Gemini AI Chatbot
     Route::get('/ask-lee-ai', [GeminiController::class, 'index'])->name('ask.lee.ai');
@@ -423,7 +417,7 @@ Route::get('/get-procedure-price', [AppointmentController::class, 'getProcedureP
     Route::get('/tooth-records/{toothRecordId}/images', [ToothRecordController::class, 'getImages']);
 });
 
-// Old PayMongo Controller routes commented out - now using session-based PaymentController
+// Old PayMongo controller routes retained only for reference (disabled)
 // use App\Http\Controllers\PayMongoController;
 // Route::middleware(['auth'])->group(function () {
 //     Route::post('/payment/create-source', [PayMongoController::class, 'createPaymentSource'])->name('payment.create-source');
