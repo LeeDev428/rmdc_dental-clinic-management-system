@@ -516,8 +516,8 @@ window.onclick = function(event) {
                         <div>
                             <h4 class="font-semibold text-lg">🔄 Rescheduling Appointment</h4>
                             <p class="text-sm mt-1"><strong>Current Appointment:</strong> {{ $reschedulingAppointment->procedure }} on {{ \Carbon\Carbon::parse($reschedulingAppointment->start)->format('F d, Y \a\t g:i A') }}</p>
-                            <p class="text-sm mt-1"><strong>Payment Status:</strong> ✅ Already Paid (₱{{ number_format($reschedulingAppointment->payment->amount ?? 0, 2) }})</p>
-                            <p class="text-sm mt-1">Please select a new date and time below. Your procedure and payment information will remain the same.</p>
+                            <p class="text-sm mt-1"><strong>Payment Mode:</strong> Physical payment at clinic.</p>
+                            <p class="text-sm mt-1">Please select a new date and time below. Your procedure information will remain the same.</p>
                         </div>
                     </div>
                 </div>
@@ -571,7 +571,7 @@ window.onclick = function(event) {
                         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-8 w-full max-w-6xl border booking-modal-landscape">
                             @if(isset($reschedulingAppointment) && $reschedulingAppointment)
                             <div class="mb-4 p-3 bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-md text-sm">
-                                <strong>🔄 Rescheduling Mode:</strong> Select a new date and time. Payment information will be preserved.
+                                <strong>🔄 Rescheduling Mode:</strong> Select a new date and time. Payment will be settled physically at the clinic.
                             </div>
                             @elseif(isset($hasPendingAppointment) && $hasPendingAppointment)
                             <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md text-sm">
@@ -774,7 +774,7 @@ window.onclick = function(event) {
                                                             <li>Rescheduling and editing the appointment is not allowed once created.</li>
                                                             <li><strong class="text-red-600">Cancellation Policy:</strong> Cancellations must be made at least <strong>2 days (48 hours) before</strong> your scheduled appointment.</li>
                                                             <li><strong class="text-red-600">Same-Day Cancellations:</strong> Cancellations on the same day of the appointment are <strong>NOT allowed</strong>.</li>
-                                                            <li><strong class="text-red-600">Down Payment:</strong> Down payments are <strong>non-refundable</strong> for late cancellations or no-shows.</li>
+                                                            <li><strong class="text-red-600">Payment Policy:</strong> Payments are collected <strong>physically at the clinic</strong> on your appointment day.</li>
                                                             <li>Deleting your appointment counts as a violation (max 3 violations per week).</li>
                                                             <li>Only one appointment is allowed per day.</li>
                                                             <li>If your appointment is not yet in the current appointment period, you may cancel or reschedule through the Cancellation page.</li>
@@ -792,192 +792,23 @@ window.onclick = function(event) {
                                         </div>
                                     </div>
 
-                                    <!-- Right Column: Payment Details -->
+                                    <!-- Right Column: Payment Arrangement -->
                                     <div class="booking-column">
-                                        <h4 class="modal-section-title">Payment Information</h4>
-                                        
-                                        @if(isset($reschedulingAppointment) && $reschedulingAppointment)
-                                        <!-- Reschedule Mode - Show Existing Payment -->
-                                        @php
-                                            $payment = $reschedulingAppointment->latestPayment;
-                                            $hasPayment = $payment !== null;
-                                        @endphp
-                                        
-                                        @if($hasPayment)
-                                        <!-- Accepted appointment with payment -->
-                                        <div class="p-6 bg-green-50 border-2 border-green-400 rounded-lg">
-                                            <div class="flex items-center mb-4">
-                                                <svg class="w-8 h-8 text-green-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                </svg>
-                                                <h5 class="text-xl font-bold text-green-800">Payment Completed</h5>
-                                            </div>
-                                            
-                                            <div class="space-y-3">
-                                                <div class="flex justify-between py-2 border-b border-green-200">
-                                                    <span class="text-gray-700 font-medium">Procedure:</span>
-                                                    <span class="text-gray-900 font-semibold">{{ $reschedulingAppointment->procedure }}</span>
-                                                </div>
-                                                
-                                                @php
-                                                    $amount = $payment->amount;
-                                                    $paymentMethod = $payment->payment_method;
-                                                    $paymentDate = \Carbon\Carbon::parse($payment->created_at)->format('M d, Y g:i A');
-                                                @endphp
-                                                
-                                                <div class="flex justify-between py-2 border-b border-green-200">
-                                                    <span class="text-gray-700 font-medium">Amount Paid:</span>
-                                                    <span class="text-green-700 font-bold text-lg">₱{{ number_format($amount, 2) }}</span>
-                                                </div>
-                                                
-                                                <div class="flex justify-between py-2 border-b border-green-200">
-                                                    <span class="text-gray-700 font-medium">Payment Date:</span>
-                                                    <span class="text-gray-900">{{ $paymentDate }}</span>
-                                                </div>
-                                                
-                                                <div class="flex justify-between py-2">
-                                                    <span class="text-gray-700 font-medium">Payment Method:</span>
-                                                    <span class="text-gray-900 uppercase">{{ $paymentMethod }}</span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mt-4 p-3 bg-white border border-green-300 rounded-md">
-                                                <p class="text-sm text-gray-700">
-                                                    <strong>Note:</strong> No additional payment required. Your payment will be transferred to the new appointment date.
-                                                </p>
-                                            </div>
-                                            
-                                            <!-- Form Action Buttons for Reschedule -->
-                                            <div class="flex justify-end gap-3 mt-6">
-                                                <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                                    Cancel
-                                                </button>
-                                                
-                                                <button type="submit" 
-                                                        id="submit-booking-btn"
-                                                        class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                    </svg>
-                                                    <span id="submit-btn-text">Confirm Reschedule</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        @else
-                                        <!-- Pending appointment without payment -->
-                                        <div class="p-6 bg-blue-50 border-2 border-blue-400 rounded-lg">
-                                            <div class="flex items-center mb-4">
-                                                <svg class="w-8 h-8 text-blue-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                                                </svg>
-                                                <h5 class="text-xl font-bold text-blue-800">Pending Appointment</h5>
-                                            </div>
-                                            
-                                            <div class="space-y-3">
-                                                <div class="flex justify-between py-2 border-b border-blue-200">
-                                                    <span class="text-gray-700 font-medium">Procedure:</span>
-                                                    <span class="text-gray-900 font-semibold">{{ $reschedulingAppointment->procedure }}</span>
-                                                </div>
-                                                
-                                                <div class="flex justify-between py-2 border-b border-blue-200">
-                                                    <span class="text-gray-700 font-medium">Status:</span>
-                                                    <span class="text-orange-600 font-semibold uppercase">{{ $reschedulingAppointment->status }}</span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="mt-4 p-3 bg-white border border-blue-300 rounded-md">
-                                                <p class="text-sm text-gray-700">
-                                                    <strong>Note:</strong> This appointment is still pending approval. You can reschedule to a different date and time.
-                                                </p>
-                                            </div>
-                                            
-                                            <!-- Form Action Buttons for Reschedule -->
-                                            <div class="flex justify-end gap-3 mt-6">
-                                                <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                                    Cancel
-                                                </button>
-                                                
-                                                <button type="submit" 
-                                                        id="submit-booking-btn"
-                                                        class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                                    <svg class="w-5 h-5 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                    </svg>
-                                                    <span id="submit-btn-text">Confirm Reschedule</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        @endif
-                                        @else
+                                        <h4 class="modal-section-title">Payment Arrangement</h4>
+
                                         <div class="payment-section">
                                             <div class="payment-breakdown">
-                                                <h5 class="font-semibold text-gray-800 mb-3 text-base">Price Breakdown</h5>
-                                                
+                                                <h5 class="font-semibold text-gray-800 mb-3 text-base">Service Fee</h5>
+
                                                 <div class="price-row">
-                                                    <span class="text-gray-600">Procedure Price:</span>
+                                                    <span class="text-gray-600">Estimated Total:</span>
                                                     <span class="font-semibold" id="display-total-price">₱0.00</span>
                                                 </div>
-                                                
-                                                <div class="price-row">
-                                                    <span class="text-gray-600">Down Payment (20%):</span>
-                                                    <span class="font-semibold" id="display-down-payment">₱0.00</span>
-                                                </div>
-                                                
-                                                <div class="price-row">
-                                                    <span class="text-gray-600">Remaining Balance:</span>
-                                                    <span class="font-semibold" id="display-balance">₱0.00</span>
-                                                </div>
-                                                
+
                                                 <div class="price-row total">
-                                                    <span>Amount to Pay Now:</span>
-                                                    <span id="display-amount-to-pay">₱0.00</span>
+                                                    <span>Payment Mode:</span>
+                                                    <span>Physical at Clinic</span>
                                                 </div>
-                                            </div>
-
-                                            <div class="payment-methods">
-                                                <h5 class="font-semibold text-gray-800 mb-3 text-base">Select Payment Method</h5>
-                                                
-                                                <label class="payment-method-option">
-                                                    <input type="radio" name="payment_method" value="gcash" required>
-                                                    <div class="payment-label flex items-center gap-3">
-                                                        <img src="{{ asset('payment-logo/gcash.png') }}" 
-                                                             alt="GCash" 
-                                                             class="w-20 h-20 object-contain"
-                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwN0RGRiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5HPC90ZXh0Pjwvc3ZnPg==';">
-                                                        <div>
-                                                            <p class="font-semibold text-gray-800">GCash</p>
-                                                            <p class="text-xs text-gray-500">E-wallet payment</p>
-                                                        </div>
-                                                    </div>
-                                                </label>
-
-                                                <label class="payment-method-option">
-                                                    <input type="radio" name="payment_method" value="paymaya">
-                                                    <div class="payment-label flex items-center gap-3">
-                                                        <img src="{{ asset('payment-logo/maya.png') }}" 
-                                                             alt="PayMaya" 
-                                                             class="w-20 h-20 object-contain"
-                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
-                                                        <div>
-                                                            <p class="font-semibold text-gray-800">PayMaya/Maya</p>
-                                                            <p class="text-xs text-gray-500">E-wallet payment</p>
-                                                        </div>
-                                                    </div>
-                                                </label>
-
-                                                <label class="payment-method-option">
-                                                    <input type="radio" name="payment_method" value="card">
-                                                     <div class="payment-label flex items-center gap-3">
-                                                        <img src="{{ asset('payment-logo/card.png') }}" 
-                                                             alt="PayMaya" 
-                                                             class="w-20 h-20 object-contain"
-                                                             onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzAwRDM1QiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4MCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QPC90ZXh0Pjwvc3ZnPg==';">
-                                                        <div>
-                                                            <p class="font-semibold text-gray-800">Credit/Debit Card</p>
-                                                            <p class="text-xs text-gray-500">Visa, Mastercard</p>
-                                                        </div>
-                                                    </div>
-                                                </label>
                                             </div>
 
                                             <div class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-r-lg">
@@ -987,23 +818,30 @@ window.onclick = function(event) {
                                                     </svg>
                                                     <div class="ml-3">
                                                         <p class="text-sm text-blue-800">
-                                                            <strong>Payment Note:</strong> A 20% down payment is required to secure your appointment. The remaining balance can be paid at the clinic.
+                                                            <strong>Payment Note:</strong> No online payment is required. Full payment will be collected physically at the clinic during your appointment.
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <!-- Form Action Buttons for Booking -->
+
+                                            @if(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                            <div class="mt-4 p-3 bg-green-50 border border-green-300 rounded-md">
+                                                <p class="text-sm text-gray-700">
+                                                    <strong>Reschedule Note:</strong> Your appointment will remain pending for admin confirmation after you pick the new schedule.
+                                                </p>
+                                            </div>
+                                            @endif
+
                                             <div class="flex justify-end gap-3 mt-6">
                                                 <button id="close-modal" type="button" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                                     Cancel
                                                 </button>
-                                                
+
                                                 <button id="delete-appointment" type="button" class="px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 hidden">
                                                     Delete Appointment
                                                 </button>
-                                                
-                                                <button type="submit" 
+
+                                                <button type="submit"
                                                         id="submit-booking-btn"
                                                         class="px-8 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700' }} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                                         {{ (isset($hasPendingAppointment) && $hasPendingAppointment && !isset($reschedulingAppointment)) ? 'disabled' : '' }}>
@@ -1013,20 +851,20 @@ window.onclick = function(event) {
                                                     <span id="submit-btn-text">
                                                         @if(isset($hasPendingAppointment) && $hasPendingAppointment)
                                                             Booking Disabled
+                                                        @elseif(isset($reschedulingAppointment) && $reschedulingAppointment)
+                                                            Confirm Reschedule
                                                         @else
-                                                            Book Appointment & Pay
+                                                            Book Appointment
                                                         @endif
                                                     </span>
                                                 </button>
                                             </div>
-                                        @endif
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Hidden fields for payment -->
+                                <!-- Hidden fields for pricing -->
                                 <input type="hidden" id="total-price-hidden" name="total_price" value="0">
-                                <input type="hidden" id="down-payment-hidden" name="down_payment" value="0">
 
 
                                 <!-- Modal for Image Zoom -->
@@ -1066,28 +904,20 @@ window.onclick = function(event) {
                 </div>
 
                 <script>
-                    // Payment Calculation - only for booking mode (not reschedule)
+                    // Procedure price calculation for booking/reschedule form
                     const operationType = document.getElementById('operation-type');
                     if (operationType) {
                         operationType.addEventListener('change', function() {
                             const selectedOption = this.options[this.selectedIndex];
                             const price = parseFloat(selectedOption.dataset.price) || 0;
                             const duration = selectedOption.dataset.duration || '';
-                            
-                            // Calculate payments
-                            const downPayment = price * 0.20;
-                            const balance = price - downPayment;
-                            
+
                             // Update display fields
                             document.getElementById('display-total-price').textContent = '₱' + price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            document.getElementById('display-down-payment').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            document.getElementById('display-balance').textContent = '₱' + balance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                            document.getElementById('display-amount-to-pay').textContent = '₱' + downPayment.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                        
+
                             // Update hidden fields
                             document.getElementById('total-price-hidden').value = price.toFixed(2);
-                            document.getElementById('down-payment-hidden').value = downPayment.toFixed(2);
-                            
+
                             // Update duration
                             document.getElementById('estimated-time').value = duration ? duration + ' minutes' : '';
                         });
@@ -1252,17 +1082,12 @@ window.onclick = function(event) {
                 'title': 'Patient Name',
                 'procedure': 'Procedure',
                 'time': 'Appointment Time',
-                'image_path': 'Valid ID',
-                'payment_method': 'Payment Method'
+                'image_path': 'Valid ID'
             };
 
             let missingFields = [];
             for (const [field, label] of Object.entries(requiredFields)) {
-                if (field === 'payment_method') {
-                    if (!document.querySelector('input[name="payment_method"]:checked')) {
-                        missingFields.push(label);
-                    }
-                } else if (field === 'image_path') {
+                if (field === 'image_path') {
                     const fileInput = document.getElementById('valid-id');
                     if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
                         missingFields.push(label);
@@ -1279,42 +1104,23 @@ window.onclick = function(event) {
                 showToast('Please fill in all required fields:\n' + missingFields.join(', '), 'error');
                 return;
             }
-            
-            // Only validate payment if NOT in reschedule mode
+
+            // Ensure total price is present for non-reschedule flow
             if (!isRescheduleMode) {
-                // Ensure payment method is selected and explicitly added
-                const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
-                if (!paymentMethod) {
-                    showToast('Please select a payment method', 'error');
-                    return;
-                }
-                
-                // Explicitly add payment method to formData
-                formData.set('payment_method', paymentMethod.value);
-                
-                // Ensure hidden payment fields are included
                 const totalPrice = document.getElementById('total-price-hidden');
-                const downPayment = document.getElementById('down-payment-hidden');
-                
+
                 if (!totalPrice || !totalPrice.value || totalPrice.value === '0') {
                     showToast('Total price is missing. Please select a procedure.', 'error');
                     return;
                 }
-                if (!downPayment || !downPayment.value || downPayment.value === '0') {
-                    showToast('Down payment is missing. Please select a procedure.', 'error');
-                    return;
-                }
-                
+
                 formData.set('total_price', totalPrice.value);
-                formData.set('down_payment', downPayment.value);
-                
+
                 // Debug: Log what we're sending
                 console.log('Submitting appointment with:');
-                console.log('Payment Method:', paymentMethod.value);
                 console.log('Total Price:', totalPrice.value);
-                console.log('Down Payment:', downPayment.value);
             } else {
-                console.log('Reschedule mode - skipping payment validation');
+                console.log('Reschedule mode - skipping total price validation');
             }
 
             // Disable button and show loading state
@@ -1355,12 +1161,6 @@ window.onclick = function(event) {
                     setTimeout(() => {
                         window.location.href = '/appointments';
                     }, 2000);
-                } else if (data.success && data.payment_url) {
-                    // Normal booking - redirect to payment gateway
-                    showToast(data.message || 'Redirecting to payment gateway...', 'info');
-                    setTimeout(() => {
-                        window.location.href = data.payment_url;
-                    }, 1500);
                 } else {
                     showToast(data.message || 'Appointment booked successfully!', 'success');
                     
@@ -1407,7 +1207,7 @@ window.onclick = function(event) {
             submitBtn.disabled = false;
             submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
             submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            submitBtnText.textContent = 'Book Appointment & Pay';
+            submitBtnText.textContent = 'Book Appointment';
         }
 
         // Close rating modal
