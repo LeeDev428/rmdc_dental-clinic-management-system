@@ -142,43 +142,25 @@
                                 <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
                                     ₱{{ number_format($amount, 2) }}
                                 </p>
-                                @if($billing->down_payment)
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                        Down Payment: ₱{{ number_format($billing->down_payment, 2) }}
-                                    </p>
-                                @endif
-                                @if($billing->payment_status == 'paid')
-                                    <span class="inline-block mt-2 text-xs text-green-600 dark:text-green-400">
-                                        <i class="fas fa-check-circle mr-1"></i>Paid
-                                    </span>
-                                @elseif($billing->payment_status == 'pending')
-                                    <span class="inline-block mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-                                        <i class="fas fa-clock mr-1"></i>Pending Payment
-                                    </span>
-                                @else
-                                    <span class="inline-block mt-2 text-xs text-red-600 dark:text-red-400">
-                                        <i class="fas fa-times-circle mr-1"></i>Unpaid
-                                    </span>
-                                @endif
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    Payment Mode: Physical at clinic
+                                </p>
+                                <span class="inline-block mt-2 text-xs text-blue-600 dark:text-blue-400">
+                                    <i class="fas fa-hand-holding-usd mr-1"></i>To be settled at visit
+                                </span>
                             </div>
                         </div>
                         
-                        @if($billing->payment_method || $billing->payment_reference)
-                            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                                    @if($billing->payment_method)
-                                        <p class="text-gray-600 dark:text-gray-400">
-                                            <strong>Payment Method:</strong> {{ strtoupper($billing->payment_method) }}
-                                        </p>
-                                    @endif
-                                    @if($billing->payment_reference)
-                                        <p class="text-gray-600 dark:text-gray-400">
-                                            <strong>Reference:</strong> {{ $billing->payment_reference }}
-                                        </p>
-                                    @endif
-                                </div>
+                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    <strong>Payment Method:</strong> Physical at clinic
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    <strong>Reference:</strong> N/A (offline payment)
+                                </p>
                             </div>
-                        @endif
+                        </div>
                     </div>
                     
                     <div class="mt-3 pt-3 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
