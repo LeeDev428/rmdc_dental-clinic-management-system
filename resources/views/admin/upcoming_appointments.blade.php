@@ -628,15 +628,6 @@
     
     // Generate pending appointment details HTML
     function generatePendingDetailsHTML(appointment) {
-        const paymentStatus = appointment.payment_status || 'unpaid';
-        const paymentBadge = {
-            'unpaid': '<span style="background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">UNPAID</span>',
-            'pending': '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">PENDING</span>',
-            'partially_paid': '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">PARTIALLY PAID</span>',
-            'paid': '<span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">PAID</span>',
-            'fully_paid': '<span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;">FULLY PAID</span>'
-        };
-        
         let html = '<div class="details-grid">';
         
         // Patient Information
@@ -687,32 +678,16 @@
             </div>
         `;
         
-        // Payment Information
-        if (appointment.requires_payment || appointment.total_price) {
+        // Physical payment information
+        if (appointment.total_price) {
             html += `
                 <div class="detail-box">
                     <div class="detail-label-pending">Total Price</div>
                     <div class="detail-value-pending">₱${parseFloat(appointment.total_price || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
                 </div>
                 <div class="detail-box">
-                    <div class="detail-label-pending">Down Payment</div>
-                    <div class="detail-value-pending">₱${parseFloat(appointment.down_payment || 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-label-pending">Remaining Balance</div>
-                    <div class="detail-value-pending">₱${parseFloat((appointment.total_price || 0) - (appointment.down_payment || 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-label-pending">Payment Method</div>
-                    <div class="detail-value-pending">${appointment.payment_method ? appointment.payment_method.toUpperCase() : 'N/A'}</div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-label-pending">Payment Status</div>
-                    <div class="detail-value-pending">${paymentBadge[paymentStatus]}</div>
-                </div>
-                <div class="detail-box">
-                    <div class="detail-label-pending">Payment Reference</div>
-                    <div class="detail-value-pending">${appointment.payment_reference || 'N/A'}</div>
+                    <div class="detail-label-pending">Payment Arrangement</div>
+                    <div class="detail-value-pending">Physical payment at clinic</div>
                 </div>
             `;
         }
