@@ -138,7 +138,6 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
 
         // Convert prices to numbers
         const price = parseFloat(data.price) || 0;
-        const downPayment = parseFloat(data.down_payment) || 0;
         
         // Service Item
         doc.setFont(undefined, 'normal');
@@ -165,20 +164,20 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         doc.text(`PHP ${price.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
         yPos += 6;
         
-        // Down Payment
-        doc.text('Down Payment (20%):', summaryX, yPos);
-        doc.text(`- PHP ${downPayment.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
+        // Payment mode
+        doc.text('Payment Mode:', summaryX, yPos);
+        doc.text('Physical at Clinic', pageWidth - margin, yPos, { align: 'right' });
         yPos += 8;
 
-        // Balance Due - Blue highlighted box
-        const balanceDue = price - downPayment;
+        // Amount due at visit - Blue highlighted box
+        const balanceDue = price;
         doc.setFillColor(37, 99, 235);
         doc.rect(summaryX - 2, yPos - 5, 72, 9, 'F');
         
         doc.setTextColor(255, 255, 255);
         doc.setFont(undefined, 'bold');
         doc.setFontSize(10);
-        doc.text('BALANCE DUE:', summaryX, yPos);
+        doc.text('AMOUNT DUE:', summaryX, yPos);
         doc.text(`PHP ${balanceDue.toFixed(2)}`, pageWidth - margin, yPos, { align: 'right' });
 
         // Payment Info Box with border
@@ -197,9 +196,9 @@ window.downloadInvoicePDF = async function(appointmentId, evt) {
         yPos += 11;
         
         const paymentInfo = [
-            `Method: ${data.payment_method || 'gcash'}`,
-            `Reference: ${data.payment_reference || 'N/A'}`,
-            `Status: ${(data.payment_status || 'PAID').toUpperCase()}`
+            'Method: PHYSICAL AT CLINIC',
+            'Reference: N/A (OFFLINE PAYMENT)',
+            'Status: TO BE SETTLED AT VISIT'
         ];
 
         paymentInfo.forEach((info, i) => {
