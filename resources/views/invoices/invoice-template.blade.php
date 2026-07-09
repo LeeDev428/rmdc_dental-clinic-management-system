@@ -295,7 +295,7 @@
                 <span class="invoice-date">Issued: {{ $appointment->created_at->format('F d, Y') }}</span>
                 <span>
                     <span class="invoice-number">Invoice #{{ str_pad($appointment->id, 6, '0', STR_PAD_LEFT) }}</span>
-                    <span class="status-badge">{{ ucfirst($appointment->payment_status ?? 'PAID') }}</span>
+                    <span class="status-badge">Physical Payment</span>
                 </span>
             </div>
         </div>
@@ -346,22 +346,22 @@
             </table>
         </div>
         
-        <!-- Payment Information & Summary -->
+        <!-- Payment Arrangement & Summary -->
         <div class="payment-section">
             <div class="payment-grid">
                 <div class="payment-box">
-                    <h4>Payment Information</h4>
+                    <h4>Payment Arrangement</h4>
                     <div class="payment-row">
                         <span class="payment-label">Payment Method</span>
-                        <span class="payment-value">{{ strtoupper($appointment->payment_method ?? 'GCASH') }}</span>
+                        <span class="payment-value">PHYSICAL AT CLINIC</span>
                     </div>
                     <div class="payment-row">
                         <span class="payment-label">Reference ID</span>
-                        <span class="payment-value">{{ $appointment->payment_reference ?? 'N/A' }}</span>
+                        <span class="payment-value">N/A (OFFLINE PAYMENT)</span>
                     </div>
                     <div class="payment-row">
                         <span class="payment-label">Status</span>
-                        <span class="payment-value">{{ strtoupper($appointment->payment_status ?? 'PAID') }}</span>
+                        <span class="payment-value">TO BE SETTLED AT VISIT</span>
                     </div>
                     <div class="payment-row">
                         <span class="payment-label">Booked On</span>
@@ -375,12 +375,12 @@
                         <span class="summary-value">PHP {{ number_format($appointment->total_price ?? 0, 2) }}</span>
                     </div>
                     <div class="summary-row deduction">
-                        <span class="summary-label">Down Payment (20%)</span>
-                        <span class="summary-value">-PHP {{ number_format($appointment->down_payment ?? 0, 2) }}</span>
+                        <span class="summary-label">Payment Mode</span>
+                        <span class="summary-value">PHYSICAL AT CLINIC</span>
                     </div>
                     <div class="summary-row total">
-                        <span class="summary-label">Balance Due</span>
-                        <span class="summary-value">PHP {{ number_format(($appointment->total_price ?? 0) - ($appointment->down_payment ?? 0), 2) }}</span>
+                        <span class="summary-label">Amount Due</span>
+                        <span class="summary-value">PHP {{ number_format(($appointment->total_price ?? 0), 2) }}</span>
                     </div>
                 </div>
             </div>
