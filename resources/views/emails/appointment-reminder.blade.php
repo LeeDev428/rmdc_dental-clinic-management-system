@@ -198,19 +198,19 @@
                 </div>
             </div>
 
-            @if($appointment->total_price && $appointment->down_payment)
+            @if($appointment->total_price)
             <div class="appointment-details">
-                <h3>💰 Payment Status</h3>
+                <h3>💰 Payment Reminder</h3>
                 <div class="detail-row">
-                    <span class="label">Down Payment:</span>
-                    <span class="value" style="color: #4CAF50;">₱{{ number_format($appointment->down_payment, 2) }} (Paid)</span>
+                    <span class="label">Payment Mode:</span>
+                    <span class="value" style="color: #4CAF50;">Physical at Clinic</span>
                 </div>
                 <div class="detail-row">
-                    <span class="label">Balance Due:</span>
-                    <span class="value" style="color: #ff6b6b; font-weight: bold;">₱{{ number_format($appointment->total_price - $appointment->down_payment, 2) }}</span>
+                    <span class="label">Amount Due:</span>
+                    <span class="value" style="color: #ff6b6b; font-weight: bold;">₱{{ number_format($appointment->total_price, 2) }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="value" style="font-size: 12px; color: #666;">Please bring the balance payment to your appointment</span>
+                    <span class="value" style="font-size: 12px; color: #666;">Please settle payment physically at the clinic during your appointment</span>
                 </div>
             </div>
             @endif
@@ -220,7 +220,7 @@
                 <ul>
                     <li><strong>Arrive 10-15 minutes early</strong> - This allows time for check-in and paperwork</li>
                     <li><strong>Bring your valid ID</strong> - Required for verification</li>
-                    <li><strong>Bring payment for balance</strong> - Cash or accepted payment methods</li>
+                    <li><strong>Bring payment for your procedure</strong> - To be settled physically at the clinic</li>
                     <li><strong>Avoid heavy meals</strong> - Eat light before your dental procedure</li>
                     <li><strong>Inform us of any medications</strong> - Important for your safety</li>
                     <li><strong>List any allergies</strong> - Let us know if you have any medical conditions</li>
