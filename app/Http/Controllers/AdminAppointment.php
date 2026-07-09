@@ -62,47 +62,19 @@ class AdminAppointment extends Controller
             $appointment->end = '2003-04-28 23:59';
             $appointment->save();
 
-            // Process refund (20% of total price)
-            $refundService = new \App\Services\RefundService();
-            $refundResult = $refundService->processRefund($appointment, "Admin declined: {$reason}");
-            
-            if ($refundResult['success']) {
-                Log::info('Refund processed for declined appointment', [
-                    'appointment_id' => $appointment->id,
-                    'refund_amount' => $refundResult['refund_amount'] ?? 0,
-                    'cancellation_fee' => $refundResult['cancellation_fee'] ?? 0
-                ]);
-                $refundMessage = " A refund of ₱" . number_format($refundResult['refund_amount'], 2) . " will be processed (5% cancellation fee applies).";
-            } else {
-                Log::warning('Refund processing issue', [
-                    'appointment_id' => $appointment->id,
-                    'message' => $refundResult['message'] ?? 'Unknown error'
-                ]);
-                $refundMessage = " Refund will be processed manually.";
-            }
-
             // Log appointment decline
             $this->logAppointmentActivity('declined', $appointment, [
                 'declined_by' => Auth::user()->name ?? 'Admin',
                 'reason' => $reason,
-                'refund_status' => $refundResult['success'] ? 'processed' : 'pending',
-                'refund_amount' => $refundResult['refund_amount'] ?? 0,
-                'description' => 'Appointment declined by admin with refund',
+                'description' => 'Appointment declined by admin',
             ]);
 
-            // Notification with refund details
+            // Notification without online refund details (physical payment policy)
             try {
                 $procedure  = $appointment->procedure ?? 'your appointment';
                 $dateTime   = \Carbon\Carbon::parse($appointment->start)->format('F j, Y \a\t g:i A');
-
-                if ($refundResult['success'] && isset($refundResult['refund_amount'])) {
-                    $notifMsg = "Your appointment for {$procedure} on {$dateTime} has been declined by the admin due to: {$reason}. "
-                              . "A 20% refund of ₱" . number_format($refundResult['refund_amount'], 2)
-                              . " has been processed and will reflect within 3-5 business days.";
-                } else {
-                    $notifMsg = "Your appointment for {$procedure} on {$dateTime} has been declined by the admin due to: {$reason}. "
-                              . "A 20% refund will be processed manually. Please contact us for assistance.";
-                }
+                $notifMsg = "Your appointment for {$procedure} on {$dateTime} has been declined by the admin due to: {$reason}. "
+                          . "Please choose a new schedule if you still wish to proceed.";
 
                 Notification::create([
                     'user_id' => $appointment->user_id,
@@ -143,7 +115,7 @@ class AdminAppointment extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Appointment declined successfully and message sent.' . ($refundMessage ?? '')
+                'message' => 'Appointment declined successfully and message sent.'
             ]);
         }
 
