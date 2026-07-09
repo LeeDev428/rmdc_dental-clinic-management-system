@@ -45,15 +45,4 @@ class Appointment extends Model
         return $this->hasMany(AppointmentCancellation::class);
     }
     
-    // Relationship to Payments
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-    
-    // Get the latest payment
-    public function latestPayment()
-    {
-        return $this->hasOne(Payment::class)->latestOfMany();
-    }
 }
