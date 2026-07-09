@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Appointment;
 use App\Models\AppointmentCancellation;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class AppointmentCancellationController extends Controller
@@ -138,7 +139,7 @@ class AppointmentCancellationController extends Controller
                 'error' => 'Validation failed: ' . implode(', ', $e->validator->errors()->all())
             ], 422);
         } catch (\Exception $e) {
-            \Log::error('Reschedule error: ' . $e->getMessage());
+            Log::error('Reschedule error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'An error occurred while processing your request: ' . $e->getMessage()
             ], 500);
