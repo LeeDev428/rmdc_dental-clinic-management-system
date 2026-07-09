@@ -29,7 +29,7 @@
                                 <ul class="list-disc ml-5 space-y-1">
                                     <li><strong>Minimum Notice:</strong> Cancellations or reschedules must be made at least <strong class="text-red-900">2 days (48 hours)</strong> before your appointment.</li>
                                     <li><strong>Same-Day Policy:</strong> Same-day cancellations or reschedules are <strong class="text-red-900">NOT permitted</strong>.</li>
-                                    <li><strong>Down Payment:</strong> Your down payment is <strong class="text-red-900">non-refundable</strong> for late cancellations or no-shows.</li>
+                                    <li><strong>Payment Policy:</strong> Payment is collected <strong class="text-red-900">physically at the clinic</strong> on appointment day.</li>
                                     <li><strong>Eligible Actions:</strong> You may only cancel or reschedule appointments that are <strong>NOT in the current appointment period</strong>.</li>
                                     <li><strong>Weekly Limit:</strong> Maximum 2 actions (cancel or reschedule) allowed per week.</li>
                                 </ul>
