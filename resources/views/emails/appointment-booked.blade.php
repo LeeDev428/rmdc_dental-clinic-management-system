@@ -135,7 +135,7 @@
         <div class="content">
             <p class="greeting">Dear <strong>{{ $appointment->user->name }}</strong>,</p>
             
-            <p>Thank you for choosing <strong>Robles Moncayo Dental Clinic (RMDC)</strong>. Your appointment has been successfully booked and your payment has been processed.</p>
+            <p>Thank you for choosing <strong>Robles Moncayo Dental Clinic (RMDC)</strong>. Your appointment has been successfully booked.</p>
             
             <div class="appointment-details">
                 <h3>📋 Your Appointment Details</h3>
@@ -166,26 +166,18 @@
             </div>
 
             <div class="appointment-details">
-                <h3>💳 Payment Summary</h3>
+                <h3>💳 Payment Arrangement</h3>
                 <div class="detail-row">
                     <span class="label">Total Amount:</span>
                     <span class="value"><strong>₱{{ number_format($appointment->total_price, 2) }}</strong></span>
                 </div>
                 <div class="detail-row">
-                    <span class="label">Down Payment (20%):</span>
-                    <span class="value" style="color: #4CAF50;"><strong>₱{{ number_format($appointment->down_payment, 2) }}</strong> (Paid)</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Balance Due:</span>
-                    <span class="value" style="color: #ff6b6b;"><strong>₱{{ number_format($appointment->total_price - $appointment->down_payment, 2) }}</strong></span>
-                </div>
-                <div class="detail-row">
                     <span class="label">Payment Method:</span>
-                    <span class="value">{{ strtoupper($appointment->payment_method) }}</span>
+                    <span class="value"><strong>Physical at Clinic</strong></span>
                 </div>
                 <div class="detail-row">
-                    <span class="label">Payment Reference:</span>
-                    <span class="value" style="font-family: monospace; font-size: 11px;">{{ $appointment->payment_reference }}</span>
+                    <span class="label">Amount Due at Visit:</span>
+                    <span class="value" style="color: #ff6b6b;"><strong>₱{{ number_format($appointment->total_price, 2) }}</strong></span>
                 </div>
             </div>
 
@@ -206,7 +198,7 @@
                     <li><strong>Wear comfortable clothing</strong> and avoid heavy meals before your appointment</li>
                     <li><strong>Your appointment is pending approval.</strong> You will receive a confirmation once the clinic admin reviews your booking</li>
                     <li>You will receive a <strong>reminder email 4 hours before</strong> your scheduled appointment</li>
-                    <li>The <strong>balance payment</strong> (80%) is due at the clinic on the day of your appointment</li>
+                    <li><strong>Full payment</strong> is due at the clinic on the day of your appointment</li>
                     <li><strong>Need to reschedule?</strong> Please contact us at least 24 hours in advance</li>
                 </ul>
             </div>
