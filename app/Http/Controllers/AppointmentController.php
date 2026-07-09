@@ -485,7 +485,7 @@ $endTime = $startTime->copy()->addMinutes($duration);
 
     
     /**
-     * Clear pending payment session for the authenticated user
+     * Clear pending booking session keys for the authenticated user
      */
     public function clearPendingSession(Request $request)
     {
@@ -525,7 +525,7 @@ $endTime = $startTime->copy()->addMinutes($duration);
         return response()->json([
             'success' => true,
             'message' => $clearedCount > 0 
-                ? "Cleared $clearedCount pending payment session(s). You can now book a new appointment." 
+                ? "Cleared $clearedCount pending booking session(s). You can now book a new appointment." 
                 : 'No pending sessions found.',
             'cleared_count' => $clearedCount
         ]);
