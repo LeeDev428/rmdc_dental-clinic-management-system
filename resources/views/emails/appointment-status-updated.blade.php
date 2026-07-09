@@ -188,8 +188,8 @@
                         <li><strong>Reminder notification</strong> - You'll receive an email reminder 4 hours before your appointment</li>
                         <li><strong>Arrive early</strong> - Please come 10-15 minutes before your scheduled time</li>
                         <li><strong>Bring valid ID</strong> - Required for verification</li>
-                        @if($appointment->total_price && $appointment->down_payment)
-                            <li><strong>Balance payment</strong> - ₱{{ number_format($appointment->total_price - $appointment->down_payment, 2) }} due at the clinic</li>
+                        @if($appointment->total_price)
+                            <li><strong>Payment</strong> - ₱{{ number_format($appointment->total_price, 2) }} due at the clinic (physical payment)</li>
                         @endif
                     </ul>
                 </div>
@@ -199,11 +199,7 @@
                     <ul>
                         <li><strong>Book a new appointment</strong> - Select a different date or time that may be available</li>
                         <li><strong>Contact us</strong> - Call or email us to discuss alternative arrangements</li>
-                        @if($appointment->total_price && $appointment->down_payment)
-                            <li><strong>Refund Information</strong> - You will receive a refund of <strong>₱{{ number_format($appointment->total_price * 0.20, 2) }}</strong> (20% of total price). A 5% cancellation fee applies. The refund will be processed within 5-7 business days to your original payment method.</li>
-                        @else
-                            <li><strong>Your payment</strong> - If you paid a down payment, a refund will be processed within 5-7 business days</li>
-                        @endif
+                        <li><strong>Payment</strong> - No online refund applies because payment is collected physically at the clinic.</li>
                     </ul>
                 </div>
             @endif
