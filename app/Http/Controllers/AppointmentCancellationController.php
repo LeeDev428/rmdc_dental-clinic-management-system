@@ -79,21 +79,11 @@ class AppointmentCancellationController extends Controller
         // Update appointment status to cancelled
         $appointment->update(['status' => 'cancelled']);
         
-        // Process refund (20% of total price)
-        $refundService = new \App\Services\RefundService();
-        $refundResult = $refundService->processRefund($appointment, "User cancelled: {$request->reason}");
-        
-        $successMessage = 'Appointment cancelled successfully.';
-        if ($refundResult['success']) {
-            $successMessage .= " You will receive a refund of ₱" . number_format($refundResult['refund_amount'], 2) . " (5% cancellation fee applies). Refund will be processed within 5-7 business days.";
-        } else {
-            $successMessage .= " Your refund will be processed manually within 5-7 business days.";
-        }
+        $successMessage = 'Appointment cancelled successfully. Payment will be settled physically for future bookings.';
         
         return response()->json([
             'success' => $successMessage,
             'remaining' => AppointmentCancellation::getRemainingCancellations($userId),
-            'refund_amount' => $refundResult['refund_amount'] ?? 0
         ]);
     }
     
