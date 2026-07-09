@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\ProcedurePrice;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use App\Traits\LogsActivity;
+use App\Mail\AppointmentBooked;
 
 class AppointmentController extends Controller
 {
@@ -45,7 +47,7 @@ class AppointmentController extends Controller
         $reschedulingAppointment = null;
         
         if ($reschedulingAppointmentId) {
-            $reschedulingAppointment = Appointment::with('latestPayment')->find($reschedulingAppointmentId);
+            $reschedulingAppointment = Appointment::find($reschedulingAppointmentId);
             
             // Verify ownership
             if ($reschedulingAppointment && $reschedulingAppointment->user_id != $user->id) {
@@ -156,17 +158,7 @@ public function store(Request $request)
         ], 422);
     }
     
-    // ✅ CHECK 2: REMOVED - Session check was causing issues with persistent database sessions
-    // User can book multiple times and go to payment - database check above prevents duplicate confirmed appointments
-    
-    // Log the incoming request for debugging
     Log::info('Appointment Request Data:', [
-        'has_payment_method' => $request->has('payment_method'),
-        'payment_method' => $request->input('payment_method'),
-        'has_total_price' => $request->has('total_price'),
-        'total_price' => $request->input('total_price'),
-        'has_down_payment' => $request->has('down_payment'),
-        'down_payment' => $request->input('down_payment'),
         'all_data' => $request->except(['image_path'])
     ]);
     
@@ -177,13 +169,6 @@ public function store(Request $request)
             'time' => 'required|string',
             'start' => 'required|date',
             'image_path' => 'required|image|mimes:jpeg,png,jpg,svg|max:2048',
-            'payment_method' => 'required|string|in:gcash,paymaya,card',
-            'total_price' => 'required|numeric|min:0.01',
-            'down_payment' => 'required|numeric|min:0.01',
-        ], [
-            'payment_method.required' => 'Please select a payment method (GCash, PayMaya, or Card)',
-            'total_price.required' => 'Total price is missing. Please refresh and select a procedure again.',
-            'down_payment.required' => 'Down payment is missing. Please refresh and select a procedure again.',
         ]);
     } catch (\Illuminate\Validation\ValidationException $e) {
         Log::error('Appointment Validation Failed:', [
@@ -211,7 +196,6 @@ public function store(Request $request)
     $timeStr = $validated['time'];
     $startTime = Carbon::parse("$dateStr $timeStr");
     $today = Carbon::today();
-    $now = Carbon::now();
 
 // ✅ Next-Day Booking System (T+1 to T+7)
 // CANNOT book today - can ONLY book from tomorrow onwards up to 7 days
@@ -247,6 +231,9 @@ $duration = $procedure ? (int) $procedure->duration : 30; // Convert to integer
 // Calculate end time 
 $endTime = $startTime->copy()->addMinutes($duration);
 
+    // Use procedure base price for records/invoice, payment is settled physically at clinic
+    $totalPrice = $procedure ? (float) $procedure->price : 0;
+
 
     // 🔥 FIX: Allow booking exactly at the end time & exclude completed appointments
     $conflictingAppointments = Appointment::whereDate('start', $startTime->toDateString())
@@ -273,9 +260,8 @@ $endTime = $startTime->copy()->addMinutes($duration);
         $image_path = $path;
     }
 
-    // Store appointment data in session instead of creating appointment immediately
-    // This ensures appointment is only created AFTER successful payment
-    $appointmentData = [
+    // Create appointment immediately. Payment is physical at clinic.
+    $appointment = Appointment::create([
         'title' => $validated['title'],
         'procedure' => $validated['procedure'],
         'time' => $validated['time'],
@@ -284,39 +270,37 @@ $endTime = $startTime->copy()->addMinutes($duration);
         'duration' => $duration,
         'user_id' => $user_id,
         'image_path' => $image_path,
-        'payment_method' => $validated['payment_method'],
-        'total_price' => $validated['total_price'],
-        'down_payment' => $validated['down_payment'],
-    ];
-    
-    // Store in session with unique key
-    $sessionKey = 'pending_appointment_' . $user_id . '_' . time();
-    session([$sessionKey => $appointmentData]);
-    session()->save(); // Force save to database immediately
-    
-    Log::info('Appointment data stored in session:', [
-        'session_key' => $sessionKey,
-        'data' => $appointmentData
+        'payment_method' => 'physical',
+        'total_price' => $totalPrice,
+        'down_payment' => 0,
+        'payment_status' => 'unpaid',
+        'payment_reference' => null,
+        'status' => 'pending',
     ]);
 
-    // Log appointment initiation
-    $this->logAppointmentActivity('initiated', null, [
+    $this->logAppointmentActivity('created', $appointment, [
         'procedure' => $validated['procedure'],
         'date' => $startTime->format('Y-m-d'),
         'time' => $validated['time'],
-        'payment_method' => $validated['payment_method'],
-        'total_price' => $validated['total_price'],
-        'description' => 'Appointment booking initiated, pending payment',
+        'payment_method' => 'physical',
+        'total_price' => $totalPrice,
+        'description' => 'Appointment created. Payment will be collected physically at the clinic.',
     ]);
 
-    // Generate PayMongo payment URL with session key
-    $paymentUrl = route('payment.create') . '?session_key=' . $sessionKey;
+    try {
+        $appointment = $appointment->fresh('user');
+        if ($appointment && $appointment->user) {
+            Mail::to($appointment->user->email)->send(new AppointmentBooked($appointment));
+        }
+    } catch (\Exception $e) {
+        Log::warning('Failed to send booking email: ' . $e->getMessage(), [
+            'appointment_id' => $appointment->id,
+        ]);
+    }
 
     return response()->json([
         'success' => true,
-        'message' => 'Redirecting to payment gateway...',
-        'payment_url' => $paymentUrl,
-        'redirect' => true,
+        'message' => 'Appointment booked successfully! Please pay at the clinic on your visit.',
     ]);
 }
 
